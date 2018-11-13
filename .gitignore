@@ -1,0 +1,53 @@
+# Use this link for more Visual Studio specific examples
+# https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/x64/
+**/x86/
+**/bld/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+
+# NuGet Packages
+*.nupkg
+
+# Node Modules
+**/node_modules/
+
+# Project Specific Exclusions
+**/App_Data/
+EMP.Web/vendor/
+EMP.Web/css/
+EMP.Web/Scripts/*.min.js
+
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+# Except build/, which is used as an MSBuild target.
+!**/packages/build/
+# We want the repositories.config too
+!**/packages/repositories.config
+# Ignore all App.Config
+**/App.config
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
+*.DotSettings.user
+
+# StyleCop
+*.StyleCop
