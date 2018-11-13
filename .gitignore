@@ -27,9 +27,6 @@
 
 # Project Specific Exclusions
 **/App_Data/
-EMP.Web/vendor/
-EMP.Web/css/
-EMP.Web/Scripts/*.min.js
 
 # The packages folder can be ignored because of Package Restore
 **/packages/*
