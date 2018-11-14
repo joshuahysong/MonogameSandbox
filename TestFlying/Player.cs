@@ -45,5 +45,11 @@ namespace TestFlying
                 heading += 0.05F;
             }
         }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            var shipCenter = new Vector2(ship.Width / 2, ship.Height / 2);
+            spriteBatch.Draw(ship, position, null, Color.White, heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
+        }
     }
 }

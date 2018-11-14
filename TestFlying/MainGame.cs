@@ -91,12 +91,11 @@ namespace TestFlying
         {
             GraphicsDevice.Clear(Color.Black);
 
-            var shipCenter = new Vector2(player.ship.Width / 2, player.ship.Height / 2);
             var backgroundCenter = new Vector2(background.Width / 2, background.Height / 2);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
             spriteBatch.Draw(background, centerScreen, null, Color.White, 0, backgroundCenter, 0.5f, SpriteEffects.None, 1f);
-            spriteBatch.Draw(player.ship, player.position, null, Color.White, player.heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
+            player.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);
