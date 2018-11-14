@@ -15,8 +15,9 @@ namespace TestFlying
         Texture2D playerShip;
         Texture2D background;
 
-        Vector2 centerScreen;
-        Vector2 position;
+        public Rectangle shipRectangle;
+        public Vector2 centerScreen;
+        public Vector2 position;
         Vector2 velocity;
         Vector2 acceleration;
         float heading;
@@ -47,7 +48,7 @@ namespace TestFlying
 
             position = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
             centerScreen = position;
-            camera = new Camera(this);
+            camera = new Camera(GraphicsDevice.Viewport);
             base.Initialize();
         }
 
@@ -85,24 +86,8 @@ namespace TestFlying
 
             HandleInput(Keyboard.GetState(), gameTime);
 
-            //if (position.X <= 0)
-            //{
-            //    position.X = GraphicsDevice.Viewport.Bounds.Width;
-            //}
-            //if (position.X > GraphicsDevice.Viewport.Bounds.Width)
-            //{
-            //    position.X = 0;
-            //}
-            //if (position.Y <= 0)
-            //{
-            //    position.Y = GraphicsDevice.Viewport.Bounds.Height;
-            //}
-            //if (position.Y > GraphicsDevice.Viewport.Bounds.Height)
-            //{
-            //    position.Y = 0;
-            //}
-            
-            // Seconds passed since iteration of update
+            shipRectangle = new Rectangle((int)position.X, (int)position.Y, playerShip.Width, playerShip.Height);
+
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             position += velocity * deltaTime;
@@ -110,6 +95,7 @@ namespace TestFlying
             acceleration.X = 0;
             acceleration.Y = 0;
 
+            camera.Update(gameTime, this);
             base.Update(gameTime);
         }
 
@@ -124,10 +110,9 @@ namespace TestFlying
             var shipCenter = new Vector2(playerShip.Width / 2, playerShip.Height / 2);
             var backgroundCenter = new Vector2(background.Width / 2, background.Height / 2);
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack/*, null, null, null, null, null, camera.Transform*/);
-            spriteBatch.Draw(background, position, null, Color.White, 0, backgroundCenter, 0.5f, SpriteEffects.None, 1f);
-            //spriteBatch.Draw(background, new Rectangle(0, 0, 1440, 900), Color.White);
-            spriteBatch.Draw(playerShip, centerScreen, null, Color.White, heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
+            spriteBatch.Draw(background, centerScreen, null, Color.White, 0, backgroundCenter, 0.5f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(playerShip, position, null, Color.White, heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -135,16 +120,16 @@ namespace TestFlying
 
         private void HandleInput(KeyboardState KeyState, GameTime gameTime)
         {
-            if (KeyState.IsKeyDown(Keys.W))
+            if (KeyState.IsKeyDown(Keys.W) || KeyState.IsKeyDown(Keys.Up))
             {
-                acceleration.X += thrust * (float)Math.Cos(heading + Math.PI);
-                acceleration.Y += thrust * (float)Math.Sin(heading + Math.PI);
+                acceleration.X += thrust * (float)Math.Cos(heading);
+                acceleration.Y += thrust * (float)Math.Sin(heading);
             }
-            if (KeyState.IsKeyDown(Keys.A))
+            if (KeyState.IsKeyDown(Keys.A) || KeyState.IsKeyDown(Keys.Left))
             {
                 heading -= 0.05F;
             }
-            if (KeyState.IsKeyDown(Keys.D))
+            if (KeyState.IsKeyDown(Keys.D) || KeyState.IsKeyDown(Keys.Right))
             {
                 heading += 0.05F;
             }
