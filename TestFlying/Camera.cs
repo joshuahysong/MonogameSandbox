@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TestFlying
@@ -19,10 +14,10 @@ namespace TestFlying
             this.viewport = viewport;
         }
 
-        public void Update(GameTime gameTime, MainGame ship)
+        public void Update(Player player)
         {
-            center = new Vector2(ship.position.X + (ship.shipRectangle.Width / 2) - ship.GraphicsDevice.Viewport.Bounds.Width / 2,
-                ship.position.Y + (ship.shipRectangle.Height / 2) - ship.GraphicsDevice.Viewport.Bounds.Height / 2);
+            center = new Vector2(player.position.X + (player.ship.Width / 2) - viewport.Bounds.Width / 2,
+                player.position.Y + (player.ship.Height / 2) - viewport.Bounds.Height / 2);
             Transform = Matrix.CreateScale(new Vector3(1, 1, 0)) * Matrix.CreateTranslation(new Vector3(-center.X, -center.Y, 0));
         }
     }
