@@ -13,8 +13,10 @@ namespace TestFlying
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D background;
+        SpriteFont debugFont;
+        Viewport viewport;
 
-        public Vector2 centerScreen;
+        public Vector2 CenterScreen;
 
         Player player;
         Camera camera;
@@ -38,9 +40,11 @@ namespace TestFlying
         /// </summary>
         protected override void Initialize()
         {
-            centerScreen = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
-            player = new Player(centerScreen);
-            camera = new Camera(GraphicsDevice.Viewport);
+            CenterScreen = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+            viewport = GraphicsDevice.Viewport;
+            player = new Player(Vector2.Zero);
+            camera = new Camera(this);
+            camera.Initialize();
             base.Initialize();
         }
 
@@ -53,8 +57,9 @@ namespace TestFlying
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            player.ship = Content.Load<Texture2D>("ship");
+            player.Ship = Content.Load<Texture2D>("ship");
             background = Content.Load<Texture2D>("starfield");
+            debugFont = Content.Load<SpriteFont>("debug");
         }
 
         /// <summary>
@@ -90,12 +95,15 @@ namespace TestFlying
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-
-            var backgroundCenter = new Vector2(background.Width / 2, background.Height / 2);
+            viewport = GraphicsDevice.Viewport;
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
-            spriteBatch.Draw(background, centerScreen, null, Color.White, 0, backgroundCenter, 0.5f, SpriteEffects.None, 1f);
+            TestDrawBackground(spriteBatch);
             player.Draw(spriteBatch);
+            spriteBatch.End();
+
+            spriteBatch.Begin();
+            spriteBatch.DrawString(debugFont, $"Player: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -105,6 +113,30 @@ namespace TestFlying
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
+        }
+
+        private Texture2D testTile1;
+        private Texture2D testTile2;
+
+        private void TestDrawBackground(SpriteBatch spriteBatch)
+        {
+            int tileSize = 200;
+            Vector2 startLocation = new Vector2(-tileSize / 2, -tileSize / 2);
+
+            testTile1 = new Texture2D(GraphicsDevice, tileSize, tileSize);
+            Color[] data = new Color[tileSize * tileSize];
+            for (int i = 0; i < data.Length; ++i) data[i] = Color.Brown;
+            testTile1.SetData(data);
+
+            testTile2 = new Texture2D(GraphicsDevice, tileSize, tileSize);
+            for (int i = 0; i < data.Length; ++i) data[i] = Color.DarkCyan;
+            testTile2.SetData(data);
+
+            int numberOfTilesX = (int)Math.Ceiling((decimal)viewport.Bounds.Width / tileSize);
+            int numberOfTilesY = (int)Math.Ceiling((decimal)viewport.Bounds.Height / tileSize);
+
+            spriteBatch.Draw(testTile1, startLocation, Color.White);
+            //spriteBatch.Draw(test, CenterScreen, null, Color.DarkCyan, 0f, new Vector2(0.5f, 0.5f), new Vector2(tileSize, tileSize), SpriteEffects.None, 0f);
         }
     }
 }

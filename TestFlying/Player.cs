@@ -2,28 +2,30 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using TestFlying.Contracts;
 
 namespace TestFlying
 {
-    public class Player
+    public class Player : IFocusable
     {
-        public Texture2D ship;
-        public Vector2 position;
+        public Texture2D Ship { get; set; }
+        public Vector2 Position { get; set; }
+        public float Heading { get; set; }
+
         Vector2 velocity;
         Vector2 acceleration;
-        public float heading;
         const float thrust = 100.0f;
 
         public Player(Vector2 position)
         {
-            this.position = position;
+            this.Position = position;
         }
 
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            position += velocity * deltaTime;
+            Position += velocity * deltaTime;
             velocity += acceleration * deltaTime;
             acceleration.X = 0;
             acceleration.Y = 0;
@@ -33,23 +35,23 @@ namespace TestFlying
         {
             if (KeyState.IsKeyDown(Keys.W) || KeyState.IsKeyDown(Keys.Up))
             {
-                acceleration.X += thrust * (float)Math.Cos(heading);
-                acceleration.Y += thrust * (float)Math.Sin(heading);
+                acceleration.X += thrust * (float)Math.Cos(Heading);
+                acceleration.Y += thrust * (float)Math.Sin(Heading);
             }
             if (KeyState.IsKeyDown(Keys.A) || KeyState.IsKeyDown(Keys.Left))
             {
-                heading -= 0.05F;
+                Heading -= 0.05F;
             }
             if (KeyState.IsKeyDown(Keys.D) || KeyState.IsKeyDown(Keys.Right))
             {
-                heading += 0.05F;
+                Heading += 0.05F;
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            var shipCenter = new Vector2(ship.Width / 2, ship.Height / 2);
-            spriteBatch.Draw(ship, position, null, Color.White, heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
+            var shipCenter = new Vector2(Ship.Width / 2, Ship.Height / 2);
+            spriteBatch.Draw(Ship, Position, null, Color.White, Heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
         }
     }
 }
