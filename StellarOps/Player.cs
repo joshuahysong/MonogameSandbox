@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using TestFlying.Contracts;
+using StellarOps.Contracts;
 
-namespace TestFlying
+namespace StellarOps
 {
     public class Player : IFocusable
     {

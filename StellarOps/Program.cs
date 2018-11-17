@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestFlying
+namespace StellarOps
 {
 #if WINDOWS || LINUX
     /// <summary>

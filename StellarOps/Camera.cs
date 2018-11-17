@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using TestFlying.Contracts;
+using StellarOps.Contracts;
 
-namespace TestFlying
+namespace StellarOps
 {
     public class Camera : GameComponent
     {
