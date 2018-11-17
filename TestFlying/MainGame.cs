@@ -106,7 +106,9 @@ namespace TestFlying
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(debugFont, $"Player: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)} | Tile : {playerTileX}, {playerTileY}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
+            spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
+            spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading,2)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 25), Color.White);
+            spriteBatch.DrawString(debugFont, $"Tile : {playerTileX}, {playerTileY}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);

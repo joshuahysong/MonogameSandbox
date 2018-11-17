@@ -38,20 +38,60 @@ namespace TestFlying
                 acceleration.X += thrust * (float)Math.Cos(Heading);
                 acceleration.Y += thrust * (float)Math.Sin(Heading);
             }
+            if (KeyState.IsKeyDown(Keys.S) || KeyState.IsKeyDown(Keys.Down))
+            {
+                if (velocity.X != 0 || velocity.Y != 0)
+                {
+                    var movementHeading = (float)Math.Atan2(velocity.Y, velocity.X);
+                    double retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
+                    if (Heading != retroHeading)
+                    {
+                        var movementDegrees = (movementHeading + Math.PI) * (180.0 / Math.PI);
+                        var retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
+                        var headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
+                        var retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
+
+                        if (retroOffset < 180)
+                        {
+                            Heading -= 0.05f;
+                            if (Heading < -Math.PI)
+                            {
+                                Heading = (float)Math.PI;
+                            }
+                        }
+                        else
+                        {
+                            Heading += 0.05f;
+                            if (Heading > Math.PI)
+                            {
+                                Heading = (float)-Math.PI;
+                            }
+                        }
+                    }
+                }
+            }
             if (KeyState.IsKeyDown(Keys.A) || KeyState.IsKeyDown(Keys.Left))
             {
-                Heading -= 0.05F;
+                Heading -= 0.05f;
+                if (Heading < -Math.PI)
+                {
+                    Heading = (float)Math.PI;
+                }
             }
             if (KeyState.IsKeyDown(Keys.D) || KeyState.IsKeyDown(Keys.Right))
             {
-                Heading += 0.05F;
+                Heading += 0.05f;
+                if (Heading > Math.PI)
+                {
+                    Heading = (float)-Math.PI;
+                }
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             var shipCenter = new Vector2(Ship.Width / 2, Ship.Height / 2);
-            spriteBatch.Draw(Ship, Position, null, Color.White, Heading + (90 * (float)Math.PI / 180), shipCenter, 0.5f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(Ship, Position, null, Color.White, Heading + (float)Math.PI / 2, shipCenter, 0.5f, SpriteEffects.None, 1f);
         }
     }
 }
