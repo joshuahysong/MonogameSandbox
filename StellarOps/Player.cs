@@ -11,15 +11,11 @@ namespace StellarOps
         public Texture2D Ship { get; set; }
         public Vector2 Position { get; set; }
         public float Heading { get; set; }
+        public float Thrust { get; set; }
+        public float TurnRate { get; set; }
 
         Vector2 velocity;
         Vector2 acceleration;
-        const float thrust = 100.0f;
-
-        public Player(Vector2 position)
-        {
-            this.Position = position;
-        }
 
         public void Update(GameTime gameTime)
         {
@@ -35,36 +31,43 @@ namespace StellarOps
         {
             if (KeyState.IsKeyDown(Keys.W) || KeyState.IsKeyDown(Keys.Up))
             {
-                acceleration.X += thrust * (float)Math.Cos(Heading);
-                acceleration.Y += thrust * (float)Math.Sin(Heading);
+                acceleration.X += Thrust * (float)Math.Cos(Heading);
+                acceleration.Y += Thrust * (float)Math.Sin(Heading);
             }
             if (KeyState.IsKeyDown(Keys.S) || KeyState.IsKeyDown(Keys.Down))
             {
                 if (velocity.X != 0 || velocity.Y != 0)
                 {
                     var movementHeading = (float)Math.Atan2(velocity.Y, velocity.X);
-                    double retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
+                    float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
                     if (Heading != retroHeading)
                     {
-                        var movementDegrees = (movementHeading + Math.PI) * (180.0 / Math.PI);
-                        var retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
-                        var headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                        var retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
+                        double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
+                        double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
+                        double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
+                        double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
 
-                        if (retroOffset < 180)
+                        if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
                         {
-                            Heading -= 0.05f;
-                            if (Heading < -Math.PI)
-                            {
-                                Heading = (float)Math.PI;
-                            }
+                            Heading = retroHeading;
                         }
                         else
                         {
-                            Heading += 0.05f;
-                            if (Heading > Math.PI)
+                            if (retroOffset < 180)
                             {
-                                Heading = (float)-Math.PI;
+                                Heading -= TurnRate;
+                                if (Heading < -Math.PI)
+                                {
+                                    Heading = (float)Math.PI;
+                                }
+                            }
+                            else
+                            {
+                                Heading += TurnRate;
+                                if (Heading > Math.PI)
+                                {
+                                    Heading = (float)-Math.PI;
+                                }
                             }
                         }
                     }
@@ -72,7 +75,7 @@ namespace StellarOps
             }
             if (KeyState.IsKeyDown(Keys.A) || KeyState.IsKeyDown(Keys.Left))
             {
-                Heading -= 0.05f;
+                Heading -= TurnRate;
                 if (Heading < -Math.PI)
                 {
                     Heading = (float)Math.PI;
@@ -80,7 +83,7 @@ namespace StellarOps
             }
             if (KeyState.IsKeyDown(Keys.D) || KeyState.IsKeyDown(Keys.Right))
             {
-                Heading += 0.05f;
+                Heading += TurnRate;
                 if (Heading > Math.PI)
                 {
                     Heading = (float)-Math.PI;

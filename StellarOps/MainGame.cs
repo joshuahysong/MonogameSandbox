@@ -43,7 +43,13 @@ namespace StellarOps
         {
             CenterScreen = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
             viewport = GraphicsDevice.Viewport;
-            player = new Player(Vector2.Zero);
+            player = new Player
+            {
+                Position = Vector2.Zero,
+                Heading = 0.0f,
+                Thrust = 200f,
+                TurnRate = 0.05f
+            };
             camera = new Camera(this);
             camera.Initialize();
             testTile1 = DrawTileRectangle(200, Color.DarkCyan);
