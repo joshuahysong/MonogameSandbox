@@ -15,11 +15,12 @@ namespace TestFlying
         Texture2D background;
         SpriteFont debugFont;
         Viewport viewport;
-
-        public Vector2 CenterScreen;
-
         Player player;
         Camera camera;
+        int playerTileX;
+        int playerTileY;
+
+        public Vector2 CenterScreen;
 
         public MainGame()
         {
@@ -45,6 +46,8 @@ namespace TestFlying
             player = new Player(Vector2.Zero);
             camera = new Camera(this);
             camera.Initialize();
+            testTile1 = DrawTileRectangle(200, Color.DarkCyan);
+            testTile2 = DrawTileRectangle(200, Color.Brown);
             base.Initialize();
         }
 
@@ -103,7 +106,7 @@ namespace TestFlying
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(debugFont, $"Player: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
+            spriteBatch.DrawString(debugFont, $"Player: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)} | Tile : {playerTileX}, {playerTileY}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -118,25 +121,58 @@ namespace TestFlying
         private Texture2D testTile1;
         private Texture2D testTile2;
 
+        private Texture2D DrawTileRectangle(int tileSize, Color color)
+        {
+            var tile = new Texture2D(GraphicsDevice, tileSize, tileSize);
+            Color[] data = new Color[tileSize * tileSize];
+            for (int i = 0; i < data.Length; ++i)
+            {
+                if (i < tileSize || i % tileSize == 0 || i > tileSize * tileSize - tileSize || (i + 1) % tileSize == 0)
+                {
+                    data[i] = Color.White;
+                }
+                else
+                {
+                    data[i] = color;
+                }
+            }
+            tile.SetData(data);
+            return tile;
+        }
+
         private void TestDrawBackground(SpriteBatch spriteBatch)
         {
             int tileSize = 200;
-            Vector2 startLocation = new Vector2(-tileSize / 2, -tileSize / 2);
-
-            testTile1 = new Texture2D(GraphicsDevice, tileSize, tileSize);
-            Color[] data = new Color[tileSize * tileSize];
-            for (int i = 0; i < data.Length; ++i) data[i] = Color.Brown;
-            testTile1.SetData(data);
-
-            testTile2 = new Texture2D(GraphicsDevice, tileSize, tileSize);
-            for (int i = 0; i < data.Length; ++i) data[i] = Color.DarkCyan;
-            testTile2.SetData(data);
+            Vector2 startLocation = Vector2.Zero;
 
             int numberOfTilesX = (int)Math.Ceiling((decimal)viewport.Bounds.Width / tileSize);
             int numberOfTilesY = (int)Math.Ceiling((decimal)viewport.Bounds.Height / tileSize);
+            playerTileX = (int)Math.Floor((player.Position.X) / tileSize);
+            playerTileY = (int)Math.Floor((player.Position.Y) / tileSize);
 
             spriteBatch.Draw(testTile1, startLocation, Color.White);
-            //spriteBatch.Draw(test, CenterScreen, null, Color.DarkCyan, 0f, new Vector2(0.5f, 0.5f), new Vector2(tileSize, tileSize), SpriteEffects.None, 0f);
+            startLocation.X = startLocation.X- tileSize;
+            DrawTile(-1, 0);
+
+            int minX = (int)Math.Floor(playerTileX - (double)numberOfTilesX / 2);
+            int maxX = (int)Math.Ceiling(playerTileX + (double)numberOfTilesX / 2);
+            int minY = (int)Math.Floor(playerTileY - (double)numberOfTilesY / 2);
+            int maxY = (int)Math.Ceiling(playerTileY + (double)numberOfTilesY / 2);
+
+            for (int x = minX; x <= maxX; x++) 
+            {
+                for (int y = minY; y <= maxY; y++)
+                {
+                    DrawTile(x, y);
+                }
+            }
+        }
+
+        private void DrawTile(int x, int y)
+        {
+            var position = new Vector2(testTile1.Bounds.Width * x, testTile1.Bounds.Height * y);
+            spriteBatch.Draw(testTile1, position, Color.White);
+            spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.White);
         }
     }
 }
