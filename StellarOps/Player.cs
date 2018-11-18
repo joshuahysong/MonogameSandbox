@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using StellarOps.Contracts;
+using System;
 
 namespace StellarOps
 {
@@ -15,6 +15,10 @@ namespace StellarOps
         public float TurnRate { get; set; }
         public Vector2 Velocity { get; set; }
         Vector2 acceleration;
+
+        const int cooldownFrames = 6;
+        int cooldownRemaining = 0;
+        static Random rand = new Random();
 
         public void Update(GameTime gameTime)
         {
@@ -47,7 +51,7 @@ namespace StellarOps
             // Rotate to face retro thurst heading
             if (KeyState.IsKeyDown(Keys.S) || KeyState.IsKeyDown(Keys.Down))
             {
-                if (Velocity.X != 0 || Velocity.Y != 0)
+                if (!(Velocity.X < 1 && Velocity.X > -1 && Velocity.Y < 1 && Velocity.Y > -1))
                 {
                     var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
                     float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
@@ -76,6 +80,10 @@ namespace StellarOps
                     }
                 }
             }
+            if (KeyState.IsKeyDown(Keys.Space))
+            {
+                FirePrimaryWeapon();
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -99,6 +107,26 @@ namespace StellarOps
             if (Heading < -Math.PI)
             {
                 Heading = (float)Math.PI;
+            }
+        }
+
+        private void FirePrimaryWeapon()
+        {
+            if (cooldownRemaining <= 0)
+            {
+                cooldownRemaining = cooldownFrames;
+                Quaternion aimQuat = Quaternion.CreateFromYawPitchRoll(0, 0, Heading);
+
+                float randomSpread = rand.NextFloat(-0.01f, 0.01f) + rand.NextFloat(-0.01f, 0.01f);
+                Vector2 vel = MathUtil.FromPolar(Heading + randomSpread, 11f);
+
+                Vector2 offset = Vector2.Transform(new Vector2(30, 0), aimQuat);
+                EntityManager.Add(new Bullet(Position + offset, vel));
+            }
+
+            if (cooldownRemaining > 0)
+            {
+                 cooldownRemaining--;
             }
         }
     }

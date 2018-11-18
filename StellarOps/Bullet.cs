@@ -1,32 +1,37 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StellarOps
 {
-    public class Bullet
+    public class Bullet : Entity
     {
-        public Texture2D texture;
+        long timeToLive;
+        double timeAlive;
 
-        public Vector2 Position;
-        public Vector2 Velocity;
-        public Vector2 Origin;
-
-        public bool IsVisible;
-
-        public Bullet(Texture2D newTexture)
+        public Bullet(Vector2 position, Vector2 velocity)
         {
-            texture = newTexture;
-            IsVisible = false;
+            image = Art.Bullet;
+            Position = position;
+            Velocity = velocity;
+            Orientation = Velocity.ToAngle();
+            Radius = 8;
+            timeToLive = 2;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Update(GameTime gameTime)
         {
-            spriteBatch.Draw(texture, Position, null, Color.White, 0f, Origin, 1f, SpriteEffects.None, 1);
+            if (Velocity.LengthSquared() > 0)
+            {
+                Orientation = Velocity.ToAngle();
+            }
+
+            Position += Velocity;
+
+            // delete bullets that go off-screen
+            timeAlive += gameTime.ElapsedGameTime.TotalSeconds;
+            if (timeAlive > timeToLive)
+            {
+                IsExpired = true;
+            }
         }
     }
 }

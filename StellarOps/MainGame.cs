@@ -12,6 +12,10 @@ namespace StellarOps
     public class MainGame : Game
     {
         public Vector2 CenterScreen { get; set; }
+        public static MainGame Instance { get; private set; }
+        public static Viewport Viewport { get { return Instance.GraphicsDevice.Viewport; } }
+        public static Vector2 ScreenSize { get { return new Vector2(Viewport.Width, Viewport.Height); } }
+        public static Camera Camera { get; set; }
 
         private int TileSize => 300;
 
@@ -21,7 +25,6 @@ namespace StellarOps
         SpriteFont debugFont;
         Viewport viewport;
         Player player;
-        Camera camera;
         Vector2 tilePosition;
 
         public MainGame()
@@ -33,6 +36,7 @@ namespace StellarOps
                 PreferredBackBufferWidth = 1440
             };
             Content.RootDirectory = "Content";
+            Instance = this;
         }
 
         /// <summary>
@@ -52,10 +56,10 @@ namespace StellarOps
                 Thrust = 200f,
                 TurnRate = 0.05f
             };
-            camera = new Camera(this);
-            camera.Initialize();
-            testTile1 = DrawTileRectangle(Color.DarkCyan);
-            testTile2 = DrawTileRectangle(Color.Brown);
+            Camera = new Camera(this);
+            Camera.Initialize();
+            testTile1 = DrawTileRectangle(Color.TransparentBlack);
+
             base.Initialize();
         }
 
@@ -71,6 +75,7 @@ namespace StellarOps
             player.Ship = Content.Load<Texture2D>("ship");
             background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
+            Art.Load(Content);
         }
 
         /// <summary>
@@ -94,7 +99,8 @@ namespace StellarOps
             this.HandleInput(keyboardState);
             player.HandleInput(keyboardState);
             player.Update(gameTime);
-            camera.Update(player);
+            Camera.Update(player);
+            EntityManager.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -107,9 +113,10 @@ namespace StellarOps
             GraphicsDevice.Clear(Color.Black);
             viewport = GraphicsDevice.Viewport;
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Camera.Transform);
             DrawBackground(spriteBatch);
             player.Draw(spriteBatch);
+            EntityManager.Draw(spriteBatch);
             spriteBatch.End();
 
             spriteBatch.Begin();
@@ -138,7 +145,7 @@ namespace StellarOps
             {
                 if (i < TileSize || i % TileSize == 0 || i > TileSize * TileSize - TileSize || (i + 1) % TileSize == 0)
                 {
-                    data[i] = Color.White;
+                    data[i] = Color.DimGray;
                 }
                 else
                 {
@@ -180,7 +187,7 @@ namespace StellarOps
         {
             var position = new Vector2(testTile1.Bounds.Width * x, testTile1.Bounds.Height * y);
             spriteBatch.Draw(testTile1, position, Color.White);
-            spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.White);
+            spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
         }
     }
 }
