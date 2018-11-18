@@ -18,7 +18,7 @@ namespace StellarOps
         public override void Initialize()
         {
             ScreenCenter = new Vector2(Game.GraphicsDevice.Viewport.Width / 2, Game.GraphicsDevice.Viewport.Height / 2);
-            Scale = 1;
+            Scale = 1f;
 
             base.Initialize();
         }

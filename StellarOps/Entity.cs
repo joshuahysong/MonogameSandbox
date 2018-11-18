@@ -6,10 +6,10 @@ namespace StellarOps
     public abstract class Entity
     {
         protected Texture2D image;
-        // The tint of the image. This will also allow us to change the transparency.
         protected Color color = Color.White;
 
-        public Vector2 Position, Velocity;
+        public Vector2 Position { get; set; }
+        public Vector2 Velocity;
         public float Orientation;
         public float Radius = 20;
         public bool IsExpired;

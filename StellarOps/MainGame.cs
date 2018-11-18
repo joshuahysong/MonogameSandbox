@@ -72,7 +72,7 @@ namespace StellarOps
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            player.Ship = Content.Load<Texture2D>("ship");
+            player.Ship = Content.Load<Texture2D>("ship2");
             background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
             Art.Load(Content);

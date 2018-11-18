@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using StellarOps.Contracts;
 
 namespace StellarOps
 {
-    public class Bullet : Entity
+    public class Bullet : Entity, IFocusable
     {
         long timeToLive;
         double timeAlive;
