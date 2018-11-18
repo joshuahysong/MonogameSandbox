@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace StellarOps
 {
@@ -10,6 +11,10 @@ namespace StellarOps
     /// </summary>
     public class MainGame : Game
     {
+        public Vector2 CenterScreen { get; set; }
+
+        private int TileSize => 300;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D background;
@@ -17,10 +22,7 @@ namespace StellarOps
         Viewport viewport;
         Player player;
         Camera camera;
-        int playerTileX;
-        int playerTileY;
-
-        public Vector2 CenterScreen;
+        Vector2 tilePosition;
 
         public MainGame()
         {
@@ -52,8 +54,8 @@ namespace StellarOps
             };
             camera = new Camera(this);
             camera.Initialize();
-            testTile1 = DrawTileRectangle(200, Color.DarkCyan);
-            testTile2 = DrawTileRectangle(200, Color.Brown);
+            testTile1 = DrawTileRectangle(Color.DarkCyan);
+            testTile2 = DrawTileRectangle(Color.Brown);
             base.Initialize();
         }
 
@@ -93,7 +95,6 @@ namespace StellarOps
             player.HandleInput(keyboardState);
             player.Update(gameTime);
             camera.Update(player);
-
             base.Update(gameTime);
         }
 
@@ -107,14 +108,14 @@ namespace StellarOps
             viewport = GraphicsDevice.Viewport;
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
-            TestDrawBackground(spriteBatch);
+            DrawBackground(spriteBatch);
             player.Draw(spriteBatch);
             spriteBatch.End();
 
             spriteBatch.Begin();
             spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
             spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading,2)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 25), Color.White);
-            spriteBatch.DrawString(debugFont, $"Tile : {playerTileX}, {playerTileY}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
+            spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -129,13 +130,13 @@ namespace StellarOps
         private Texture2D testTile1;
         private Texture2D testTile2;
 
-        private Texture2D DrawTileRectangle(int tileSize, Color color)
+        private Texture2D DrawTileRectangle(Color color)
         {
-            var tile = new Texture2D(GraphicsDevice, tileSize, tileSize);
-            Color[] data = new Color[tileSize * tileSize];
+            var tile = new Texture2D(GraphicsDevice, TileSize, TileSize);
+            Color[] data = new Color[TileSize * TileSize];
             for (int i = 0; i < data.Length; ++i)
             {
-                if (i < tileSize || i % tileSize == 0 || i > tileSize * tileSize - tileSize || (i + 1) % tileSize == 0)
+                if (i < TileSize || i % TileSize == 0 || i > TileSize * TileSize - TileSize || (i + 1) % TileSize == 0)
                 {
                     data[i] = Color.White;
                 }
@@ -148,24 +149,23 @@ namespace StellarOps
             return tile;
         }
 
-        private void TestDrawBackground(SpriteBatch spriteBatch)
+        private void DrawBackground(SpriteBatch spriteBatch)
         {
-            int tileSize = 200;
             Vector2 startLocation = Vector2.Zero;
 
-            int numberOfTilesX = (int)Math.Ceiling((decimal)viewport.Bounds.Width / tileSize);
-            int numberOfTilesY = (int)Math.Ceiling((decimal)viewport.Bounds.Height / tileSize);
-            playerTileX = (int)Math.Floor((player.Position.X) / tileSize);
-            playerTileY = (int)Math.Floor((player.Position.Y) / tileSize);
+            int numberOfTilesX = (int)Math.Ceiling((decimal)viewport.Bounds.Width / TileSize);
+            int numberOfTilesY = (int)Math.Ceiling((decimal)viewport.Bounds.Height / TileSize);
+            tilePosition.X = (int)Math.Floor((player.Position.X) / TileSize);
+            tilePosition.Y = (int)Math.Floor((player.Position.Y) / TileSize);
 
             spriteBatch.Draw(testTile1, startLocation, Color.White);
-            startLocation.X = startLocation.X- tileSize;
+            startLocation.X = startLocation.X- TileSize;
             DrawTile(-1, 0);
 
-            int minX = (int)Math.Floor(playerTileX - (double)numberOfTilesX / 2);
-            int maxX = (int)Math.Ceiling(playerTileX + (double)numberOfTilesX / 2);
-            int minY = (int)Math.Floor(playerTileY - (double)numberOfTilesY / 2);
-            int maxY = (int)Math.Ceiling(playerTileY + (double)numberOfTilesY / 2);
+            int minX = (int)Math.Floor(tilePosition.X - (double)numberOfTilesX / 2);
+            int maxX = (int)Math.Ceiling(tilePosition.X + (double)numberOfTilesX / 2);
+            int minY = (int)Math.Floor(tilePosition.Y - (double)numberOfTilesY / 2);
+            int maxY = (int)Math.Ceiling(tilePosition.Y + (double)numberOfTilesY / 2);
 
             for (int x = minX; x <= maxX; x++) 
             {

@@ -13,32 +13,43 @@ namespace StellarOps
         public float Heading { get; set; }
         public float Thrust { get; set; }
         public float TurnRate { get; set; }
-
-        Vector2 velocity;
+        public Vector2 Velocity { get; set; }
         Vector2 acceleration;
 
         public void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Position += velocity * deltaTime;
-            velocity += acceleration * deltaTime;
+            Position += Velocity * deltaTime;
+            Velocity += acceleration * deltaTime;
             acceleration.X = 0;
             acceleration.Y = 0;
         }
 
         public void HandleInput(KeyboardState KeyState)
         {
+            // Apply thrust
             if (KeyState.IsKeyDown(Keys.W) || KeyState.IsKeyDown(Keys.Up))
             {
                 acceleration.X += Thrust * (float)Math.Cos(Heading);
                 acceleration.Y += Thrust * (float)Math.Sin(Heading);
             }
+            // Rotate Counter-Clockwise
+            if (KeyState.IsKeyDown(Keys.A) || KeyState.IsKeyDown(Keys.Left))
+            {
+                RotateCounterClockwise();
+            }
+            // Rotate Clockwise
+            if (KeyState.IsKeyDown(Keys.D) || KeyState.IsKeyDown(Keys.Right))
+            {
+                RotateClockwise();
+            }
+            // Rotate to face retro thurst heading
             if (KeyState.IsKeyDown(Keys.S) || KeyState.IsKeyDown(Keys.Down))
             {
-                if (velocity.X != 0 || velocity.Y != 0)
+                if (Velocity.X != 0 || Velocity.Y != 0)
                 {
-                    var movementHeading = (float)Math.Atan2(velocity.Y, velocity.X);
+                    var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
                     float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
                     if (Heading != retroHeading)
                     {
@@ -55,38 +66,14 @@ namespace StellarOps
                         {
                             if (retroOffset < 180)
                             {
-                                Heading -= TurnRate;
-                                if (Heading < -Math.PI)
-                                {
-                                    Heading = (float)Math.PI;
-                                }
+                                RotateCounterClockwise();
                             }
                             else
                             {
-                                Heading += TurnRate;
-                                if (Heading > Math.PI)
-                                {
-                                    Heading = (float)-Math.PI;
-                                }
+                                RotateClockwise();
                             }
                         }
                     }
-                }
-            }
-            if (KeyState.IsKeyDown(Keys.A) || KeyState.IsKeyDown(Keys.Left))
-            {
-                Heading -= TurnRate;
-                if (Heading < -Math.PI)
-                {
-                    Heading = (float)Math.PI;
-                }
-            }
-            if (KeyState.IsKeyDown(Keys.D) || KeyState.IsKeyDown(Keys.Right))
-            {
-                Heading += TurnRate;
-                if (Heading > Math.PI)
-                {
-                    Heading = (float)-Math.PI;
                 }
             }
         }
@@ -95,6 +82,24 @@ namespace StellarOps
         {
             var shipCenter = new Vector2(Ship.Width / 2, Ship.Height / 2);
             spriteBatch.Draw(Ship, Position, null, Color.White, Heading + (float)Math.PI / 2, shipCenter, 0.5f, SpriteEffects.None, 1f);
+        }
+
+        private void RotateClockwise()
+        {
+            Heading += TurnRate;
+            if (Heading > Math.PI)
+            {
+                Heading = (float)-Math.PI;
+            }
+        }
+
+        private void RotateCounterClockwise()
+        {
+            Heading -= TurnRate;
+            if (Heading < -Math.PI)
+            {
+                Heading = (float)Math.PI;
+            }
         }
     }
 }
