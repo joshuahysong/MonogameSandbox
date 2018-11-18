@@ -72,7 +72,7 @@ namespace StellarOps
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            player.Ship = Content.Load<Texture2D>("ship2");
+            player.Ship = Content.Load<Texture2D>("ship");
             background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
             Art.Load(Content);
@@ -95,11 +95,13 @@ namespace StellarOps
         protected override void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
+            MouseState mouseState = Mouse.GetState();
 
             this.HandleInput(keyboardState);
-            player.HandleInput(keyboardState);
-            player.Update(gameTime);
+            player.Input(keyboardState);
+            Camera.Input(keyboardState, mouseState);
             Camera.Update(player);
+            player.Update(gameTime);
             EntityManager.Update(gameTime);
             base.Update(gameTime);
         }
@@ -124,6 +126,7 @@ namespace StellarOps
             spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 25), Color.White);
             spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
             spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 65), Color.White);
+            spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 85), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -159,15 +162,12 @@ namespace StellarOps
         private void DrawBackground(SpriteBatch spriteBatch)
         {
             Vector2 startLocation = Vector2.Zero;
-
-            int numberOfTilesX = (int)Math.Ceiling((decimal)viewport.Bounds.Width / TileSize);
-            int numberOfTilesY = (int)Math.Ceiling((decimal)viewport.Bounds.Height / TileSize);
+            int numberOfTilesX = (int)Math.Ceiling(((double)viewport.Bounds.Width / TileSize) / Camera.Scale);
+            int numberOfTilesY = (int)Math.Ceiling(((double)viewport.Bounds.Height / TileSize) / Camera.Scale);
             tilePosition.X = (int)Math.Floor((player.Position.X) / TileSize);
             tilePosition.Y = (int)Math.Floor((player.Position.Y) / TileSize);
 
-            spriteBatch.Draw(testTile, startLocation, Color.White);
             startLocation.X = startLocation.X- TileSize;
-            DrawTile(-1, 0);
 
             int minX = (int)Math.Floor(tilePosition.X - (double)numberOfTilesX / 2);
             int maxX = (int)Math.Ceiling(tilePosition.X + (double)numberOfTilesX / 2);

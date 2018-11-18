@@ -39,7 +39,7 @@ namespace StellarOps
             acceleration.Y = 0;
         }
 
-        public void HandleInput(KeyboardState KeyState)
+        public void Input(KeyboardState KeyState)
         {
             // Apply thrust
             if (KeyState.IsKeyDown(Keys.W) || KeyState.IsKeyDown(Keys.Up))

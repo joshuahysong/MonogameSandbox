@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 
 namespace StellarOps
@@ -13,6 +14,8 @@ namespace StellarOps
         public Vector2 ScreenCenter { get; protected set; }
         public Matrix Transform { get; set; }
 
+        private int previousScrollValue;
+
         public Camera(Game game) : base(game) { }
 
         public override void Initialize()
@@ -25,11 +28,10 @@ namespace StellarOps
 
         public void Update(IFocusable focus)
         {
-            Transform = Matrix.Identity *
-                        Matrix.CreateTranslation(-focus.Position.X, -focus.Position.Y, 0) *
-                        Matrix.CreateRotationZ(Rotation) *
-                        Matrix.CreateTranslation(Origin.X, Origin.Y, 0) *
-                        Matrix.CreateScale(new Vector3(Scale, Scale, Scale));
+            Transform = Matrix.CreateTranslation(new Vector3(-focus.Position.X, -focus.Position.Y, 0)) *
+                Matrix.CreateRotationZ(Rotation) *
+                Matrix.CreateScale(new Vector3(Scale, Scale, 0)) *
+                Matrix.CreateTranslation(new Vector3(MainGame.Viewport.Width * 0.5f, MainGame.Viewport.Height * 0.5f, 0));
 
             Origin = ScreenCenter / Scale;
             Position = focus.Position;
@@ -48,6 +50,27 @@ namespace StellarOps
             }
 
             return true;
+        }
+
+        public void Input(KeyboardState keyboardState, MouseState mouseState)
+        {
+            if (mouseState.ScrollWheelValue < previousScrollValue)
+            {
+                Scale -= 0.1f;
+                if (Scale < 0.5f)
+                {
+                    Scale = 0.5f;
+                }
+            }
+            else if (mouseState.ScrollWheelValue > previousScrollValue)
+            {
+                Scale += 0.1f;
+                if (Scale > 4f)
+                {
+                    Scale = 4f;
+                }
+            }
+            previousScrollValue = mouseState.ScrollWheelValue;
         }
     }
 }
