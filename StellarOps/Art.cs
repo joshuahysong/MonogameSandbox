@@ -13,7 +13,7 @@ namespace StellarOps
 
         public static void Load(ContentManager content)
         {
-            Player = content.Load<Texture2D>("Player");
+            Player = content.Load<Texture2D>("ship");
             Seeker = content.Load<Texture2D>("Seeker");
             Wanderer = content.Load<Texture2D>("Wanderer");
             Bullet = content.Load<Texture2D>("Bullet");

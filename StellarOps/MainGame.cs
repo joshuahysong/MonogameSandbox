@@ -11,19 +11,19 @@ namespace StellarOps
     /// </summary>
     public class MainGame : Game
     {
-        public Vector2 CenterScreen { get; set; }
         public static MainGame Instance { get; private set; }
-        public static Viewport Viewport { get { return Instance.GraphicsDevice.Viewport; } }
-        public static Vector2 ScreenSize { get { return new Vector2(Viewport.Width, Viewport.Height); } }
-        public static Camera Camera { get; set; }
+        public Camera Camera { get; set; }
+        public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
+        public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
+        public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
 
         private int TileSize => 300;
+        private Texture2D testTile;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D background;
         SpriteFont debugFont;
-        Viewport viewport;
         Player player;
         Vector2 tilePosition;
 
@@ -47,8 +47,10 @@ namespace StellarOps
         /// </summary>
         protected override void Initialize()
         {
-            CenterScreen = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
-            viewport = GraphicsDevice.Viewport;
+            Camera = new Camera();
+            testTile = DrawTileRectangle(Color.TransparentBlack);
+
+            base.Initialize();
             player = new Player
             {
                 Position = Vector2.Zero,
@@ -56,11 +58,7 @@ namespace StellarOps
                 Thrust = 500f,
                 TurnRate = 0.05f
             };
-            Camera = new Camera(this);
-            Camera.Initialize();
-            testTile = DrawTileRectangle(Color.TransparentBlack);
-
-            base.Initialize();
+            EntityManager.Add(player);
         }
 
         /// <summary>
@@ -72,7 +70,7 @@ namespace StellarOps
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            player.Ship = Content.Load<Texture2D>("ship");
+            //player.Ship = Content.Load<Texture2D>("ship");
             background = Content.Load<Texture2D>("starfield");
             debugFont = Content.Load<SpriteFont>("debug");
             Art.Load(Content);
@@ -101,7 +99,6 @@ namespace StellarOps
             player.Input(keyboardState);
             Camera.Input(keyboardState, mouseState);
             Camera.Update(player);
-            player.Update(gameTime);
             EntityManager.Update(gameTime);
             base.Update(gameTime);
         }
@@ -113,20 +110,18 @@ namespace StellarOps
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            viewport = GraphicsDevice.Viewport;
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Camera.Transform);
             DrawBackground(spriteBatch);
-            player.Draw(spriteBatch);
             EntityManager.Draw(spriteBatch);
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
-            spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 25), Color.White);
-            spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
-            spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 65), Color.White);
-            spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 85), Color.White);
+            spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
+            spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
+            spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
+            spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
+            spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -137,8 +132,6 @@ namespace StellarOps
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
         }
-
-        private Texture2D testTile;
 
         private Texture2D DrawTileRectangle(Color color)
         {
@@ -162,8 +155,8 @@ namespace StellarOps
         private void DrawBackground(SpriteBatch spriteBatch)
         {
             Vector2 startLocation = Vector2.Zero;
-            int numberOfTilesX = (int)Math.Ceiling(((double)viewport.Bounds.Width / TileSize) / Camera.Scale);
-            int numberOfTilesY = (int)Math.Ceiling(((double)viewport.Bounds.Height / TileSize) / Camera.Scale);
+            int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / TileSize) / Camera.Scale);
+            int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / TileSize) / Camera.Scale);
             tilePosition.X = (int)Math.Floor((player.Position.X) / TileSize);
             tilePosition.Y = (int)Math.Floor((player.Position.Y) / TileSize);
 

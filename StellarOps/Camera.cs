@@ -5,25 +5,19 @@ using StellarOps.Contracts;
 
 namespace StellarOps
 {
-    public class Camera : GameComponent
+    public class Camera
     {
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
         public Vector2 Origin { get; set; }
         public float Scale { get; set; }
-        public Vector2 ScreenCenter { get; protected set; }
         public Matrix Transform { get; set; }
 
         private int previousScrollValue;
 
-        public Camera(Game game) : base(game) { }
-
-        public override void Initialize()
+        public Camera()
         {
-            ScreenCenter = new Vector2(Game.GraphicsDevice.Viewport.Width / 2, Game.GraphicsDevice.Viewport.Height / 2);
             Scale = 1f;
-
-            base.Initialize();
         }
 
         public void Update(IFocusable focus)
@@ -31,9 +25,9 @@ namespace StellarOps
             Transform = Matrix.CreateTranslation(new Vector3(-focus.Position.X, -focus.Position.Y, 0)) *
                 Matrix.CreateRotationZ(Rotation) *
                 Matrix.CreateScale(new Vector3(Scale, Scale, 0)) *
-                Matrix.CreateTranslation(new Vector3(MainGame.Viewport.Width * 0.5f, MainGame.Viewport.Height * 0.5f, 0));
+                Matrix.CreateTranslation(new Vector3(MainGame.ScreenCenter.X, MainGame.ScreenCenter.Y, 0));
 
-            Origin = ScreenCenter / Scale;
+            Origin = MainGame.ScreenCenter / Scale;
             Position = focus.Position;
         }
 

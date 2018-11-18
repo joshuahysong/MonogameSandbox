@@ -5,12 +5,12 @@ namespace StellarOps
 {
     public abstract class Entity
     {
-        protected Texture2D image;
+        protected Texture2D Image;
         protected Color color = Color.White;
 
         public Vector2 Position { get; set; }
         public Vector2 Velocity;
-        public float Orientation;
+        public float Heading;
         public float Radius = 20;
         public bool IsExpired;
 
@@ -18,7 +18,7 @@ namespace StellarOps
         {
             get
             {
-                return image == null ? Vector2.Zero : new Vector2(image.Width, image.Height);
+                return Image == null ? Vector2.Zero : new Vector2(Image.Width, Image.Height);
             }
         }
 
@@ -26,7 +26,7 @@ namespace StellarOps
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(image, Position, null, color, Orientation, Size / 2f, 1f, 0, 0);
+            spriteBatch.Draw(Image, Position, null, color, Heading, Size / 2f, 1f, 0, 0);
         }
     }
 }

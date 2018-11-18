@@ -10,10 +10,10 @@ namespace StellarOps
 
         public Bullet(Vector2 position, Vector2 velocity)
         {
-            image = Art.Bullet;
+            Image = Art.Bullet;
             Position = position;
             Velocity = velocity;
-            Orientation = Velocity.ToAngle();
+            Heading = Velocity.ToAngle();
             Radius = 8;
             timeToLive = 10;
         }
@@ -23,7 +23,7 @@ namespace StellarOps
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Velocity.LengthSquared() > 0)
             {
-                Orientation = Velocity.ToAngle();
+                Heading = Velocity.ToAngle();
             }
 
             Position += Velocity * deltaTime;

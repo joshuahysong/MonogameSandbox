@@ -6,22 +6,28 @@ using System;
 
 namespace StellarOps
 {
-    public class Player : IFocusable
+    public class Player : Entity, IFocusable
     {
-        public Texture2D Ship { get; set; }
-        public Vector2 Position { get; set; }
-        public float Heading { get; set; }
-        public float Thrust { get; set; }
-        public float TurnRate { get; set; }
-        public Vector2 Velocity;
+        public float Thrust;
+        public float TurnRate;
         float maxVelocity => 500;
         Vector2 acceleration;
+        Weapon PrimaryWeapon;
 
-        const int cooldownFrames = 20;
-        int cooldownRemaining = 0;
-        static Random rand = new Random();
+        public Player()
+        {
+            Image = Art.Player;
+            PrimaryWeapon = new Weapon()
+            {
+                Cooldown = 20,
+                CooldownRemaining = 0,
+                AttachedPosition = new Vector2(30, 0),
+                Speed = 1000f,
+                Accuracy = 99f
+            };
+        }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -62,20 +68,22 @@ namespace StellarOps
             {
                 RotateToRetro(false);
             }
+            // Rotate to face retro thurst heading and thrust to brake
             if (KeyState.IsKeyDown(Keys.X))
             {
                 RotateToRetro(true);
             }
+            // Fire Primary Weapon
             if (KeyState.IsKeyDown(Keys.Space))
             {
-                FirePrimaryWeapon();
+                PrimaryWeapon.Fire(Heading, Velocity, Position);
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
-            var shipCenter = new Vector2(Ship.Width / 2, Ship.Height / 2);
-            spriteBatch.Draw(Ship, Position, null, Color.White, Heading + (float)Math.PI / 2, shipCenter, 0.5f, SpriteEffects.None, 1f);
+            var shipCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+            spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, shipCenter, 0.5f, SpriteEffects.None, 1f);
         }
 
         private void RotateClockwise()
@@ -141,26 +149,6 @@ namespace StellarOps
         {
             double brakingRange = maxVelocity / 100;
             return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
-        }
-
-        private void FirePrimaryWeapon()
-        {
-            if (cooldownRemaining <= 0)
-            {
-                cooldownRemaining = cooldownFrames;
-                Quaternion aimQuat = Quaternion.CreateFromYawPitchRoll(0, 0, Heading);
-
-                float randomSpread = rand.NextFloat(-0.01f, 0.01f) + rand.NextFloat(-0.01f, 0.01f);
-                Vector2 vel = MathUtil.FromPolar(Heading + randomSpread, 1000f);
-
-                Vector2 offset = Vector2.Transform(new Vector2(30, 0), aimQuat);
-                EntityManager.Add(new Bullet(Position + offset, vel + Velocity));
-            }
-
-            if (cooldownRemaining > 0)
-            {
-                 cooldownRemaining--;
-            }
         }
     }
 }
