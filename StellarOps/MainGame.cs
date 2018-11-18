@@ -53,7 +53,7 @@ namespace StellarOps
             {
                 Position = Vector2.Zero,
                 Heading = 0.0f,
-                Thrust = 200f,
+                Thrust = 500f,
                 TurnRate = 0.05f
             };
             Camera = new Camera(this);

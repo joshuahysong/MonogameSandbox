@@ -13,10 +13,11 @@ namespace StellarOps
         public float Heading { get; set; }
         public float Thrust { get; set; }
         public float TurnRate { get; set; }
-        public Vector2 Velocity { get; set; }
+        public Vector2 Velocity;
+        float maxVelocity => 500;
         Vector2 acceleration;
 
-        const int cooldownFrames = 6;
+        const int cooldownFrames = 20;
         int cooldownRemaining = 0;
         static Random rand = new Random();
 
@@ -26,6 +27,14 @@ namespace StellarOps
 
             Position += Velocity * deltaTime;
             Velocity += acceleration * deltaTime;
+            if (Velocity.X > maxVelocity || Velocity.X < maxVelocity * -1)
+            {
+                Velocity.X = Velocity.X < 0 ? -1 * maxVelocity : maxVelocity;
+            }
+            if (Velocity.Y > maxVelocity || Velocity.Y < maxVelocity * -1)
+            {
+                Velocity.Y = Velocity.Y < 0 ? -1 * maxVelocity : maxVelocity;
+            }
             acceleration.X = 0;
             acceleration.Y = 0;
         }
@@ -118,10 +127,10 @@ namespace StellarOps
                 Quaternion aimQuat = Quaternion.CreateFromYawPitchRoll(0, 0, Heading);
 
                 float randomSpread = rand.NextFloat(-0.01f, 0.01f) + rand.NextFloat(-0.01f, 0.01f);
-                Vector2 vel = MathUtil.FromPolar(Heading + randomSpread, 11f);
+                Vector2 vel = MathUtil.FromPolar(Heading + randomSpread, 1000f);
 
                 Vector2 offset = Vector2.Transform(new Vector2(30, 0), aimQuat);
-                EntityManager.Add(new Bullet(Position + offset, vel));
+                EntityManager.Add(new Bullet(Position + offset, vel + Velocity));
             }
 
             if (cooldownRemaining > 0)

@@ -14,17 +14,18 @@ namespace StellarOps
             Velocity = velocity;
             Orientation = Velocity.ToAngle();
             Radius = 8;
-            timeToLive = 2;
+            timeToLive = 10;
         }
 
         public override void Update(GameTime gameTime)
         {
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Velocity.LengthSquared() > 0)
             {
                 Orientation = Velocity.ToAngle();
             }
 
-            Position += Velocity;
+            Position += Velocity * deltaTime;
 
             // delete bullets that go off-screen
             timeAlive += gameTime.ElapsedGameTime.TotalSeconds;
