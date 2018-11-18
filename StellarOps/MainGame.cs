@@ -121,8 +121,9 @@ namespace StellarOps
 
             spriteBatch.Begin();
             spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 5), Color.White);
-            spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading,2)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 25), Color.White);
-            spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
+            spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 25), Color.White);
+            spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 45), Color.White);
+            spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(viewport.Bounds.X + 5, viewport.Bounds.Y + 65), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);

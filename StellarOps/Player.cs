@@ -60,34 +60,11 @@ namespace StellarOps
             // Rotate to face retro thurst heading
             if (KeyState.IsKeyDown(Keys.S) || KeyState.IsKeyDown(Keys.Down))
             {
-                if (!(Velocity.X < 1 && Velocity.X > -1 && Velocity.Y < 1 && Velocity.Y > -1))
-                {
-                    var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
-                    float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
-                    if (Heading != retroHeading)
-                    {
-                        double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
-                        double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                        double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
-                        double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
-
-                        if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
-                        {
-                            Heading = retroHeading;
-                        }
-                        else
-                        {
-                            if (retroOffset < 180)
-                            {
-                                RotateCounterClockwise();
-                            }
-                            else
-                            {
-                                RotateClockwise();
-                            }
-                        }
-                    }
-                }
+                RotateToRetro(false);
+            }
+            if (KeyState.IsKeyDown(Keys.X))
+            {
+                RotateToRetro(true);
             }
             if (KeyState.IsKeyDown(Keys.Space))
             {
@@ -116,6 +93,50 @@ namespace StellarOps
             if (Heading < -Math.PI)
             {
                 Heading = (float)Math.PI;
+            }
+        }
+
+        private void RotateToRetro(bool IsBraking)
+        {
+            if (!(Velocity.X < 1 && Velocity.X > -1 && Velocity.Y < 1 && Velocity.Y > -1))
+            {
+                var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
+                float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
+                if (Heading != retroHeading)
+                {
+                    double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
+                    double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
+                    double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
+                    double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
+
+                    if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
+                    {
+                        Heading = retroHeading;
+                    }
+                    else
+                    {
+                        if (retroOffset < 180)
+                        {
+                            RotateCounterClockwise();
+                        }
+                        else
+                        {
+                            RotateClockwise();
+                        }
+                    }
+                }
+                else if (IsBraking && Heading == retroHeading)
+                {
+                    if (Velocity.X < 1 && Velocity.X > -1 && Velocity.Y < 1 && Velocity.Y > -1)
+                    {
+                        Velocity = Vector2.Zero;
+                    }
+                    else
+                    {
+                        acceleration.X += Thrust * (float)Math.Cos(Heading);
+                        acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                    }
+                }
             }
         }
 
