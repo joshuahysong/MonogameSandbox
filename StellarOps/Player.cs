@@ -98,46 +98,49 @@ namespace StellarOps
 
         private void RotateToRetro(bool IsBraking)
         {
-            if (!(Velocity.X < 1 && Velocity.X > -1 && Velocity.Y < 1 && Velocity.Y > -1))
+            var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
+            if (Heading != retroHeading && !IsWithinBrakingRange())
             {
-                var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
-                float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
-                if (Heading != retroHeading)
-                {
-                    double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
-                    double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                    double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
-                    double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
+                double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
+                double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
+                double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
+                double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
 
-                    if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
-                    {
-                        Heading = retroHeading;
-                    }
-                    else
-                    {
-                        if (retroOffset < 180)
-                        {
-                            RotateCounterClockwise();
-                        }
-                        else
-                        {
-                            RotateClockwise();
-                        }
-                    }
-                }
-                else if (IsBraking && Heading == retroHeading)
+                if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
                 {
-                    if (Velocity.X < 1 && Velocity.X > -1 && Velocity.Y < 1 && Velocity.Y > -1)
+                    Heading = retroHeading;
+                }
+                else
+                {
+                    if (retroOffset < 180)
                     {
-                        Velocity = Vector2.Zero;
+                        RotateCounterClockwise();
                     }
                     else
                     {
-                        acceleration.X += Thrust * (float)Math.Cos(Heading);
-                        acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                        RotateClockwise();
                     }
                 }
             }
+            else if (IsBraking)
+            {
+                if (IsWithinBrakingRange())
+                {
+                    Velocity = Vector2.Zero;
+                }
+                else if (Heading == retroHeading)
+                {
+                    acceleration.X += Thrust * (float)Math.Cos(Heading);
+                    acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                }
+            }
+        }
+
+        private bool IsWithinBrakingRange()
+        {
+            double brakingRange = maxVelocity / 100;
+            return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
         }
 
         private void FirePrimaryWeapon()

@@ -58,7 +58,7 @@ namespace StellarOps
             };
             Camera = new Camera(this);
             Camera.Initialize();
-            testTile1 = DrawTileRectangle(Color.TransparentBlack);
+            testTile = DrawTileRectangle(Color.TransparentBlack);
 
             base.Initialize();
         }
@@ -135,8 +135,7 @@ namespace StellarOps
                 Exit();
         }
 
-        private Texture2D testTile1;
-        private Texture2D testTile2;
+        private Texture2D testTile;
 
         private Texture2D DrawTileRectangle(Color color)
         {
@@ -166,7 +165,7 @@ namespace StellarOps
             tilePosition.X = (int)Math.Floor((player.Position.X) / TileSize);
             tilePosition.Y = (int)Math.Floor((player.Position.Y) / TileSize);
 
-            spriteBatch.Draw(testTile1, startLocation, Color.White);
+            spriteBatch.Draw(testTile, startLocation, Color.White);
             startLocation.X = startLocation.X- TileSize;
             DrawTile(-1, 0);
 
@@ -186,8 +185,8 @@ namespace StellarOps
 
         private void DrawTile(int x, int y)
         {
-            var position = new Vector2(testTile1.Bounds.Width * x, testTile1.Bounds.Height * y);
-            spriteBatch.Draw(testTile1, position, Color.White);
+            var position = new Vector2(testTile.Bounds.Width * x, testTile.Bounds.Height * y);
+            spriteBatch.Draw(testTile, position, Color.White);
             spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
         }
     }
