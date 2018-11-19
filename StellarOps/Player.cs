@@ -14,12 +14,15 @@ namespace StellarOps
         Vector2 acceleration;
         Weapon PrimaryWeapon;
 
+        int framesUntilRespawn = 0;
+        public bool IsDead { get { return framesUntilRespawn > 0; } }
+
         public Player()
         {
             Image = Art.Player;
             PrimaryWeapon = new Weapon()
             {
-                Cooldown = 20,
+                Cooldown = 10,
                 CooldownRemaining = 0,
                 AttachedPosition = new Vector2(30, 0),
                 Speed = 1000f,
@@ -29,6 +32,11 @@ namespace StellarOps
 
         public override void Update(GameTime gameTime)
         {
+            if (IsDead)
+            {
+                framesUntilRespawn--;
+                return;
+            }
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Position += Velocity * deltaTime;
@@ -82,8 +90,11 @@ namespace StellarOps
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
+            if (!IsDead)
+            {
+                Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+                spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
+            }
         }
 
         private void RotateClockwise()
@@ -149,6 +160,11 @@ namespace StellarOps
         {
             double brakingRange = maxVelocity / 100;
             return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
+        }
+
+        public void Kill()
+        {
+            framesUntilRespawn = 60;
         }
     }
 }

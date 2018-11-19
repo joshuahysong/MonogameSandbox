@@ -16,6 +16,7 @@ namespace StellarOps
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
         public static bool IsDebugging = true;
+        public static Player Player;
         public Camera Camera { get; set; }
 
         private int TileSize => 300;
@@ -31,7 +32,6 @@ namespace StellarOps
         SpriteBatch spriteBatch;
         Texture2D background;
         SpriteFont debugFont;
-        Player player;
         Vector2 tilePosition;
 
         public MainGame()
@@ -58,14 +58,14 @@ namespace StellarOps
             testTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
 
             base.Initialize();
-            player = new Player
+            Player = new Player
             {
                 Position = Vector2.Zero,
                 Heading = 0.0f,
                 Thrust = 500f,
                 TurnRate = 0.05f
             };
-            EntityManager.Add(player);
+            EntityManager.Add(Player);
         }
 
         /// <summary>
@@ -108,11 +108,12 @@ namespace StellarOps
             gamepadState = GamePad.GetState(PlayerIndex.One);
 
             this.Input();
-            player.Input(keyboardState);
+            Player.Input(keyboardState);
             Camera.Input(keyboardState, mouseState);
 
-            Camera.Update(player);
+            Camera.Update(Player);
             EntityManager.Update(gameTime);
+            EnemySpawner.Update();
             base.Update(gameTime);
         }
 
@@ -133,9 +134,9 @@ namespace StellarOps
             spriteBatch.Draw(Art.Pointer, new Vector2(mouseState.X, mouseState.Y), Color.White);
             if (IsDebugging)
             {
-                spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
-                spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
-                spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
+                spriteBatch.DrawString(debugFont, $"Position: {Math.Round(Player.Position.X)}, {Math.Round(Player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
+                spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(Player.Velocity.X)}, {Math.Round(Player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
+                spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
                 spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
                 spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
                 spriteBatch.DrawString(debugFont, $"Mouse : {mouseState.X}, {mouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 105), Color.White);
@@ -192,8 +193,8 @@ namespace StellarOps
             Vector2 startLocation = Vector2.Zero;
             int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / TileSize) / Camera.Scale);
             int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / TileSize) / Camera.Scale);
-            tilePosition.X = (int)Math.Floor((player.Position.X) / TileSize);
-            tilePosition.Y = (int)Math.Floor((player.Position.Y) / TileSize);
+            tilePosition.X = (int)Math.Floor((Player.Position.X) / TileSize);
+            tilePosition.Y = (int)Math.Floor((Player.Position.Y) / TileSize);
 
             startLocation.X = startLocation.X- TileSize;
 
