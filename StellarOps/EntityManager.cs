@@ -30,14 +30,14 @@ namespace StellarOps
         {
             isUpdating = true;
 
-            foreach (var entity in entities)
+            foreach (Entity entity in entities)
             {
                 entity.Update(gameTime);
             }
 
             isUpdating = false;
 
-            foreach (var entity in addedEntities)
+            foreach (Entity entity in addedEntities)
             {
                 entities.Add(entity);
             }
@@ -50,7 +50,7 @@ namespace StellarOps
 
         public static void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var entity in entities)
+            foreach (Entity entity in entities)
             {
                 entity.Draw(spriteBatch);
             }

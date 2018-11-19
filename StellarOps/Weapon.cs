@@ -24,7 +24,7 @@ namespace StellarOps
                 CooldownRemaining = Cooldown;
                 Quaternion aimQuat = Quaternion.CreateFromYawPitchRoll(0, 0, heading);
 
-                var jitter = 1 - Accuracy / 100;
+                float jitter = 1 - Accuracy / 100;
                 float randomSpread = rand.NextFloat(-jitter, jitter) + rand.NextFloat(-jitter, jitter);
                 Vector2 vel = MathUtil.FromPolar(heading + randomSpread, Speed);
 

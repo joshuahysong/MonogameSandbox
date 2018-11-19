@@ -82,8 +82,8 @@ namespace StellarOps
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            var shipCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, shipCenter, 0.5f, SpriteEffects.None, 1f);
+            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+            spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
         }
 
         private void RotateClockwise()
@@ -106,7 +106,7 @@ namespace StellarOps
 
         private void RotateToRetro(bool IsBraking)
         {
-            var movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
             if (Heading != retroHeading && !IsWithinBrakingRange())
             {

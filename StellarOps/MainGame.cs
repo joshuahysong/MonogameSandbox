@@ -12,13 +12,20 @@ namespace StellarOps
     public class MainGame : Game
     {
         public static MainGame Instance { get; private set; }
-        public Camera Camera { get; set; }
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
+        public static bool IsDebugging = true;
+        public Camera Camera { get; set; }
 
         private int TileSize => 300;
         private Texture2D testTile;
+        private KeyboardState keyboardState;
+        private KeyboardState lastKeyboardState;
+        private MouseState mouseState;
+        private MouseState lastMouseState;
+        private GamePadState gamepadState;
+        private GamePadState lastGamepadState;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -48,7 +55,7 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            testTile = DrawTileRectangle(Color.TransparentBlack);
+            testTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
 
             base.Initialize();
             player = new Player
@@ -92,12 +99,18 @@ namespace StellarOps
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-            MouseState mouseState = Mouse.GetState();
+            lastKeyboardState = keyboardState;
+            lastMouseState = mouseState;
+            lastGamepadState = gamepadState;
 
-            this.HandleInput(keyboardState);
+            keyboardState = Keyboard.GetState();
+            mouseState = Mouse.GetState();
+            gamepadState = GamePad.GetState(PlayerIndex.One);
+
+            this.Input();
             player.Input(keyboardState);
             Camera.Input(keyboardState, mouseState);
+
             Camera.Update(player);
             EntityManager.Update(gameTime);
             base.Update(gameTime);
@@ -117,29 +130,51 @@ namespace StellarOps
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
-            spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
-            spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
-            spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
-            spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
+            spriteBatch.Draw(Art.Pointer, new Vector2(mouseState.X, mouseState.Y), Color.White);
+            if (IsDebugging)
+            {
+                spriteBatch.DrawString(debugFont, $"Position: {Math.Round(player.Position.X)}, {Math.Round(player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
+                spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(player.Velocity.X)}, {Math.Round(player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
+                spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
+                spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
+                spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
+                spriteBatch.DrawString(debugFont, $"Mouse : {mouseState.X}, {mouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 105), Color.White);
+            }
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
-        private void HandleInput(KeyboardState keyboardState)
+        private void Input()
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyboardState.IsKeyDown(Keys.Escape))
+            if (keyboardState.IsKeyDown(Keys.Escape))
+            {
                 Exit();
+            }
+            if (WasKeyPressed(Keys.F4))
+            {
+                IsDebugging = !IsDebugging;
+                testTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
+            }
+        }
+        
+        public bool WasKeyPressed(Keys key)
+        {
+            return lastKeyboardState.IsKeyUp(key) && keyboardState.IsKeyDown(key);
         }
 
-        private Texture2D DrawTileRectangle(Color color)
+        public bool WasButtonPressed(Buttons button)
         {
-            var tile = new Texture2D(GraphicsDevice, TileSize, TileSize);
+            return lastGamepadState.IsButtonUp(button) && gamepadState.IsButtonDown(button);
+        }
+
+        private Texture2D DrawTileRectangle(Color color, bool border = false)
+        {
+            Texture2D tile = new Texture2D(GraphicsDevice, TileSize, TileSize);
             Color[] data = new Color[TileSize * TileSize];
             for (int i = 0; i < data.Length; ++i)
             {
-                if (i < TileSize || i % TileSize == 0 || i > TileSize * TileSize - TileSize || (i + 1) % TileSize == 0)
+                if (border && (i < TileSize || i % TileSize == 0 || i > TileSize * TileSize - TileSize || (i + 1) % TileSize == 0))
                 {
                     data[i] = Color.DimGray;
                 }
@@ -178,9 +213,12 @@ namespace StellarOps
 
         private void DrawTile(int x, int y)
         {
-            var position = new Vector2(testTile.Bounds.Width * x, testTile.Bounds.Height * y);
+            Vector2 position = new Vector2(testTile.Bounds.Width * x, testTile.Bounds.Height * y);
             spriteBatch.Draw(testTile, position, Color.White);
-            spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
+            if (IsDebugging)
+            {
+                spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
+            }
         }
     }
 }
