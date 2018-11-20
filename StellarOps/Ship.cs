@@ -1,100 +1,44 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using System;
+using System.Collections.Generic;
 
 namespace StellarOps
 {
-    public class Player : Entity, IFocusable
+    public class Ship : Entity, IFocusable
     {
         public float Thrust;
         public float TurnRate;
-        float maxVelocity => 500;
+        public float MaxVelocity;
+        public List<Weapon> Weapons;
+
         Vector2 acceleration;
-        Weapon PrimaryWeapon;
 
-        int framesUntilRespawn = 0;
-        public bool IsDead { get { return framesUntilRespawn > 0; } }
-
-        public Player()
-        {
-            Image = Art.Player;
-            PrimaryWeapon = new Weapon()
-            {
-                Cooldown = 10,
-                CooldownRemaining = 0,
-                AttachedPosition = new Vector2(30, 0),
-                Speed = 1000f,
-                Accuracy = 99f
-            };
-        }
+        public Ship() { }
 
         public override void Update(GameTime gameTime)
         {
-            if (IsDead)
-            {
-                framesUntilRespawn--;
-                return;
-            }
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Position += Velocity * deltaTime;
             Velocity += acceleration * deltaTime;
-            if (Velocity.X > maxVelocity || Velocity.X < maxVelocity * -1)
+            if (Velocity.X > MaxVelocity || Velocity.X < MaxVelocity * -1)
             {
-                Velocity.X = Velocity.X < 0 ? -1 * maxVelocity : maxVelocity;
+                Velocity.X = Velocity.X < 0 ? -1 * MaxVelocity : MaxVelocity;
             }
-            if (Velocity.Y > maxVelocity || Velocity.Y < maxVelocity * -1)
+            if (Velocity.Y > MaxVelocity || Velocity.Y < MaxVelocity * -1)
             {
-                Velocity.Y = Velocity.Y < 0 ? -1 * maxVelocity : maxVelocity;
+                Velocity.Y = Velocity.Y < 0 ? -1 * MaxVelocity : MaxVelocity;
             }
             acceleration.X = 0;
             acceleration.Y = 0;
         }
 
-        public void HandleInput()
-        {
-            // Apply thrust
-            if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
-            {
-                acceleration.X += Thrust * (float)Math.Cos(Heading);
-                acceleration.Y += Thrust * (float)Math.Sin(Heading);
-            }
-            // Rotate Counter-Clockwise
-            if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
-            {
-                RotateCounterClockwise();
-            }
-            // Rotate Clockwise
-            if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
-            {
-                RotateClockwise();
-            }
-            // Rotate to face retro thurst heading
-            if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
-            {
-                RotateToRetro(false);
-            }
-            // Rotate to face retro thurst heading and thrust to brake
-            if (Input.IsKeyPressed(Keys.X))
-            {
-                RotateToRetro(true);
-            }
-            // Fire Primary Weapon
-            if (Input.IsKeyPressed(Keys.Space))
-            {
-                PrimaryWeapon.Fire(Heading, Velocity, Position);
-            }
-        }
-
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (!IsDead)
-            {
-                Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-                spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
-            }
+            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+            spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
         }
 
         private void RotateClockwise()
@@ -158,13 +102,8 @@ namespace StellarOps
 
         private bool IsWithinBrakingRange()
         {
-            double brakingRange = maxVelocity / 100;
+            double brakingRange = MaxVelocity / 100;
             return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
-        }
-
-        public void Kill()
-        {
-            framesUntilRespawn = 60;
         }
     }
 }

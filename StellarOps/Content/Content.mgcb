@@ -30,7 +30,7 @@
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:debug.spritefont
+/build:debug.spritefont;DebugFont.spritefont
 
 #begin Player.png
 /importer:TextureImporter

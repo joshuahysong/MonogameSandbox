@@ -2,13 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
 
 namespace StellarOps
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class MainGame : Game
     {
         public static MainGame Instance { get; private set; }
@@ -23,17 +19,9 @@ namespace StellarOps
         private int TileSize => 1000;
         private Texture2D starTile;
         private Texture2D debugTile;
-        private KeyboardState keyboardState;
-        private KeyboardState lastKeyboardState;
-        private MouseState mouseState;
-        private MouseState lastMouseState;
-        private GamePadState gamepadState;
-        private GamePadState lastGamepadState;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D background;
-        SpriteFont debugFont;
         Vector2 tilePosition;
 
         public MainGame()
@@ -48,12 +36,6 @@ namespace StellarOps
             Instance = this;
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
             Camera = new Camera();
@@ -71,59 +53,24 @@ namespace StellarOps
             EntityManager.Add(Player);
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            //player.Ship = Content.Load<Texture2D>("ship");
-            background = Content.Load<Texture2D>("starfield");
-            debugFont = Content.Load<SpriteFont>("debug");
             Art.Load(Content);
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
-
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            lastKeyboardState = keyboardState;
-            lastMouseState = mouseState;
-            lastGamepadState = gamepadState;
-
-            keyboardState = Keyboard.GetState();
-            mouseState = Mouse.GetState();
-            gamepadState = GamePad.GetState(PlayerIndex.One);
-
-            this.Input();
-            Player.Input(keyboardState);
-            Camera.Input(keyboardState, mouseState);
+            Input.Update();
+            this.HandleInput();
+            Camera.HandleInput();
+            Player.HandleInput();
 
             Camera.Update(Player);
             EntityManager.Update(gameTime);
-            //EnemySpawner.Update();
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
@@ -138,42 +85,31 @@ namespace StellarOps
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.Draw(Art.Pointer, new Vector2(mouseState.X, mouseState.Y), Color.White);
+            spriteBatch.Draw(Art.Pointer, new Vector2(Input.MouseState.X, Input.MouseState.Y), Color.White);
             if (IsDebugging)
             {
-                spriteBatch.DrawString(debugFont, $"Position: {Math.Round(Player.Position.X)}, {Math.Round(Player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
-                spriteBatch.DrawString(debugFont, $"Velocity : {Math.Round(Player.Velocity.X)}, {Math.Round(Player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
-                spriteBatch.DrawString(debugFont, $"Heading : {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
-                spriteBatch.DrawString(debugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
-                spriteBatch.DrawString(debugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
-                spriteBatch.DrawString(debugFont, $"Mouse : {mouseState.X}, {mouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 105), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Position: {Math.Round(Player.Position.X)}, {Math.Round(Player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Velocity : {Math.Round(Player.Velocity.X)}, {Math.Round(Player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Heading : {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Mouse : {Input.MouseState.X}, {Input.MouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 105), Color.White);
             }
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
-        private void Input()
+        private void HandleInput()
         {
-            if (keyboardState.IsKeyDown(Keys.Escape))
+            if (Input.WasKeyPressed(Keys.Escape))
             {
                 Exit();
             }
-            if (WasKeyPressed(Keys.F4))
+            if (Input.WasKeyPressed(Keys.F4))
             {
                 IsDebugging = !IsDebugging;
-                //starTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
             }
-        }
-        
-        public bool WasKeyPressed(Keys key)
-        {
-            return lastKeyboardState.IsKeyUp(key) && keyboardState.IsKeyDown(key);
-        }
-
-        public bool WasButtonPressed(Buttons button)
-        {
-            return lastGamepadState.IsButtonUp(button) && gamepadState.IsButtonDown(button);
         }
 
         private Texture2D DrawTileRectangle(Color color, bool border = false)
@@ -237,7 +173,7 @@ namespace StellarOps
             spriteBatch.Draw(tileToDraw, position, Color.White);
             if (IsDebugging)
             {
-                spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
+                spriteBatch.DrawString(Art.DebugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
             }
         }
     }

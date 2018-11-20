@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 
 namespace StellarOps
@@ -46,9 +45,9 @@ namespace StellarOps
             return true;
         }
 
-        public void Input(KeyboardState keyboardState, MouseState mouseState)
+        public void HandleInput()
         {
-            if (mouseState.ScrollWheelValue < previousScrollValue)
+            if (Input.MouseState.ScrollWheelValue < previousScrollValue)
             {
                 Scale -= 0.1f;
                 if (Scale < 0.5f)
@@ -56,7 +55,7 @@ namespace StellarOps
                     Scale = 0.5f;
                 }
             }
-            else if (mouseState.ScrollWheelValue > previousScrollValue)
+            else if (Input.MouseState.ScrollWheelValue > previousScrollValue)
             {
                 Scale += 0.1f;
                 if (Scale > 4f)
@@ -64,7 +63,7 @@ namespace StellarOps
                     Scale = 4f;
                 }
             }
-            previousScrollValue = mouseState.ScrollWheelValue;
+            previousScrollValue = Input.MouseState.ScrollWheelValue;
         }
     }
 }
