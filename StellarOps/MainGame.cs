@@ -15,12 +15,14 @@ namespace StellarOps
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-        public static bool IsDebugging = true;
+        public static Random Random = new Random();
+        public static bool IsDebugging = false;
         public static Player Player;
         public Camera Camera { get; set; }
 
-        private int TileSize => 300;
-        private Texture2D testTile;
+        private int TileSize => 1000;
+        private Texture2D starTile;
+        private Texture2D debugTile;
         private KeyboardState keyboardState;
         private KeyboardState lastKeyboardState;
         private MouseState mouseState;
@@ -55,7 +57,8 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            testTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
+            starTile = DrawTileRectangle(Color.TransparentBlack, false);
+            debugTile = DrawTileRectangle(Color.TransparentBlack, true);
 
             base.Initialize();
             Player = new Player
@@ -113,7 +116,7 @@ namespace StellarOps
 
             Camera.Update(Player);
             EntityManager.Update(gameTime);
-            EnemySpawner.Update();
+            //EnemySpawner.Update();
             base.Update(gameTime);
         }
 
@@ -127,6 +130,10 @@ namespace StellarOps
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Camera.Transform);
             DrawBackground(spriteBatch);
+            if (IsDebugging)
+            {
+                DrawBackground(spriteBatch, true);
+            }
             EntityManager.Draw(spriteBatch);
             spriteBatch.End();
 
@@ -155,7 +162,7 @@ namespace StellarOps
             if (WasKeyPressed(Keys.F4))
             {
                 IsDebugging = !IsDebugging;
-                testTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
+                //starTile = DrawTileRectangle(Color.TransparentBlack, IsDebugging);
             }
         }
         
@@ -181,14 +188,21 @@ namespace StellarOps
                 }
                 else
                 {
-                    data[i] = color;
+                    if (!border && Random.Next(1, 5000) == 1)
+                    {
+                        data[i] = Color.White;
+                    }
+                    else
+                    {
+                        data[i] = color;
+                    }
                 }
             }
             tile.SetData(data);
             return tile;
         }
 
-        private void DrawBackground(SpriteBatch spriteBatch)
+        private void DrawBackground(SpriteBatch spriteBatch, bool areDrawingDebugTiles = false)
         {
             Vector2 startLocation = Vector2.Zero;
             int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / TileSize) / Camera.Scale);
@@ -207,15 +221,20 @@ namespace StellarOps
             {
                 for (int y = minY; y <= maxY; y++)
                 {
-                    DrawTile(x, y);
+                    DrawTile(x, y, areDrawingDebugTiles);
                 }
             }
         }
 
-        private void DrawTile(int x, int y)
+        private void DrawTile(int x, int y, bool IsDrawingDebugTile)
         {
-            Vector2 position = new Vector2(testTile.Bounds.Width * x, testTile.Bounds.Height * y);
-            spriteBatch.Draw(testTile, position, Color.White);
+            Texture2D tileToDraw = starTile;
+            if (IsDrawingDebugTile)
+            {
+                tileToDraw = debugTile;
+            }
+            Vector2 position = new Vector2(tileToDraw.Bounds.Width * x, tileToDraw.Bounds.Height * y);
+            spriteBatch.Draw(tileToDraw, position, Color.White);
             if (IsDebugging)
             {
                 spriteBatch.DrawString(debugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
