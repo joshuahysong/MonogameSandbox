@@ -89,11 +89,13 @@ namespace StellarOps
             if (IsDebugging)
             {
                 spriteBatch.DrawString(Art.DebugFont, $"Position: {Math.Round(Player.Position.X)}, {Math.Round(Player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Velocity : {Math.Round(Player.Velocity.X)}, {Math.Round(Player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 25), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Heading : {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 45), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Tile : {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Zoom : {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 85), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Mouse : {Input.MouseState.X}, {Input.MouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 105), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Velocity: {Math.Round(Player.Velocity.X)}, {Math.Round(Player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 20), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Heading: {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 35), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Tile: {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 50), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Zoom: {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Mouse: \r {Input.MouseState.X}, {Input.MouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 80), Color.White);
+                string fps = $"FPS : {Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
+                spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);
             }
             spriteBatch.End();
 
@@ -124,9 +126,13 @@ namespace StellarOps
                 }
                 else
                 {
-                    if (!border && Random.Next(1, 5000) == 1)
+                    if (!border && Random.Next(1, 10000) == 1)
                     {
                         data[i] = Color.White;
+                    }
+                    else if (!border && Random.Next(1, 10000) == 1)
+                    {
+                        data[i] = Color.DimGray;
                     }
                     else
                     {

@@ -67,17 +67,17 @@ namespace StellarOps
                 RotateCounterClockwise();
             }
             // Rotate Clockwise
-            if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
+            else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
             {
                 RotateClockwise();
             }
             // Rotate to face retro thurst heading
-            if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
+            else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
             {
                 RotateToRetro(false);
             }
             // Rotate to face retro thurst heading and thrust to brake
-            if (Input.IsKeyPressed(Keys.X))
+            else if (Input.IsKeyPressed(Keys.X))
             {
                 RotateToRetro(true);
             }
