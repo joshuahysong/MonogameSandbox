@@ -14,7 +14,7 @@ namespace StellarOps
         public static Random Random = new Random();
         public static bool IsDebugging = false;
         public static Player Player;
-        public Camera Camera { get; set; }
+        public static Camera Camera { get; set; }
 
         private int TileSize => 1000;
         private Texture2D starTile;
@@ -47,8 +47,8 @@ namespace StellarOps
             {
                 Position = Vector2.Zero,
                 Heading = 0.0f,
-                Thrust = 500f,
-                TurnRate = 0.05f
+                Thrust = 250f,
+                TurnRate = 0.02f
             };
             EntityManager.Add(Player);
         }

@@ -5,7 +5,8 @@ namespace StellarOps
 {
     public static class Art
     {
-        public static Texture2D Ship { get; set; }
+        public static Texture2D TestShip { get; set; }
+        public static Texture2D TestShipInterior { get; set; }
         public static Texture2D Player { get; set; }
         public static Texture2D Seeker { get; set; }
         public static Texture2D Wanderer { get; set; }
@@ -17,13 +18,14 @@ namespace StellarOps
 
         public static void Load(ContentManager content)
         {
-            Ship = content.Load<Texture2D>("ship");
-            Player = content.Load<Texture2D>("ship");
+            Player = content.Load<Texture2D>("ship3");
             Background = content.Load<Texture2D>("Pointer");
             Seeker = content.Load<Texture2D>("Seeker");
             Wanderer = content.Load<Texture2D>("Wanderer");
             Bullet = content.Load<Texture2D>("Bullet");
             Pointer = content.Load<Texture2D>("Pointer");
+            TestShip = content.Load<Texture2D>("Ships/TestShip");
+            TestShipInterior = content.Load<Texture2D>("Ships/TestShip_Interior");
 
             DebugFont = content.Load<SpriteFont>("DebugFont");
         }

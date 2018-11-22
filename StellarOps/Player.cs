@@ -19,7 +19,7 @@ namespace StellarOps
 
         public Player()
         {
-            Image = Art.Player;
+            Image = Art.TestShip;
             PrimaryWeapon = new Weapon()
             {
                 Cooldown = 10,
@@ -93,7 +93,7 @@ namespace StellarOps
             if (!IsDead)
             {
                 Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-                spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
+                spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? Art.TestShipInterior : Image, Position, null, Color.White, Heading/* + (float)Math.PI / 2*/, imageCenter, 0.5f, SpriteEffects.None, 1f);
             }
         }
 
