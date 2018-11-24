@@ -39,8 +39,8 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            starTile = DrawTileRectangle(Color.TransparentBlack, false);
-            debugTile = DrawTileRectangle(Color.TransparentBlack, true);
+            starTile = DrawStars(DrawTileRectangle(TileSize, Color.TransparentBlack, Color.TransparentBlack));
+            debugTile = DrawTileRectangle(TileSize, Color.TransparentBlack, Color.DimGray);
 
             base.Initialize();
             Player = new Player();
@@ -108,29 +108,40 @@ namespace StellarOps
             }
         }
 
-        private Texture2D DrawTileRectangle(Color color, bool border = false)
+        public Texture2D DrawTileRectangle(int tileSize, Color fillColor, Color borderColor)
         {
-            Texture2D tile = new Texture2D(GraphicsDevice, TileSize, TileSize);
-            Color[] data = new Color[TileSize * TileSize];
+            Texture2D tile = new Texture2D(GraphicsDevice, tileSize, tileSize);
+            Color[] data = new Color[tileSize * tileSize];
             for (int i = 0; i < data.Length; ++i)
             {
-                if (border && (i < TileSize || i % TileSize == 0 || i > TileSize * TileSize - TileSize || (i + 1) % TileSize == 0))
+                if (i < tileSize || i % tileSize == 0 || i > tileSize * tileSize - tileSize || (i + 1) % tileSize == 0)
                 {
-                    data[i] = Color.DimGray;
+                    data[i] = borderColor;
                 }
                 else
                 {
-                    if (!border && Random.Next(1, 10000) == 1)
+                    data[i] = fillColor;
+                }
+            }
+            tile.SetData(data);
+            return tile;
+        }
+
+        public Texture2D DrawStars(Texture2D tile)
+        {
+            Color[] data = new Color[tile.Width * tile.Height];
+            tile.GetData(data);
+            for (int i = 0; i < data.Length; ++i)
+            {
+                if (!(i < tile.Width || i % tile.Width == 0 || i > tile.Width * tile.Width - tile.Width || (i + 1) % tile.Width == 0))
+                {
+                    if (Random.Next(1, 10000) == 1)
                     {
                         data[i] = Color.White;
                     }
-                    else if (!border && Random.Next(1, 10000) == 1)
+                    else if (Random.Next(1, 10000) == 1)
                     {
                         data[i] = Color.DimGray;
-                    }
-                    else
-                    {
-                        data[i] = color;
                     }
                 }
             }
@@ -143,8 +154,8 @@ namespace StellarOps
             Vector2 startLocation = Vector2.Zero;
             int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / TileSize) / Camera.Scale);
             int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / TileSize) / Camera.Scale);
-            tilePosition.X = (int)Math.Floor((Player.Position.X) / TileSize);
-            tilePosition.Y = (int)Math.Floor((Player.Position.Y) / TileSize);
+            tilePosition.X = (int)Math.Floor(Camera.Position.X / TileSize);
+            tilePosition.Y = (int)Math.Floor(Camera.Position.Y / TileSize);
 
             startLocation.X = startLocation.X- TileSize;
 

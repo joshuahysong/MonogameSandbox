@@ -15,9 +15,15 @@ namespace StellarOps.Ships
         public float MaxVelocity;
         public List<Weapon> Weapons;
 
+        protected int[,] tileMap;
+        protected Texture2D testTile;
+
         Vector2 acceleration;
 
-        public ShipCore() { }
+        public ShipCore()
+        {
+            testTile = MainGame.Instance.DrawTileRectangle(20, Color.Red, Color.Blue);
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -76,6 +82,28 @@ namespace StellarOps.Ships
         {
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
             spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 0.5f, SpriteEffects.None, 1f);
+
+            // Test Tilemap
+
+            int numberOfTilesY = tileMap.GetLength(0);
+            int numberOfTilesX = tileMap.GetLength(1);
+            //tilePosition.X = (int)Math.Floor(Camera.Position.X / TileSize);
+            //tilePosition.Y = (int)Math.Floor(Camera.Position.Y / TileSize);
+
+            //startLocation.X = startLocation.X - TileSize;
+
+            //int minX = numberOfTilesX / 2 * ;
+            //int maxX = (int)Math.Ceiling(tilePosition.X + (double)numberOfTilesX / 2);
+            //int minY = (int)Math.Floor(tilePosition.Y - (double)numberOfTilesY / 2);
+            //int maxY = (int)Math.Ceiling(tilePosition.Y + (double)numberOfTilesY / 2);
+
+            for (int y = 0; y < tileMap.GetLength(0); y++)
+            {
+                for (int x = 0; x < tileMap.GetLength(1); x++)
+                {
+                    spriteBatch.Draw(testTile, Position, null, Color.White, Heading, imageCenter, 0.5f, SpriteEffects.None, 1f);
+                }
+            }
         }
 
         private void RotateClockwise()

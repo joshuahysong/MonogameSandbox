@@ -22,7 +22,7 @@ namespace StellarOps
         {
             Ship = new TestShip(Vector2.Zero);
             IsPiloting = true;
-            //Image = Art.TestShip;
+            Image = Art.TestShip;
             //PrimaryWeapon = new Weapon()
             //{
             //    Cooldown = 10,
