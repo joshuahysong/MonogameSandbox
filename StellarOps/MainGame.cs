@@ -43,13 +43,7 @@ namespace StellarOps
             debugTile = DrawTileRectangle(Color.TransparentBlack, true);
 
             base.Initialize();
-            Player = new Player
-            {
-                Position = Vector2.Zero,
-                Heading = 0.0f,
-                Thrust = 250f,
-                TurnRate = 0.02f
-            };
+            Player = new Player();
             EntityManager.Add(Player);
         }
 
@@ -66,7 +60,7 @@ namespace StellarOps
             Camera.HandleInput();
             Player.HandleInput();
 
-            Camera.Update(Player);
+            Camera.Update(Player.Ship);
             EntityManager.Update(gameTime);
             base.Update(gameTime);
         }

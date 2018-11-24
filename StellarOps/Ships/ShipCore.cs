@@ -1,13 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using System;
 using System.Collections.Generic;
 
-namespace StellarOps
+namespace StellarOps.Ships
 {
-    public class Ship : Entity, IFocusable
+    public class ShipCore : Entity, IFocusable
     {
+        public Texture2D InteriorImage;
         public float Thrust;
         public float TurnRate;
         public float MaxVelocity;
@@ -15,7 +17,7 @@ namespace StellarOps
 
         Vector2 acceleration;
 
-        public Ship() { }
+        public ShipCore() { }
 
         public override void Update(GameTime gameTime)
         {
@@ -35,10 +37,45 @@ namespace StellarOps
             acceleration.Y = 0;
         }
 
+        public void HandleInput()
+        {
+            // Apply thrust
+            if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
+            {
+                acceleration.X += Thrust * (float)Math.Cos(Heading);
+                acceleration.Y += Thrust * (float)Math.Sin(Heading);
+            }
+            // Rotate Counter-Clockwise
+            if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
+            {
+                RotateCounterClockwise();
+            }
+            // Rotate Clockwise
+            else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
+            {
+                RotateClockwise();
+            }
+            // Rotate to face retro thurst heading
+            else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
+            {
+                RotateToRetro(false);
+            }
+            // Rotate to face retro thurst heading and thrust to brake
+            else if (Input.IsKeyPressed(Keys.X))
+            {
+                RotateToRetro(true);
+            }
+            // Fire Primary Weapon
+            //if (Input.IsKeyPressed(Keys.Space))
+            //{
+            //    PrimaryWeapon.Fire(Heading, Velocity, Position);
+            //}
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            spriteBatch.Draw(Image, Position, null, Color.White, Heading + (float)Math.PI / 2, imageCenter, 0.5f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 0.5f, SpriteEffects.None, 1f);
         }
 
         private void RotateClockwise()
