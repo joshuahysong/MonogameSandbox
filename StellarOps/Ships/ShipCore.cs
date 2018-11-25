@@ -16,13 +16,15 @@ namespace StellarOps.Ships
         public List<Weapon> Weapons;
 
         protected int[,] tileMap;
-        protected Texture2D testTile;
+        protected Texture2D testTile0;
+        protected Texture2D testTile1;
 
         Vector2 acceleration;
 
         public ShipCore()
         {
-            testTile = MainGame.Instance.DrawTileRectangle(20, Color.Red, Color.Blue);
+            testTile0 = MainGame.Instance.DrawTileRectangle(37, Color.Blue * 0.2f, Color.Blue);
+            testTile1 = MainGame.Instance.DrawTileRectangle(37, Color.Red * 0.2f, Color.Red);
         }
 
         public override void Update(GameTime gameTime)
@@ -81,27 +83,18 @@ namespace StellarOps.Ships
         public override void Draw(SpriteBatch spriteBatch)
         {
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 0.5f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 1f, SpriteEffects.None, 1f);
 
-            // Test Tilemap
-
-            int numberOfTilesY = tileMap.GetLength(0);
-            int numberOfTilesX = tileMap.GetLength(1);
-            //tilePosition.X = (int)Math.Floor(Camera.Position.X / TileSize);
-            //tilePosition.Y = (int)Math.Floor(Camera.Position.Y / TileSize);
-
-            //startLocation.X = startLocation.X - TileSize;
-
-            //int minX = numberOfTilesX / 2 * ;
-            //int maxX = (int)Math.Ceiling(tilePosition.X + (double)numberOfTilesX / 2);
-            //int minY = (int)Math.Floor(tilePosition.Y - (double)numberOfTilesY / 2);
-            //int maxY = (int)Math.Ceiling(tilePosition.Y + (double)numberOfTilesY / 2);
-
+            //Test Tilemap
+            Vector2 origin = imageCenter;
             for (int y = 0; y < tileMap.GetLength(0); y++)
             {
                 for (int x = 0; x < tileMap.GetLength(1); x++)
                 {
-                    spriteBatch.Draw(testTile, Position, null, Color.White, Heading, imageCenter, 0.5f, SpriteEffects.None, 1f);
+                    Texture2D tileToDraw = tileMap[y, x] == 0 ? testTile0 : testTile1;
+                    Vector2 offset = new Vector2(x * tileToDraw.Width, y * tileToDraw.Height);
+                    origin = imageCenter - offset;
+                    spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
                 }
             }
         }
