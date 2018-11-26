@@ -11,6 +11,8 @@ namespace StellarOps
         public static MouseState LastMouseState;
         public static GamePadState GamepadState;
         public static GamePadState LastGamepadState;
+        public static Vector2 ScreenMousePosition;
+        public static Vector2 WorldMousePosition;
 
         public static void Update()
         {
@@ -21,6 +23,9 @@ namespace StellarOps
             KeyboardState = Keyboard.GetState();
             MouseState = Mouse.GetState();
             GamepadState = GamePad.GetState(PlayerIndex.One);
+
+            ScreenMousePosition = new Vector2(MouseState.X, MouseState.Y);
+            WorldMousePosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
         }
 
         public static bool IsKeyPressed(Keys key)

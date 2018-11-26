@@ -58,7 +58,6 @@ namespace StellarOps
             Input.Update();
             this.HandleInput();
             Camera.HandleInput();
-            Player.HandleInput();
 
             Camera.Update(Player.Ship);
             EntityManager.Update(gameTime);
@@ -87,7 +86,8 @@ namespace StellarOps
                 spriteBatch.DrawString(Art.DebugFont, $"Heading: {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 35), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Tile: {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 50), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Zoom: {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Mouse: \r {Input.MouseState.X}, {Input.MouseState.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 80), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Mouse Screen Position: \r {Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 80), Color.White);
+                spriteBatch.DrawString(Art.DebugFont, $"Mouse World Position: \r {Input.WorldMousePosition.X}, {Input.WorldMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 95), Color.White);
                 string fps = $"FPS : {Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
                 spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);
             }

@@ -22,7 +22,8 @@ namespace StellarOps
         {
             Ship = new TestShip(Vector2.Zero);
             IsPiloting = true;
-            Image = Art.TestShip;
+            Image = Art.Player;
+            Position = new Vector2(235,-18);
             //PrimaryWeapon = new Weapon()
             //{
             //    Cooldown = 10,
@@ -35,137 +36,38 @@ namespace StellarOps
 
         public override void Update(GameTime gameTime)
         {
-            //if (IsDead)
-            //{
-            //    framesUntilRespawn--;
-            //    return;
-            //}
-            //float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            //Position += Velocity * deltaTime;
-            //Velocity += acceleration * deltaTime;
-            //if (Velocity.X > maxVelocity || Velocity.X < maxVelocity * -1)
-            //{
-            //    Velocity.X = Velocity.X < 0 ? -1 * maxVelocity : maxVelocity;
-            //}
-            //if (Velocity.Y > maxVelocity || Velocity.Y < maxVelocity * -1)
-            //{
-            //    Velocity.Y = Velocity.Y < 0 ? -1 * maxVelocity : maxVelocity;
-            //}
-            //acceleration.X = 0;
-            //acceleration.Y = 0;
+            HandleInput(gameTime);
             Ship.Update(gameTime);
         }
 
-        public void HandleInput()
+        public void HandleInput(GameTime gameTime)
         {
             if (IsPiloting)
             {
                 Ship.HandleInput();
             }
-        //    // Apply thrust
-        //    if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
-        //    {
-        //        acceleration.X += Thrust * (float)Math.Cos(Heading);
-        //        acceleration.Y += Thrust * (float)Math.Sin(Heading);
-        //    }
-        //    // Rotate Counter-Clockwise
-        //    if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
-        //    {
-        //        RotateCounterClockwise();
-        //    }
-        //    // Rotate Clockwise
-        //    else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
-        //    {
-        //        RotateClockwise();
-        //    }
-        //    // Rotate to face retro thurst heading
-        //    else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
-        //    {
-        //        RotateToRetro(false);
-        //    }
-        //    // Rotate to face retro thurst heading and thrust to brake
-        //    else if (Input.IsKeyPressed(Keys.X))
-        //    {
-        //        RotateToRetro(true);
-        //    }
-        //    // Fire Primary Weapon
-        //    if (Input.IsKeyPressed(Keys.Space))
-        //    {
-        //        PrimaryWeapon.Fire(Heading, Velocity, Position);
-        //    }
+
+            if (Input.MouseState.LeftButton == ButtonState.Pressed && Ship.InteriorIsDisplayed)
+            {
+                Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
+                if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))
+                {
+                    Vector2 direction = Vector2.Normalize(targetPosition - Position);
+                    Heading = (float)Math.Atan2(direction.Y, direction.X);
+
+                    Position += direction * (float)gameTime.ElapsedGameTime.TotalSeconds * 50.0f;
+                }
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            //Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            //spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? Art.TestShipInterior : Image, Position, null, Color.White, Heading/* + (float)Math.PI / 2*/, imageCenter, 0.5f, SpriteEffects.None, 1f);
             Ship.Draw(spriteBatch);
+            if (Ship.InteriorIsDisplayed)
+            {
+                Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+                spriteBatch.Draw(Image, Position, null, Color.White, Heading - (float)(Math.PI * 0.5f), imageCenter, 1f, SpriteEffects.None, 1f);
+            }
         }
-
-        //private void RotateClockwise()
-        //{
-        //    Heading += TurnRate;
-        //    if (Heading > Math.PI)
-        //    {
-        //        Heading = (float)-Math.PI;
-        //    }
-        //}
-
-        //private void RotateCounterClockwise()
-        //{
-        //    Heading -= TurnRate;
-        //    if (Heading < -Math.PI)
-        //    {
-        //        Heading = (float)Math.PI;
-        //    }
-        //}
-
-        //private void RotateToRetro(bool IsBraking)
-        //{
-        //    float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
-        //    float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
-        //    if (Heading != retroHeading && !IsWithinBrakingRange())
-        //    {
-        //        double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
-        //        double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-        //        double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
-        //        double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
-
-        //        if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
-        //        {
-        //            Heading = retroHeading;
-        //        }
-        //        else
-        //        {
-        //            if (retroOffset < 180)
-        //            {
-        //                RotateCounterClockwise();
-        //            }
-        //            else
-        //            {
-        //                RotateClockwise();
-        //            }
-        //        }
-        //    }
-        //    else if (IsBraking)
-        //    {
-        //        if (IsWithinBrakingRange())
-        //        {
-        //            Velocity = Vector2.Zero;
-        //        }
-        //        else if (Heading == retroHeading)
-        //        {
-        //            acceleration.X += Thrust * (float)Math.Cos(Heading);
-        //            acceleration.Y += Thrust * (float)Math.Sin(Heading);
-        //        }
-        //    }
-        //}
-
-        //private bool IsWithinBrakingRange()
-        //{
-        //    double brakingRange = maxVelocity / 100;
-        //    return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
-        //}
     }
 }

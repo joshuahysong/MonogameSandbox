@@ -23,7 +23,7 @@ namespace StellarOps
         {
             Transform = Matrix.CreateTranslation(new Vector3(-focus.Position.X, -focus.Position.Y, 0)) *
                 Matrix.CreateRotationZ(Rotation) *
-                Matrix.CreateScale(new Vector3(Scale, Scale, 0)) *
+                Matrix.CreateScale(new Vector3(Scale, Scale, 1)) *
                 Matrix.CreateTranslation(new Vector3(MainGame.ScreenCenter.X, MainGame.ScreenCenter.Y, 0));
 
             Origin = MainGame.ScreenCenter / Scale;

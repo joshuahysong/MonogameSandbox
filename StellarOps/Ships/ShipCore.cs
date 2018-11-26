@@ -14,6 +14,7 @@ namespace StellarOps.Ships
         public float TurnRate;
         public float MaxVelocity;
         public List<Weapon> Weapons;
+        public bool InteriorIsDisplayed;
 
         protected int[,] tileMap;
         protected Texture2D testTile0;
@@ -23,8 +24,8 @@ namespace StellarOps.Ships
 
         public ShipCore()
         {
-            testTile0 = MainGame.Instance.DrawTileRectangle(37, Color.Blue * 0.2f, Color.Blue);
-            testTile1 = MainGame.Instance.DrawTileRectangle(37, Color.Red * 0.2f, Color.Red);
+            testTile0 = MainGame.Instance.DrawTileRectangle(35, Color.Blue * 0.2f, Color.Blue);
+            testTile1 = MainGame.Instance.DrawTileRectangle(35, Color.Red * 0.2f, Color.Red);
         }
 
         public override void Update(GameTime gameTime)
@@ -43,6 +44,16 @@ namespace StellarOps.Ships
             }
             acceleration.X = 0;
             acceleration.Y = 0;
+
+            // Interior Display
+            if (MainGame.Camera.Scale > 1.2)
+            {
+                InteriorIsDisplayed = true;
+            }
+            else
+            {
+                InteriorIsDisplayed = false;
+            }
         }
 
         public void HandleInput()
@@ -83,18 +94,21 @@ namespace StellarOps.Ships
         public override void Draw(SpriteBatch spriteBatch)
         {
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            spriteBatch.Draw(MainGame.Camera.Scale > 1.2 ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 1f, SpriteEffects.None, 1f);
+            spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 1f, SpriteEffects.None, 1f);
 
-            //Test Tilemap
-            Vector2 origin = imageCenter;
-            for (int y = 0; y < tileMap.GetLength(0); y++)
+            //Debug Tilemap
+            if (MainGame.IsDebugging)
             {
-                for (int x = 0; x < tileMap.GetLength(1); x++)
+                Vector2 origin = imageCenter;
+                for (int y = 0; y < tileMap.GetLength(0); y++)
                 {
-                    Texture2D tileToDraw = tileMap[y, x] == 0 ? testTile0 : testTile1;
-                    Vector2 offset = new Vector2(x * tileToDraw.Width, y * tileToDraw.Height);
-                    origin = imageCenter - offset;
-                    spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
+                    for (int x = 0; x < tileMap.GetLength(1); x++)
+                    {
+                        Texture2D tileToDraw = tileMap[y, x] == 0 ? testTile0 : testTile1;
+                        Vector2 offset = new Vector2(x * tileToDraw.Width, y * tileToDraw.Height);
+                        origin = imageCenter - offset;
+                        spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
+                    }
                 }
             }
         }
