@@ -11,19 +11,19 @@ namespace StellarOps
     {
         //public float Thrust;
         //public float TurnRate;
-        public ShipCore Ship;
+        //public ShipCore Ship;
         //float maxVelocity => 500;
         //Vector2 acceleration;
         //Weapon PrimaryWeapon;
 
-        bool IsPiloting;
+        //bool IsPiloting;
 
         public Player()
         {
-            Ship = new TestShip(Vector2.Zero);
-            IsPiloting = true;
+            //IsPiloting = true;
             Image = Art.Player;
-            Position = new Vector2(235,-18);
+            Position = new Vector2(540,180);
+            //Position = Vector2.Zero;
             //PrimaryWeapon = new Weapon()
             //{
             //    Cooldown = 10,
@@ -37,17 +37,17 @@ namespace StellarOps
         public override void Update(GameTime gameTime)
         {
             HandleInput(gameTime);
-            Ship.Update(gameTime);
+            //Ship.Update(gameTime);
         }
 
         public void HandleInput(GameTime gameTime)
         {
-            if (IsPiloting)
-            {
-                Ship.HandleInput();
-            }
+            //if (IsPiloting)
+            //{
+            //    Ship.HandleInput();
+            //}
 
-            if (Input.MouseState.LeftButton == ButtonState.Pressed && Ship.InteriorIsDisplayed)
+            if (Input.MouseState.LeftButton == ButtonState.Pressed/* && !Ship.InteriorIsDisplayed*/)
             {
                 Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
                 if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))
@@ -60,13 +60,19 @@ namespace StellarOps
             }
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            Ship.Draw(spriteBatch);
-            if (Ship.InteriorIsDisplayed)
+            if (parentTransform != Matrix.Identity || MainGame.Camera.Focus == this)
             {
-                Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-                spriteBatch.Draw(Image, Position, null, Color.White, Heading - (float)(Math.PI * 0.5f), imageCenter, 1f, SpriteEffects.None, 1f);
+                // Calculate global transform
+                Matrix globalTransform = LocalTransform * parentTransform;
+
+                //// Get values from GlobalTransform for SpriteBatch and render sprite
+                Vector2 position, scale;
+                float rotation;
+                DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
+                Console.WriteLine($"{position} | {Position}");
+                spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), Vector2.Zero, scale, SpriteEffects.None, 0.0f);
             }
         }
     }

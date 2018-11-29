@@ -11,6 +11,7 @@ namespace StellarOps
         public Vector2 Origin { get; set; }
         public float Scale { get; set; }
         public Matrix Transform { get; set; }
+        public IFocusable Focus { get; set; }
 
         private int previousScrollValue;
 
@@ -21,6 +22,7 @@ namespace StellarOps
 
         public void Update(IFocusable focus)
         {
+            Focus = focus;
             Transform = Matrix.CreateTranslation(new Vector3(-focus.Position.X, -focus.Position.Y, 0)) *
                 Matrix.CreateRotationZ(Rotation) *
                 Matrix.CreateScale(new Vector3(Scale, Scale, 1)) *

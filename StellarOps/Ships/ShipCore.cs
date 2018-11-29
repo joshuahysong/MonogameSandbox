@@ -15,6 +15,7 @@ namespace StellarOps.Ships
         public float MaxVelocity;
         public List<Weapon> Weapons;
         public bool InteriorIsDisplayed;
+        public List<Entity> CrewMembers;
 
         protected int[,] tileMap;
         protected Texture2D testTile0;
@@ -24,12 +25,15 @@ namespace StellarOps.Ships
 
         public ShipCore()
         {
+            CrewMembers = new List<Entity>();
             testTile0 = MainGame.Instance.DrawTileRectangle(35, Color.Blue * 0.2f, Color.Blue);
             testTile1 = MainGame.Instance.DrawTileRectangle(35, Color.Red * 0.2f, Color.Red);
         }
 
         public override void Update(GameTime gameTime)
         {
+            HandleInput();
+
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Position += Velocity * deltaTime;
@@ -91,15 +95,25 @@ namespace StellarOps.Ships
             //}
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, Position, null, Color.White, Heading, imageCenter, 1f, SpriteEffects.None, 1f);
+            // Calculate global transform
+            Matrix globalTransform = LocalTransform * parentTransform;
+
+            //// Get values from GlobalTransform for SpriteBatch and render sprite
+            Vector2 position, scale;
+            float rotation;
+            DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
+            spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, position, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.0f);
+
+            // Draw Children
+            Children.ForEach(c => c.Draw(spriteBatch, globalTransform));
 
             //Debug Tilemap
+            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+            Vector2 origin = imageCenter;
             if (MainGame.IsDebugging)
             {
-                Vector2 origin = imageCenter;
                 for (int y = 0; y < tileMap.GetLength(0); y++)
                 {
                     for (int x = 0; x < tileMap.GetLength(1); x++)

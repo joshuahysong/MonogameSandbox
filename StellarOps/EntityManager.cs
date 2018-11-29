@@ -59,11 +59,11 @@ namespace StellarOps
             bullets = bullets.Where(x => !x.IsExpired).ToList();
         }
 
-        public static void Draw(SpriteBatch spriteBatch)
+        public static void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
             foreach (Entity entity in entities)
             {
-                entity.Draw(spriteBatch);
+                entity.Draw(spriteBatch, parentTransform);
             }
         }
     }

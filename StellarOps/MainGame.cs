@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StellarOps.Ships;
 using System;
 
 namespace StellarOps
@@ -14,6 +15,7 @@ namespace StellarOps
         public static Random Random = new Random();
         public static bool IsDebugging = false;
         public static Player Player;
+        public static ShipCore Ship;
         public static Camera Camera { get; set; }
 
         private int TileSize => 1000;
@@ -45,6 +47,9 @@ namespace StellarOps
             base.Initialize();
             Player = new Player();
             EntityManager.Add(Player);
+            Ship = new TestShip(Vector2.Zero);
+            Ship.Children.Add(Player);
+            EntityManager.Add(Ship);
         }
 
         protected override void LoadContent()
@@ -59,7 +64,7 @@ namespace StellarOps
             this.HandleInput();
             Camera.HandleInput();
 
-            Camera.Update(Player.Ship);
+            Camera.Update(Ship);
             EntityManager.Update(gameTime);
             base.Update(gameTime);
         }
@@ -74,7 +79,7 @@ namespace StellarOps
             {
                 DrawBackground(spriteBatch, true);
             }
-            EntityManager.Draw(spriteBatch);
+            EntityManager.Draw(spriteBatch, Matrix.Identity);
             spriteBatch.End();
 
             spriteBatch.Begin();
