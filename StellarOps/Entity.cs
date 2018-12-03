@@ -13,16 +13,19 @@ namespace StellarOps
         public Vector2 Velocity;
         public float Heading;
         public Texture2D Image;
+        public Vector2 ImageCenter => new Vector2(Image.Width / 2, Image.Height / 2);
         public Matrix LocalTransform {
             get {
                 // Transform = -Origin * Scale * Rotation * Translation
-                return Matrix.CreateTranslation(-Image.Width / 2f, -Image.Height / 2f, 0f) *
-                       Matrix.CreateScale(1f, 1f, 1f) *
-                       Matrix.CreateRotationZ(Heading) *
-                       Matrix.CreateTranslation(Position.X, Position.Y, 0f);
+                return //Matrix.CreateTranslation(-Image.Width / 2f, -Image.Height / 2f, 0f) *
+                    Matrix.CreateTranslation(0, 0, 0f) *
+                    Matrix.CreateScale(1f, 1f, 1f) *
+                    Matrix.CreateRotationZ(Heading) *
+                    Matrix.CreateTranslation(Position.X, Position.Y, 0f);
             }
         }
         public List<Entity> Children;
+        public bool IsChild;
 
         public float Radius = 20;
         public bool IsExpired;
@@ -40,7 +43,7 @@ namespace StellarOps
             Children = new List<Entity>();
         }
 
-        public abstract void Update(GameTime gameTime);
+        public abstract void Update(GameTime gameTime, Matrix parentTransform);
 
         public virtual void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {

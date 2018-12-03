@@ -36,13 +36,13 @@ namespace StellarOps
             }
         }
 
-        public static void Update(GameTime gameTime)
+        public static void Update(GameTime gameTime, Matrix parentTransform)
         {
             isUpdating = true;
 
             foreach (Entity entity in entities)
             {
-                entity.Update(gameTime);
+                entity.Update(gameTime, parentTransform);
             }
 
             isUpdating = false;
@@ -61,7 +61,7 @@ namespace StellarOps
 
         public static void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            foreach (Entity entity in entities)
+            foreach (Entity entity in entities.Where(e => !e.IsChild))
             {
                 entity.Draw(spriteBatch, parentTransform);
             }

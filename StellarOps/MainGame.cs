@@ -65,7 +65,7 @@ namespace StellarOps
             Camera.HandleInput();
 
             Camera.Update(Ship);
-            EntityManager.Update(gameTime);
+            EntityManager.Update(gameTime, Matrix.Identity);
             base.Update(gameTime);
         }
 
@@ -75,11 +75,11 @@ namespace StellarOps
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Camera.Transform);
             DrawBackground(spriteBatch);
+            EntityManager.Draw(spriteBatch, Matrix.Identity);
             if (IsDebugging)
             {
                 DrawBackground(spriteBatch, true);
             }
-            EntityManager.Draw(spriteBatch, Matrix.Identity);
             spriteBatch.End();
 
             spriteBatch.Begin();

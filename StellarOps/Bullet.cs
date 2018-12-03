@@ -18,7 +18,7 @@ namespace StellarOps
             timeToLive = 10;
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Velocity.LengthSquared() > 0)

@@ -30,7 +30,7 @@ namespace StellarOps.Ships
             testTile1 = MainGame.Instance.DrawTileRectangle(35, Color.Red * 0.2f, Color.Red);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             HandleInput();
 
@@ -58,6 +58,8 @@ namespace StellarOps.Ships
             {
                 InteriorIsDisplayed = false;
             }
+
+            Children.ForEach(c => c.Update(gameTime, LocalTransform));
         }
 
         public void HandleInput()
@@ -104,7 +106,7 @@ namespace StellarOps.Ships
             Vector2 position, scale;
             float rotation;
             DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
-            spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, position, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
 
             // Draw Children
             Children.ForEach(c => c.Draw(spriteBatch, globalTransform));
