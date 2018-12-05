@@ -11,7 +11,6 @@ namespace StellarOps
         public Player()
         {
             Image = Art.Player;
-            //Position = new Vector2(Image.Width / 2, Image.Height / 2);
             Position = Vector2.Zero;
             IsChild = true;
         }
@@ -23,7 +22,6 @@ namespace StellarOps
 
         public void HandleInput(GameTime gameTime, Matrix parentTransform)
         {
-
             if (Input.MouseState.LeftButton == ButtonState.Pressed)
             {
                 Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
@@ -38,11 +36,16 @@ namespace StellarOps
                     Vector2 direction = Vector2.Normalize(targetPosition - position);
 
                     // Get parent rotation
-                    DecomposeMatrix(ref parentTransform, out position, out rotation, out scale);
+                    Vector2 parentPosition;
+                    Vector2 parentScale;
+                    float parentRotation;
+                    DecomposeMatrix(ref parentTransform, out parentPosition, out parentRotation, out parentScale);
 
-                    Heading = (float)Math.Atan2(direction.Y, direction.X) - rotation;
+                    Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
 
-                    //Position += direction * (float)gameTime.ElapsedGameTime.TotalSeconds * 50.0f;
+                    Vector2 moveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(Heading), (float)Math.Sin(Heading)));
+
+                    Position += (moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * 50.0f);
                 }
             }
         }

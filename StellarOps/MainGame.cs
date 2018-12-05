@@ -46,7 +46,6 @@ namespace StellarOps
 
             base.Initialize();
             Player = new Player();
-            EntityManager.Add(Player);
             Ship = new TestShip(Vector2.Zero);
             Ship.Children.Add(Player);
             EntityManager.Add(Ship);
