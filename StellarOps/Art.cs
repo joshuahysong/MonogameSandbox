@@ -24,8 +24,8 @@ namespace StellarOps
             Wanderer = content.Load<Texture2D>("Wanderer");
             Bullet = content.Load<Texture2D>("Bullet");
             Pointer = content.Load<Texture2D>("Pointer");
-            TestShip = content.Load<Texture2D>("Ships/TestShip");
-            TestShipInterior = content.Load<Texture2D>("Ships/TestShip_Interior");
+            TestShip = content.Load<Texture2D>("Ships/TestShip_Interior2");
+            TestShipInterior = content.Load<Texture2D>("Ships/TestShip_Interior2");
 
             DebugFont = content.Load<SpriteFont>("DebugFont");
         }

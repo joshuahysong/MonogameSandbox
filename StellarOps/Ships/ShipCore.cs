@@ -18,16 +18,17 @@ namespace StellarOps.Ships
         public List<Entity> CrewMembers;
 
         protected int[,] tileMap;
-        protected Texture2D testTile0;
-        protected Texture2D testTile1;
+        protected Dictionary<int, Texture2D> debugTiles;
 
         Vector2 acceleration;
 
         public ShipCore()
         {
             CrewMembers = new List<Entity>();
-            testTile0 = MainGame.Instance.DrawTileRectangle(35, Color.Blue * 0.2f, Color.Blue);
-            testTile1 = MainGame.Instance.DrawTileRectangle(35, Color.Red * 0.2f, Color.Red);
+            debugTiles = new Dictionary<int, Texture2D>();
+            debugTiles.Add(0, MainGame.Instance.DrawTileRectangle(35, Color.DimGray * 0.2f, Color.DimGray * 0.3f));
+            debugTiles.Add(1, MainGame.Instance.DrawTileRectangle(35, Color.Blue * 0.2f, Color.Blue * 0.3f));
+            debugTiles.Add(2, MainGame.Instance.DrawTileRectangle(35, Color.Red * 0.2f, Color.Red * 0.3f));
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -120,7 +121,7 @@ namespace StellarOps.Ships
                 {
                     for (int x = 0; x < tileMap.GetLength(1); x++)
                     {
-                        Texture2D tileToDraw = tileMap[y, x] == 0 ? testTile0 : testTile1;
+                        Texture2D tileToDraw = debugTiles[tileMap[y, x]];
                         Vector2 offset = new Vector2(x * tileToDraw.Width, y * tileToDraw.Height);
                         origin = imageCenter - offset;
                         spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
