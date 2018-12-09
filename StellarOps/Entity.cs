@@ -8,6 +8,7 @@ namespace StellarOps
     public abstract class Entity
     {
         protected Color color = Color.White;
+        protected Texture2D boundingBox => MainGame.Instance.DrawTileRectangle(Image.Width, Image.Height, Color.Green* 0.2f, Color.Green * 0.3f);
 
         public Vector2 Position { get; set; }
         public Vector2 Velocity;

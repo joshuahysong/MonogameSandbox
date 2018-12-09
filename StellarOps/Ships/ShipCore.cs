@@ -26,9 +26,9 @@ namespace StellarOps.Ships
         {
             CrewMembers = new List<Entity>();
             debugTiles = new Dictionary<int, Texture2D>();
-            debugTiles.Add(0, MainGame.Instance.DrawTileRectangle(35, Color.DimGray * 0.2f, Color.DimGray * 0.3f));
-            debugTiles.Add(1, MainGame.Instance.DrawTileRectangle(35, Color.Blue * 0.2f, Color.Blue * 0.3f));
-            debugTiles.Add(2, MainGame.Instance.DrawTileRectangle(35, Color.Red * 0.2f, Color.Red * 0.3f));
+            debugTiles.Add(0, MainGame.Instance.DrawTileRectangle(35, 35, Color.DimGray * 0.2f, Color.DimGray * 0.3f));
+            debugTiles.Add(1, MainGame.Instance.DrawTileRectangle(35, 35, Color.Blue * 0.2f, Color.Blue * 0.3f));
+            debugTiles.Add(2, MainGame.Instance.DrawTileRectangle(35, 35, Color.Red * 0.2f, Color.Red * 0.3f));
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)

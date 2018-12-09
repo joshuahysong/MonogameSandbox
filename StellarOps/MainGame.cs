@@ -41,8 +41,8 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            starTile = DrawStars(DrawTileRectangle(TileSize, Color.TransparentBlack, Color.TransparentBlack));
-            debugTile = DrawTileRectangle(TileSize, Color.TransparentBlack, Color.DimGray);
+            starTile = DrawStars(DrawTileRectangle(TileSize, TileSize, Color.TransparentBlack, Color.TransparentBlack));
+            debugTile = DrawTileRectangle(TileSize, TileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
 
             base.Initialize();
             Player = new Player();
@@ -112,13 +112,13 @@ namespace StellarOps
             }
         }
 
-        public Texture2D DrawTileRectangle(int tileSize, Color fillColor, Color borderColor)
+        public Texture2D DrawTileRectangle(int width, int height, Color fillColor, Color borderColor)
         {
-            Texture2D tile = new Texture2D(GraphicsDevice, tileSize, tileSize);
-            Color[] data = new Color[tileSize * tileSize];
+            Texture2D tile = new Texture2D(GraphicsDevice, width, height);
+            Color[] data = new Color[width * height];
             for (int i = 0; i < data.Length; ++i)
             {
-                if (i < tileSize || i % tileSize == 0 || i > tileSize * tileSize - tileSize || (i + 1) % tileSize == 0)
+                if (i < width || i % width == 0 || i > width * height - width || (i + 1) % width == 0)
                 {
                     data[i] = borderColor;
                 }

@@ -61,6 +61,11 @@ namespace StellarOps
             DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
             var imageCenter = new Vector2(Image.Width / 8, Image.Height / 8);
             spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
+
+            if (MainGame.IsDebugging)
+            {
+                spriteBatch.Draw(boundingBox, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
+            }
         }
     }
 }
