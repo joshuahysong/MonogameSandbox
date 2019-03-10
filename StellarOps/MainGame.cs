@@ -87,6 +87,7 @@ namespace StellarOps
             spriteBatch.Draw(Art.Pointer, new Vector2(Input.MouseState.X, Input.MouseState.Y), Color.White);
             if (IsDebugging)
             {
+                // Left Top
                 spriteBatch.DrawString(Art.DebugFont, $"Position: {Math.Round(Player.Position.X)}, {Math.Round(Player.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Velocity: {Math.Round(Player.Velocity.X)}, {Math.Round(Player.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 20), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Heading: {Math.Round(Player.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 35), Color.White);
@@ -94,8 +95,12 @@ namespace StellarOps
                 spriteBatch.DrawString(Art.DebugFont, $"Zoom: {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Mouse Screen Position: \r {Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 80), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Mouse World Position: \r {Input.WorldMousePosition.X}, {Input.WorldMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 95), Color.White);
+
+                // Right Top
                 string fps = $"FPS : {Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
                 spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);
+                string focusName = $"Camera Focus: {Camera.Focus.GetType().Name}";
+                spriteBatch.DrawString(Art.DebugFont, focusName, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(focusName).X, Viewport.Bounds.Y + 20), Color.White);
             }
             spriteBatch.End();
 

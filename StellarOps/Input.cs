@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace StellarOps
 {
@@ -13,9 +14,11 @@ namespace StellarOps
         public static GamePadState LastGamepadState;
         public static Vector2 ScreenMousePosition;
         public static Vector2 WorldMousePosition;
+        public static List<Keys> ManagedKeys;
 
         public static void Update()
         {
+            ManagedKeys = new List<Keys>();
             LastKeyboardState = KeyboardState;
             LastMouseState = MouseState;
             LastGamepadState = GamepadState;
@@ -36,6 +39,11 @@ namespace StellarOps
         public static bool WasKeyPressed(Keys key)
         {
             return LastKeyboardState.IsKeyUp(key) && KeyboardState.IsKeyDown(key);
+        }
+
+        public static bool IsKeyToggled(Keys key)
+        {
+            return !LastKeyboardState.IsKeyDown(key) && KeyboardState.IsKeyDown(key);
         }
 
         public static bool IsButtonPressed(Buttons button)

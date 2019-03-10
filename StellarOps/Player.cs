@@ -8,7 +8,7 @@ namespace StellarOps
 {
     public class Player : Entity, IFocusable
     {
-        public Vector2 WorldPosition { get; private set; }
+        public Vector2 WorldPosition { get; set; }
 
         public Player()
         {
@@ -22,7 +22,6 @@ namespace StellarOps
             HandleInput(gameTime, parentTransform);
             HandleCollisions();
             GetTilePosition();
-            //Console.WriteLine(this.Position);
         }
 
         public void HandleInput(GameTime gameTime, Matrix parentTransform)
@@ -35,25 +34,30 @@ namespace StellarOps
             DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
             WorldPosition = position;
 
-            if (Input.MouseState.LeftButton == ButtonState.Pressed)
+            if (MainGame.Camera.Focus == this)
             {
-                Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
-
-                if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))
+                if (Input.MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    Vector2 direction = Vector2.Normalize(targetPosition - position);
+                    Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
 
-                    // Get parent rotation
-                    Vector2 parentPosition;
-                    Vector2 parentScale;
-                    float parentRotation;
-                    DecomposeMatrix(ref parentTransform, out parentPosition, out parentRotation, out parentScale);
+                    if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))
+                    {
+                        Vector2 direction = Vector2.Normalize(targetPosition - position);
 
-                    Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
-
-                    Vector2 moveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(Heading), (float)Math.Sin(Heading)));
-
-                    Position += (moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * 50.0f);
+                        // Get parent rotation
+                        Vector2 parentPosition;
+                        Vector2 parentScale;
+                        float parentRotation;
+                        DecomposeMatrix(ref parentTransform, out parentPosition, out parentRotation, out parentScale);
+                        Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
+                        Vector2 moveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(Heading), (float)Math.Sin(Heading)));
+                        Position += (moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * 50.0f);
+                    }
+                }
+                if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
+                {
+                    Input.ManagedKeys.Add(Keys.F);
+                    MainGame.Camera.Focus = MainGame.Ship;
                 }
             }
         }
@@ -64,7 +68,8 @@ namespace StellarOps
             Matrix globalTransform = LocalTransform * parentTransform;
 
             //// Get values from GlobalTransform for SpriteBatch and render sprite
-            Vector2 position, scale;
+            Vector2 position;
+            Vector2 scale;
             float rotation;
             DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
             var imageCenter = new Vector2(Image.Width / 8, Image.Height / 8);

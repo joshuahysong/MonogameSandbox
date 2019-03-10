@@ -17,7 +17,7 @@ namespace StellarOps.Ships
         public List<Weapon> Weapons;
         public bool InteriorIsDisplayed;
         public int[,] TileMap;
-        public Vector2 WorldPosition { get; private set; }
+        public Vector2 WorldPosition { get; set; }
 
         protected Dictionary<int, Texture2D> debugTiles;
 
@@ -66,41 +66,45 @@ namespace StellarOps.Ships
 
         public void HandleInput()
         {
-            // Apply thrust
-            if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
+            if (MainGame.Camera.Focus == this)
             {
-                acceleration.X += Thrust * (float)Math.Cos(Heading);
-                acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                // Apply thrust
+                if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
+                {
+                    acceleration.X += Thrust * (float)Math.Cos(Heading);
+                    acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                }
+                // Rotate Counter-Clockwise
+                if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
+                {
+                    RotateCounterClockwise();
+                }
+                // Rotate Clockwise
+                else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
+                {
+                    RotateClockwise();
+                }
+                // Rotate to face retro thurst heading
+                else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
+                {
+                    RotateToRetro(false);
+                }
+                // Rotate to face retro thurst heading and thrust to brake
+                else if (Input.IsKeyPressed(Keys.X))
+                {
+                    RotateToRetro(true);
+                }
+                if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
+                {
+                    Input.ManagedKeys.Add(Keys.F);
+                    MainGame.Camera.Focus = MainGame.Player;
+                }
+                // Fire Primary Weapon
+                //if (Input.IsKeyPressed(Keys.Space))
+                //{
+                //    PrimaryWeapon.Fire(Heading, Velocity, Position);
+                //}
             }
-            // Rotate Counter-Clockwise
-            if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
-            {
-                RotateCounterClockwise();
-            }
-            // Rotate Clockwise
-            else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
-            {
-                RotateClockwise();
-            }
-            // Rotate to face retro thurst heading
-            else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
-            {
-                RotateToRetro(false);
-            }
-            // Rotate to face retro thurst heading and thrust to brake
-            else if (Input.IsKeyPressed(Keys.X))
-            {
-                RotateToRetro(true);
-            }
-            if (Input.IsKeyPressed(Keys.F))
-            {
-                MainGame.Camera.Focus = (Player)Children.First();
-            }
-            // Fire Primary Weapon
-            //if (Input.IsKeyPressed(Keys.Space))
-            //{
-            //    PrimaryWeapon.Fire(Heading, Velocity, Position);
-            //}
         }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
