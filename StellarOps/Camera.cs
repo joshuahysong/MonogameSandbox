@@ -52,9 +52,13 @@ namespace StellarOps
             if (Input.MouseState.ScrollWheelValue < previousScrollValue)
             {
                 Scale -= 0.1f;
-                if (Scale < 0.5f)
+                if (Scale < 1f && Focus == MainGame.Player)
                 {
-                    Scale = 0.5f;
+                    Scale = 1f;
+                }
+                else if (Scale < 0.1f)
+                {
+                    Scale = 0.1f;
                 }
             }
             else if (Input.MouseState.ScrollWheelValue > previousScrollValue)

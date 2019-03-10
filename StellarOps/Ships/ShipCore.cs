@@ -98,6 +98,10 @@ namespace StellarOps.Ships
                 {
                     Input.ManagedKeys.Add(Keys.F);
                     MainGame.Camera.Focus = MainGame.Player;
+                    if (MainGame.Camera.Scale < 1f)
+                    {
+                        MainGame.Camera.Scale = 1F;
+                    }
                 }
                 // Fire Primary Weapon
                 //if (Input.IsKeyPressed(Keys.Space))
