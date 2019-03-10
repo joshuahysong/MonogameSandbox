@@ -14,7 +14,7 @@ namespace StellarOps.Ships
             MaxVelocity = 400f;
             Image = Art.TestShip;
             InteriorImage = Art.TestShipInterior;
-            tileMap = new int[,]
+            TileMap = new int[,]
             {
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
                 {0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0},

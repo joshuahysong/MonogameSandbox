@@ -47,7 +47,9 @@ namespace StellarOps
             base.Initialize();
             Player = new Player();
             Ship = new TestShip(Vector2.Zero);
+            Camera.Focus = Ship;
             Ship.Children.Add(Player);
+            Player.Container = Ship;
             EntityManager.Add(Ship);
         }
 
@@ -63,7 +65,7 @@ namespace StellarOps
             this.HandleInput();
             Camera.HandleInput();
 
-            Camera.Update(Ship);
+            Camera.Update(Camera.Focus);
             EntityManager.Update(gameTime, Matrix.Identity);
             base.Update(gameTime);
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StellarOps.Ships;
 using System;
 using System.Collections.Generic;
 
@@ -7,13 +8,14 @@ namespace StellarOps
 {
     public abstract class Entity
     {
-        protected Color color = Color.White;
-        protected Texture2D boundingBox => MainGame.Instance.DrawTileRectangle(Image.Width, Image.Height, Color.Green* 0.2f, Color.Green * 0.3f);
-
         public Vector2 Position { get; set; }
         public Vector2 Velocity;
         public float Heading;
         public Texture2D Image;
+
+        protected Color color = Color.White;
+        protected Texture2D boundingBox => MainGame.Instance.DrawTileRectangle(Image.Width, Image.Height, Color.Green* 0.2f, Color.Green * 0.3f);
+
         public Vector2 ImageCenter => new Vector2(Image.Width / 2, Image.Height / 2);
         public Matrix LocalTransform {
             get {
@@ -25,11 +27,24 @@ namespace StellarOps
                     Matrix.CreateTranslation(Position.X, Position.Y, 0f);
             }
         }
+
+        public ShipCore Container; // Genericize away from ship
         public List<Entity> Children;
         public bool IsChild;
 
         public float Radius = 20;
         public bool IsExpired;
+
+        public Rectangle BoundingRectangle
+        {
+            get
+            {
+                int left = (int)Math.Round(Position.X);
+                int top = (int)Math.Round(Position.Y);
+
+                return new Rectangle(left, top, Image.Width, Image.Height);
+            }
+        }
 
         public Vector2 Size
         {
@@ -60,6 +75,14 @@ namespace StellarOps
             rotation = (float)Math.Atan2(direction.Y, direction.X);
             position = new Vector2(position3.X, position3.Y);
             scale = new Vector2(scale3.X, scale3.Y);
+        }
+
+        public void GetTilePosition()
+        {
+            Vector2 startLocation = Vector2.Zero;
+            int numberOfTilesY = Container.TileMap.GetLength(0);
+            int numberOfTilesX = Container.TileMap.GetLength(1);
+            //Console.WriteLine($"{numberOfTilesX}, {numberOfTilesY}");
         }
     }
 }

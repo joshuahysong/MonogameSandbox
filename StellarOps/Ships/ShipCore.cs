@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StellarOps.Ships
 {
@@ -15,16 +16,15 @@ namespace StellarOps.Ships
         public float MaxVelocity;
         public List<Weapon> Weapons;
         public bool InteriorIsDisplayed;
-        public List<Entity> CrewMembers;
+        public int[,] TileMap;
+        public Vector2 WorldPosition { get; private set; }
 
-        protected int[,] tileMap;
         protected Dictionary<int, Texture2D> debugTiles;
 
         Vector2 acceleration;
 
         public ShipCore()
         {
-            CrewMembers = new List<Entity>();
             debugTiles = new Dictionary<int, Texture2D>();
             debugTiles.Add(0, MainGame.Instance.DrawTileRectangle(35, 35, Color.DimGray * 0.2f, Color.DimGray * 0.3f));
             debugTiles.Add(1, MainGame.Instance.DrawTileRectangle(35, 35, Color.Blue * 0.2f, Color.Blue * 0.3f));
@@ -38,6 +38,7 @@ namespace StellarOps.Ships
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Position += Velocity * deltaTime;
+            WorldPosition = Position;
             Velocity += acceleration * deltaTime;
             if (Velocity.X > MaxVelocity || Velocity.X < MaxVelocity * -1)
             {
@@ -91,6 +92,10 @@ namespace StellarOps.Ships
             {
                 RotateToRetro(true);
             }
+            if (Input.IsKeyPressed(Keys.F))
+            {
+                MainGame.Camera.Focus = (Player)Children.First();
+            }
             // Fire Primary Weapon
             //if (Input.IsKeyPressed(Keys.Space))
             //{
@@ -117,11 +122,11 @@ namespace StellarOps.Ships
             Vector2 origin = imageCenter;
             if (MainGame.IsDebugging)
             {
-                for (int y = 0; y < tileMap.GetLength(0); y++)
+                for (int y = 0; y < TileMap.GetLength(0); y++)
                 {
-                    for (int x = 0; x < tileMap.GetLength(1); x++)
+                    for (int x = 0; x < TileMap.GetLength(1); x++)
                     {
-                        Texture2D tileToDraw = debugTiles[tileMap[y, x]];
+                        Texture2D tileToDraw = debugTiles[TileMap[y, x]];
                         Vector2 offset = new Vector2(x * tileToDraw.Width, y * tileToDraw.Height);
                         origin = imageCenter - offset;
                         spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
@@ -193,6 +198,20 @@ namespace StellarOps.Ships
         {
             double brakingRange = MaxVelocity / 100;
             return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
+        }
+
+        public bool GetCollision(int x, int y)
+        {
+            //Console.WriteLine($"{x},{y}");
+            return false;// tileMap[x, y] == 1;
+        }
+
+        /// <summary>
+        /// Gets the bounding rectangle of a tile in world space.
+        /// </summary>
+        public Rectangle GetBounds(int x, int y)
+        {
+            return new Rectangle(x * 35, y * 35, 35, 35);
         }
     }
 }

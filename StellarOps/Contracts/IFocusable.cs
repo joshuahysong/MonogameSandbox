@@ -4,6 +4,6 @@ namespace StellarOps.Contracts
 {
     public interface IFocusable
     {
-        Vector2 Position { get; }
+        Vector2 WorldPosition { get; }
     }
 }

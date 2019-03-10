@@ -3,7 +3,7 @@ using StellarOps.Contracts;
 
 namespace StellarOps
 {
-    public class Bullet : Entity, IFocusable
+    public class Bullet : Entity
     {
         long timeToLive;
         double timeAlive;
