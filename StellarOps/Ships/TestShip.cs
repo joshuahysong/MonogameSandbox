@@ -9,9 +9,9 @@ namespace StellarOps.Ships
         {
             Position = Vector2.Zero;
             Heading = 0.0f;
-            Thrust = 250;
+            Thrust = 250f;
             TurnRate = 0.02f;
-            MaxVelocity = 400f;
+            MaxVelocity = 500f;
             Image = Art.TestShip;
             InteriorImage = Art.TestShipInterior;
             TileMap = new int[,]

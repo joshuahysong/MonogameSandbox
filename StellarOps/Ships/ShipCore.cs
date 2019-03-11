@@ -21,7 +21,7 @@ namespace StellarOps.Ships
 
         protected Dictionary<int, Texture2D> debugTiles;
 
-        Vector2 acceleration;
+        private Vector2 _acceleration;
 
         public ShipCore()
         {
@@ -37,19 +37,17 @@ namespace StellarOps.Ships
 
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            Velocity += _acceleration * deltaTime;
+
+            if (Velocity.LengthSquared() > MaxVelocity * MaxVelocity)
+            {
+                Velocity.Normalize();
+                Velocity *= MaxVelocity;
+            }
+            _acceleration.X = 0;
+            _acceleration.Y = 0;
             Position += Velocity * deltaTime;
             WorldPosition = Position;
-            Velocity += acceleration * deltaTime;
-            if (Velocity.X > MaxVelocity || Velocity.X < MaxVelocity * -1)
-            {
-                Velocity.X = Velocity.X < 0 ? -1 * MaxVelocity : MaxVelocity;
-            }
-            if (Velocity.Y > MaxVelocity || Velocity.Y < MaxVelocity * -1)
-            {
-                Velocity.Y = Velocity.Y < 0 ? -1 * MaxVelocity : MaxVelocity;
-            }
-            acceleration.X = 0;
-            acceleration.Y = 0;
 
             // Interior Display
             if (MainGame.Camera.Scale > 1.2)
@@ -71,8 +69,8 @@ namespace StellarOps.Ships
                 // Apply thrust
                 if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
                 {
-                    acceleration.X += Thrust * (float)Math.Cos(Heading);
-                    acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                    _acceleration.X += Thrust * (float)Math.Cos(Heading);
+                    _acceleration.Y += Thrust * (float)Math.Sin(Heading);
                 }
                 // Rotate Counter-Clockwise
                 if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
@@ -196,8 +194,8 @@ namespace StellarOps.Ships
                 }
                 else if (Heading == retroHeading)
                 {
-                    acceleration.X += Thrust * (float)Math.Cos(Heading);
-                    acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                    _acceleration.X += Thrust * (float)Math.Cos(Heading);
+                    _acceleration.Y += Thrust * (float)Math.Sin(Heading);
                 }
             }
         }
