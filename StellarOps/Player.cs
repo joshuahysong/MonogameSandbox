@@ -9,6 +9,7 @@ namespace StellarOps
     public class Player : Entity, IFocusable
     {
         public Vector2 WorldPosition { get; set; }
+        public float Speed => 50f;
 
         public Player()
         {
@@ -36,22 +37,43 @@ namespace StellarOps
 
             if (MainGame.Camera.Focus == this)
             {
-                if (Input.MouseState.LeftButton == ButtonState.Pressed)
+                Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
+                float parentRotation = 0;
+
+                if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))
                 {
-                    Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
+                    Vector2 direction = Vector2.Normalize(targetPosition - position);
 
-                    if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))
+                    Vector2 parentPosition;
+                    Vector2 parentScale;
+                    DecomposeMatrix(ref parentTransform, out parentPosition, out parentRotation, out parentScale);
+                    Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
+
+                    if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.D))
                     {
-                        Vector2 direction = Vector2.Normalize(targetPosition - position);
-
-                        // Get parent rotation
-                        Vector2 parentPosition;
-                        Vector2 parentScale;
-                        float parentRotation;
-                        DecomposeMatrix(ref parentTransform, out parentPosition, out parentRotation, out parentScale);
-                        Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
-                        Vector2 moveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(Heading), (float)Math.Sin(Heading)));
-                        Position += (moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * 50.0f);
+                        Vector2 moveDirection = new Vector2();
+                        float relativeHeading = 0;
+                        if (Input.IsKeyPressed(Keys.W))
+                        {
+                            relativeHeading = (float)Math.Atan2(1, 0) - parentRotation;
+                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                        }
+                        if (Input.IsKeyPressed(Keys.S))
+                        {
+                            relativeHeading = (float)Math.Atan2(-1, 0) - parentRotation;
+                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                        }
+                        if (Input.IsKeyPressed(Keys.A))
+                        {
+                            relativeHeading = (float)Math.Atan2(0, 1) - parentRotation;
+                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                        }
+                        if (Input.IsKeyPressed(Keys.D))
+                        {
+                            relativeHeading = (float)Math.Atan2(0, -1) - parentRotation;
+                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                        }
+                        Position -= moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * Speed;
                     }
                 }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
