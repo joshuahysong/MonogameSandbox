@@ -27,24 +27,14 @@ namespace StellarOps
                     Matrix.CreateTranslation(Position.X, Position.Y, 0f);
             }
         }
+        public bool IsChild => Parent != null;
 
         public ShipCore Container; // Genericize away from ship
+        public Entity Parent;
         public List<Entity> Children;
-        public bool IsChild;
 
         public float Radius = 20;
         public bool IsExpired;
-
-        public Rectangle BoundingRectangle
-        {
-            get
-            {
-                int left = (int)Math.Round(Position.X);
-                int top = (int)Math.Round(Position.Y);
-
-                return new Rectangle(left, top, Image.Width, Image.Height);
-            }
-        }
 
         public Vector2 Size
         {
@@ -77,12 +67,19 @@ namespace StellarOps
             scale = new Vector2(scale3.X, scale3.Y);
         }
 
-        public void GetTilePosition()
+        public Rectangle GetBoundingRectangle()
         {
-            Vector2 startLocation = Vector2.Zero;
-            int numberOfTilesY = Container.TileMap.GetLength(0);
-            int numberOfTilesX = Container.TileMap.GetLength(1);
-            //Console.WriteLine($"{numberOfTilesX}, {numberOfTilesY}");
+            Vector2 rectangePosition = Position;
+            if (IsChild)
+            {
+                Vector2 imageCenter = new Vector2(Parent.Image.Width / 2, Parent.Image.Height / 2);
+                rectangePosition = Position + imageCenter;
+            }
+
+            int left = (int)Math.Round(rectangePosition.X);
+            int top = (int)Math.Round(rectangePosition.Y);
+
+            return new Rectangle(left, top, Image.Width, Image.Height);
         }
     }
 }

@@ -101,11 +101,6 @@ namespace StellarOps.Ships
                         MainGame.Camera.Scale = 2F;
                     }
                 }
-                // Fire Primary Weapon
-                //if (Input.IsKeyPressed(Keys.Space))
-                //{
-                //    PrimaryWeapon.Fire(Heading, Velocity, Position);
-                //}
             }
         }
 
@@ -115,7 +110,8 @@ namespace StellarOps.Ships
             Matrix globalTransform = LocalTransform * parentTransform;
 
             //// Get values from GlobalTransform for SpriteBatch and render sprite
-            Vector2 position, scale;
+            Vector2 position;
+            Vector2 scale;
             float rotation;
             DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
             spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
@@ -208,8 +204,7 @@ namespace StellarOps.Ships
 
         public bool GetCollision(int x, int y)
         {
-            //Console.WriteLine($"{x},{y}");
-            return false;// tileMap[x, y] == 1;
+            return TileMap[y, x] == 1;
         }
 
         /// <summary>
