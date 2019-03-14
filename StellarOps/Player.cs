@@ -15,6 +15,7 @@ namespace StellarOps
         public Player()
         {
             Image = Art.Player;
+            Radius = Image.Width / 2;
             Position = Vector2.Zero;
         }
 
@@ -71,11 +72,10 @@ namespace StellarOps
                             relativeHeading = (float)Math.Atan2(0, -1) - parentRotation;
                             moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
                         }
-                        Vector2 oldPosition = Position;
-                        Position -= moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * Speed;
-                        if (NewPositionBlocked())
+                        var newMovement = moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * Speed;
+                        if (!NewPositionBlocked(newMovement))
                         {
-                            Position = oldPosition;
+                            Position -= newMovement;
                         }
                     }
                 }
@@ -110,14 +110,21 @@ namespace StellarOps
             }
         }
 
-        private bool NewPositionBlocked()
+        private bool NewPositionBlocked(Vector2 newMovement)
         {
-            // Get the player's bounding rectangle and find neighboring tiles.
-            Rectangle bounds = GetBoundingRectangle();
-            int leftTile = (int)Math.Floor((float)bounds.Left / 35);
-            int topTile = (int)Math.Floor((float)bounds.Top / 35);
+            Vector2 futurePosition = Position - Vector2.Normalize(newMovement) * Radius;
+            Vector2 imageCenter = new Vector2(Parent.Image.Width / 2, Parent.Image.Height / 2);
+            Vector2 playerCenterPosition = futurePosition + imageCenter;
 
-            return ((ShipCore)Parent).GetCollision(leftTile, topTile);
+            int x = (int)Math.Floor(playerCenterPosition.X / 35);
+            int y = (int)Math.Floor(playerCenterPosition.Y / 35);
+
+            if (((ShipCore)Parent).GetCollision(x, y))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

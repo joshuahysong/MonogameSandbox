@@ -33,7 +33,7 @@ namespace StellarOps
         public Entity Parent;
         public List<Entity> Children;
 
-        public float Radius = 20;
+        public float Radius;
         public bool IsExpired;
 
         public Vector2 Size
