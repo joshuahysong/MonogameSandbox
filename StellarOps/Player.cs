@@ -15,7 +15,7 @@ namespace StellarOps
         public Player()
         {
             Image = Art.Player;
-            Radius = Image.Width / 2;
+            Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
             Position = Vector2.Zero;
         }
 
@@ -52,31 +52,52 @@ namespace StellarOps
                     {
                         Vector2 moveDirection = new Vector2();
                         float relativeHeading = 0;
+                        float movementSpeed = Speed;
+                        if (Input.IsKeyPressed(Keys.LeftShift))
+                        {
+                            movementSpeed = (float)(Speed * 1.75);
+                        }
                         if (Input.IsKeyPressed(Keys.W))
                         {
                             relativeHeading = (float)Math.Atan2(1, 0) - parentRotation;
-                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            if (!NewPositionBlocked(newMovement))
+                            {
+                                moveDirection += newMoveDirection;
+                            }
                         }
                         if (Input.IsKeyPressed(Keys.S))
                         {
                             relativeHeading = (float)Math.Atan2(-1, 0) - parentRotation;
-                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            if (!NewPositionBlocked(newMovement))
+                            {
+                                moveDirection += newMoveDirection;
+                            }
                         }
                         if (Input.IsKeyPressed(Keys.A))
                         {
                             relativeHeading = (float)Math.Atan2(0, 1) - parentRotation;
-                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            if (!NewPositionBlocked(newMovement))
+                            {
+                                moveDirection += newMoveDirection;
+                            }
                         }
                         if (Input.IsKeyPressed(Keys.D))
                         {
                             relativeHeading = (float)Math.Atan2(0, -1) - parentRotation;
-                            moveDirection += Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            if (!NewPositionBlocked(newMovement))
+                            {
+                                moveDirection += newMoveDirection;
+                            }
                         }
-                        var newMovement = moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * Speed;
-                        if (!NewPositionBlocked(newMovement))
-                        {
-                            Position -= newMovement;
-                        }
+                        Position -= moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
                     }
                 }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
