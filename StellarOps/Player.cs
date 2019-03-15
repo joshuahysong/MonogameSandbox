@@ -12,11 +12,14 @@ namespace StellarOps
         public Vector2 WorldPosition { get; set; }
         public float Speed => 50f;
 
+        public Texture2D Bounds { get; set; }
+
         public Player()
         {
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
             Position = Vector2.Zero;
+            Bounds = Art.CreateCircle((int)Radius - 1, Color.Green * 0.5f);
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -122,12 +125,12 @@ namespace StellarOps
             Vector2 scale;
             float rotation;
             DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
-            var imageCenter = new Vector2(Image.Width / 8, Image.Height / 8);
             spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
 
             if (MainGame.IsDebugging)
             {
-                spriteBatch.Draw(boundingBox, position, GetBoundingRectangle(), Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
+                var origin = new Vector2(Bounds.Width / 2, Bounds.Height / 2);
+                spriteBatch.Draw(Bounds, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), origin, scale, SpriteEffects.None, 0.0f);
             }
         }
 

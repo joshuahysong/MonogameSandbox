@@ -109,7 +109,7 @@ namespace StellarOps.Ships
             // Calculate global transform
             Matrix globalTransform = LocalTransform * parentTransform;
 
-            //// Get values from GlobalTransform for SpriteBatch and render sprite
+            // Get values from GlobalTransform for SpriteBatch and render sprite
             Vector2 position;
             Vector2 scale;
             float rotation;
