@@ -12,6 +12,7 @@ namespace StellarOps.Ships
         public Texture2D InteriorImage;
         public float Thrust;
         public float TurnRate;
+        public float ManeuveringThrust;
         public float MaxVelocity;
         public List<Weapon> Weapons;
         public bool InteriorIsDisplayed;
@@ -34,9 +35,9 @@ namespace StellarOps.Ships
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
-            HandleInput();
-
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            HandleInput(deltaTime);
 
             Velocity += _acceleration * deltaTime;
 
@@ -63,7 +64,7 @@ namespace StellarOps.Ships
             Children.ForEach(c => c.Update(gameTime, LocalTransform));
         }
 
-        public void HandleInput()
+        public void HandleInput(float deltaTime)
         {
             if (MainGame.Camera.Focus == this)
             {
@@ -76,22 +77,22 @@ namespace StellarOps.Ships
                 // Rotate Counter-Clockwise
                 if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
                 {
-                    RotateCounterClockwise();
+                    RotateCounterClockwise(deltaTime);
                 }
                 // Rotate Clockwise
                 else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
                 {
-                    RotateClockwise();
+                    RotateClockwise(deltaTime);
                 }
                 // Rotate to face retro thurst heading
                 else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
                 {
-                    RotateToRetro(false);
+                    RotateToRetro(deltaTime, false);
                 }
                 // Rotate to face retro thurst heading and thrust to brake
                 else if (Input.IsKeyPressed(Keys.X))
                 {
-                    RotateToRetro(true);
+                    RotateToRetro(deltaTime, true);
                 }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
                 {
@@ -135,25 +136,25 @@ namespace StellarOps.Ships
             }
         }
 
-        private void RotateClockwise()
+        private void RotateClockwise(float deltaTime)
         {
-            Heading += TurnRate;
+            Heading += TurnRate * deltaTime;
             if (Heading > Math.PI)
             {
                 Heading = (float)-Math.PI;
             }
         }
 
-        private void RotateCounterClockwise()
+        private void RotateCounterClockwise(float deltaTime)
         {
-            Heading -= TurnRate;
+            Heading -= TurnRate * deltaTime;
             if (Heading < -Math.PI)
             {
                 Heading = (float)Math.PI;
             }
         }
 
-        private void RotateToRetro(bool IsBraking)
+        private void RotateToRetro(float deltaTime, bool IsBraking)
         {
             float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
@@ -161,7 +162,7 @@ namespace StellarOps.Ships
             {
                 double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
                 double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                double turnRateDegrees = Math.PI * 2 * TurnRate / 100 * 360 * 2;
+                double turnRateDegrees = Math.PI * 2 * (TurnRate * deltaTime) / 100 * 360 * 2;
                 double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
 
                 if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
@@ -172,11 +173,11 @@ namespace StellarOps.Ships
                 {
                     if (retroOffset < 180)
                     {
-                        RotateCounterClockwise();
+                        RotateCounterClockwise(deltaTime);
                     }
                     else
                     {
-                        RotateClockwise();
+                        RotateClockwise(deltaTime);
                     }
                 }
             }
