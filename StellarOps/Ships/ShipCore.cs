@@ -29,9 +29,9 @@ namespace StellarOps.Ships
         {
             debugTiles = new Dictionary<int, Texture2D>
             {
-                { 0, MainGame.Instance.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
-                { 1, MainGame.Instance.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, MainGame.Instance.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) }
+                { 0, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
+                { 1, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
+                { 2, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) }
             };
         }
 
@@ -119,7 +119,10 @@ namespace StellarOps.Ships
                 }
                 else
                 {
-                    SlowDownManueveringThrust();
+                    if (_currentTurnRate != 0)
+                    {
+                        SlowDownManueveringThrust();
+                    }
                 }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
                 {
@@ -133,7 +136,10 @@ namespace StellarOps.Ships
             }
             else
             {
-                SlowDownManueveringThrust();
+                if (_currentTurnRate != 0)
+                {
+                    SlowDownManueveringThrust();
+                }
             }
         }
 
@@ -193,8 +199,7 @@ namespace StellarOps.Ships
             {
                 double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
                 double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                double turnRateDegrees = Math.PI * (MaxTurnRate * deltaTime) / 180.0;
-                //double turnRateDegrees = Math.PI * 2 * (_currentTurnRate * deltaTime) / 100 * 360 * 2;
+                double turnRateDegrees = Math.PI * (_currentTurnRate * deltaTime) / 180.0;
                 double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
 
                 if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
@@ -207,13 +212,11 @@ namespace StellarOps.Ships
                     {
                         _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
                             : _currentTurnRate - ManeuveringThrust;
-                        RotateCounterClockwise(deltaTime);
                     }
                     else
                     {
                         _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
                             : _currentTurnRate + ManeuveringThrust;
-                        RotateClockwise(deltaTime);
                     }
                 }
             }

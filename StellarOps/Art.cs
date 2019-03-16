@@ -32,6 +32,25 @@ namespace StellarOps
             DebugFont = content.Load<SpriteFont>("DebugFont");
         }
 
+        public static Texture2D DrawTileRectangle(int width, int height, Color fillColor, Color borderColor)
+        {
+            Texture2D tile = new Texture2D(MainGame.Instance.GraphicsDevice, width, height);
+            Color[] data = new Color[width * height];
+            for (int i = 0; i < data.Length; ++i)
+            {
+                if (i < width || i % width == 0 || i > width * height - width || (i + 1) % width == 0)
+                {
+                    data[i] = borderColor;
+                }
+                else
+                {
+                    data[i] = fillColor;
+                }
+            }
+            tile.SetData(data);
+            return tile;
+        }
+
         public static Texture2D CreateCircle(int radius, Color borderColor)
         {
             int outerRadius = radius * 2 + 2; // So circle doesn't go out of bounds

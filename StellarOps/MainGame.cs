@@ -18,7 +18,6 @@ namespace StellarOps
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-        public static Random Random => new Random();
         public static int WorldTileSize => 1000;
 
         public Dictionary<string, string> PlayerDebugEntries { get; set; }
@@ -47,8 +46,8 @@ namespace StellarOps
         {
             IsDebugging = false;
             Camera = new Camera();
-            starTile = DrawStars(DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
-            debugTile = DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
+            starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
+            debugTile = Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
             PlayerDebugEntries = new Dictionary<string, string>();
             ShipDebugEntries = new Dictionary<string, string>();
             SystemDebugEntries = new Dictionary<string, string>();
@@ -136,11 +135,6 @@ namespace StellarOps
                     spriteBatch.DrawString(Art.DebugFont, $"{debugEntry.Key}: {debugEntry.Value}", new Vector2(xTextOffset, yTextOffset), Color.White);
                     yTextOffset += 15;
                 }
-
-                // Right Top
-                //spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);
-                //string focusName = $"Camera Focus: {Camera.Focus.GetType().Name}";
-                //spriteBatch.DrawString(Art.DebugFont, focusName, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(focusName).X, Viewport.Bounds.Y + 20), Color.White);
             }
             spriteBatch.End();
 
@@ -159,27 +153,9 @@ namespace StellarOps
             }
         }
 
-        public Texture2D DrawTileRectangle(int width, int height, Color fillColor, Color borderColor)
-        {
-            Texture2D tile = new Texture2D(GraphicsDevice, width, height);
-            Color[] data = new Color[width * height];
-            for (int i = 0; i < data.Length; ++i)
-            {
-                if (i < width || i % width == 0 || i > width * height - width || (i + 1) % width == 0)
-                {
-                    data[i] = borderColor;
-                }
-                else
-                {
-                    data[i] = fillColor;
-                }
-            }
-            tile.SetData(data);
-            return tile;
-        }
-
         public Texture2D DrawStars(Texture2D tile)
         {
+            Random Random = new Random();
             Color[] data = new Color[tile.Width * tile.Height];
             tile.GetData(data);
             for (int i = 0; i < data.Length; ++i)
