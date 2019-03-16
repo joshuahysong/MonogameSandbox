@@ -11,25 +11,27 @@ namespace StellarOps.Ships
     {
         public Texture2D InteriorImage;
         public float Thrust;
-        public float TurnRate;
+        public float MaxTurnRate;
         public float ManeuveringThrust;
         public float MaxVelocity;
         public List<Weapon> Weapons;
         public bool InteriorIsDisplayed;
         public int[,] TileMap;
         public Vector2 WorldPosition { get; set; }
+        public int ShipTileSize => 35;
 
         protected Dictionary<int, Texture2D> debugTiles;
 
         private Vector2 _acceleration;
+        private float _currentTurnRate;
 
         public ShipCore()
         {
             debugTiles = new Dictionary<int, Texture2D>
             {
-                { 0, MainGame.Instance.DrawTileRectangle(35, 35, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
-                { 1, MainGame.Instance.DrawTileRectangle(35, 35, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, MainGame.Instance.DrawTileRectangle(35, 35, Color.Red * 0.2f, Color.Red * 0.3f) }
+                { 0, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
+                { 1, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
+                { 2, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) }
             };
         }
 
@@ -38,6 +40,15 @@ namespace StellarOps.Ships
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             HandleInput(deltaTime);
+
+            if (_currentTurnRate > 0)
+            {
+                RotateClockwise(deltaTime);
+            }
+            else if (_currentTurnRate < 0)
+            {
+                RotateCounterClockwise(deltaTime);
+            }
 
             Velocity += _acceleration * deltaTime;
 
@@ -62,6 +73,16 @@ namespace StellarOps.Ships
             }
 
             Children.ForEach(c => c.Update(gameTime, LocalTransform));
+
+            if (MainGame.IsDebugging)
+            {
+                MainGame.Instance.ShipDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
+                MainGame.Instance.ShipDebugEntries["Velocity"] = $"{Math.Round(Velocity.X)}, {Math.Round(Velocity.Y)}";
+                MainGame.Instance.ShipDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
+                MainGame.Instance.ShipDebugEntries["Velocity Heading"] = $"{Math.Round(Math.Atan2(Velocity.Y, Velocity.X), 2)}";
+                MainGame.Instance.ShipDebugEntries["World Tile"] = $"{Math.Floor(Position.X / MainGame.WorldTileSize)}, {Math.Floor(Position.Y / MainGame.WorldTileSize)}";
+                MainGame.Instance.ShipDebugEntries["Current Turn Rate"] = $"{Math.Round(_currentTurnRate, 2)}";
+            }
         }
 
         public void HandleInput(float deltaTime)
@@ -77,12 +98,14 @@ namespace StellarOps.Ships
                 // Rotate Counter-Clockwise
                 if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
                 {
-                    RotateCounterClockwise(deltaTime);
+                    _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
+                        : _currentTurnRate - ManeuveringThrust;
                 }
                 // Rotate Clockwise
                 else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
                 {
-                    RotateClockwise(deltaTime);
+                    _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
+                        : _currentTurnRate + ManeuveringThrust;
                 }
                 // Rotate to face retro thurst heading
                 else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
@@ -94,6 +117,13 @@ namespace StellarOps.Ships
                 {
                     RotateToRetro(deltaTime, true);
                 }
+                else
+                {
+                    if (_currentTurnRate != 0)
+                    {
+                        SlowDownManueveringThrust();
+                    }
+                }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
                 {
                     Input.ManagedKeys.Add(Keys.F);
@@ -102,6 +132,13 @@ namespace StellarOps.Ships
                     {
                         MainGame.Camera.Scale = 2F;
                     }
+                }
+            }
+            else
+            {
+                if (_currentTurnRate != 0)
+                {
+                    SlowDownManueveringThrust();
                 }
             }
         }
@@ -138,7 +175,7 @@ namespace StellarOps.Ships
 
         private void RotateClockwise(float deltaTime)
         {
-            Heading += TurnRate * deltaTime;
+            Heading += _currentTurnRate * deltaTime;
             if (Heading > Math.PI)
             {
                 Heading = (float)-Math.PI;
@@ -147,7 +184,7 @@ namespace StellarOps.Ships
 
         private void RotateCounterClockwise(float deltaTime)
         {
-            Heading -= TurnRate * deltaTime;
+            Heading += _currentTurnRate * deltaTime;
             if (Heading < -Math.PI)
             {
                 Heading = (float)Math.PI;
@@ -158,27 +195,38 @@ namespace StellarOps.Ships
         {
             float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
-            if (Heading != retroHeading && !IsWithinBrakingRange())
+            if (Heading != retroHeading  && !IsWithinBrakingRange())
             {
                 double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
                 double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                double turnRateDegrees = Math.PI * 2 * (TurnRate * deltaTime) / 100 * 360 * 2;
+                double turnRateDegrees = Math.PI * 2 * (_currentTurnRate * deltaTime) / 100 * 360 * 2;
+                turnRateDegrees = turnRateDegrees < 0 ? turnRateDegrees * -1 : turnRateDegrees;
                 double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
+
+                double thrustMagnitude = Math.Round(_currentTurnRate / ManeuveringThrust * _currentTurnRate);
+                thrustMagnitude = thrustMagnitude < 0 ? thrustMagnitude * -1 : thrustMagnitude;
 
                 if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
                 {
                     Heading = retroHeading;
+                    _currentTurnRate = 0;
                 }
-                else
+                else if (retroOffset > thrustMagnitude && 360 - retroOffset > thrustMagnitude)
                 {
                     if (retroOffset < 180)
                     {
-                        RotateCounterClockwise(deltaTime);
+                        _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
+                            : _currentTurnRate - ManeuveringThrust;
                     }
                     else
                     {
-                        RotateClockwise(deltaTime);
+                        _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
+                            : _currentTurnRate + ManeuveringThrust;
                     }
+                }
+                else
+                {
+                    SlowDownManueveringThrust();
                 }
             }
             else if (IsBraking)
@@ -209,17 +257,21 @@ namespace StellarOps.Ships
         public Rectangle GetTileRectangle(int x, int y)
         {
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            Vector2 tilePosition = new Vector2(x * 35, y * 35);
+            Vector2 tilePosition = new Vector2(x * ShipTileSize, y * ShipTileSize);
             tilePosition -= imageCenter;
-            return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, 35, 35);
+            return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, ShipTileSize, ShipTileSize);
         }
 
-        /// <summary>
-        /// Gets the bounding rectangle of a tile in world space.
-        /// </summary>
-        public Rectangle GetBounds(int x, int y)
+        private void SlowDownManueveringThrust()
         {
-            return new Rectangle(x * 35, y * 35, 35, 35);
+            if (_currentTurnRate < 0)
+            {
+                _currentTurnRate = _currentTurnRate + ManeuveringThrust > 0 ? 0 : _currentTurnRate + ManeuveringThrust;
+            }
+            else if (_currentTurnRate > 0)
+            {
+                _currentTurnRate = _currentTurnRate - ManeuveringThrust < 0 ? 0 : _currentTurnRate - ManeuveringThrust;
+            }
         }
     }
 }

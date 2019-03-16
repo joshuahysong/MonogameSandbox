@@ -10,7 +10,8 @@ namespace StellarOps.Ships
             Position = Vector2.Zero;
             Heading = 0.0f;
             Thrust = 250f;
-            TurnRate = 0.6f;
+            MaxTurnRate = 0.65f;
+            ManeuveringThrust = 0.01f;
             MaxVelocity = 500f;
             Image = Art.TestShip;
             InteriorImage = Art.TestShipInterior;

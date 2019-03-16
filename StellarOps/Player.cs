@@ -11,7 +11,9 @@ namespace StellarOps
     public class Player : Entity, IFocusable
     {
         public Vector2 WorldPosition { get; set; }
-        public float Speed => 50f;
+        public float MaxSpeed => 50f;
+
+        private float _currentSpeed;
 
         public Texture2D Bounds { get; set; }
 
@@ -21,11 +23,21 @@ namespace StellarOps
             Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
             Position = Vector2.Zero;
             Bounds = Art.CreateCircle((int)Radius - 1, Color.Green * 0.5f);
+            _currentSpeed = MaxSpeed;
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             HandleInput(gameTime, parentTransform);
+
+            if (MainGame.IsDebugging)
+            {
+                MainGame.Instance.PlayerDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
+                MainGame.Instance.PlayerDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
+                MainGame.Instance.PlayerDebugEntries["Speed"] = $"{_currentSpeed}";
+                Vector2 playerRelativePosition = Position + Parent.ImageCenter;
+                MainGame.Instance.PlayerDebugEntries["Container Tile"] = $"{Math.Floor(playerRelativePosition.X / ((ShipCore)Parent).ShipTileSize)}, {Math.Floor(playerRelativePosition.Y / ((ShipCore)Parent).ShipTileSize)}";
+            }
         }
 
         public void HandleInput(GameTime gameTime, Matrix parentTransform)
@@ -51,16 +63,16 @@ namespace StellarOps
                     {
                         Vector2 moveDirection = new Vector2();
                         float relativeHeading = 0;
-                        float movementSpeed = Speed;
+                        _currentSpeed = MaxSpeed;
                         if (Input.IsKeyPressed(Keys.LeftShift))
                         {
-                            movementSpeed = (float)(Speed * 1.75);
+                            _currentSpeed = (float)(MaxSpeed * 1.75);
                         }
                         if (Input.IsKeyPressed(Keys.W))
                         {
                             relativeHeading = (float)Math.Atan2(1, 0) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
-                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * _currentSpeed;
                             if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
@@ -70,7 +82,7 @@ namespace StellarOps
                         {
                             relativeHeading = (float)Math.Atan2(-1, 0) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
-                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * _currentSpeed;
                             if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
@@ -80,7 +92,7 @@ namespace StellarOps
                         {
                             relativeHeading = (float)Math.Atan2(0, 1) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
-                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * _currentSpeed;
                             if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
@@ -90,13 +102,13 @@ namespace StellarOps
                         {
                             relativeHeading = (float)Math.Atan2(0, -1) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
-                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                            Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * _currentSpeed;
                             if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
                             }
                         }
-                        Position -= moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
+                        Position -= moveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * _currentSpeed;
                     }
                 }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
@@ -130,12 +142,11 @@ namespace StellarOps
         private bool IsMovingTowardsCollision(Vector2 newMovement)
         {
             Vector2 futurePosition = Position - newMovement;
-            Vector2 imageCenter = new Vector2(Parent.Image.Width / 2, Parent.Image.Height / 2);
-            Vector2 playerCenterPosition = futurePosition + imageCenter;
+            Vector2 playerRelativePosition = futurePosition + Parent.ImageCenter;
             ShipCore parent = (ShipCore)Parent;
 
-            int tileX = (int)Math.Floor(playerCenterPosition.X / 35);
-            int tileY = (int)Math.Floor(playerCenterPosition.Y / 35);
+            int tileX = (int)Math.Floor(playerRelativePosition.X / parent.ShipTileSize);
+            int tileY = (int)Math.Floor(playerRelativePosition.Y / parent.ShipTileSize);
 
             for (int y = tileY - 1; y <= tileY + 1; y++)
             {
@@ -154,6 +165,7 @@ namespace StellarOps
 
             return false;
         }
+
         private bool IsTileCollided(Vector2 newPosition, Rectangle tile)
         {
             float halfWidth = tile.Width / 2;
