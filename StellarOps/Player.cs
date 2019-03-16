@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using StellarOps.Ships;
 using System;
+using System.Collections.Generic;
 
 namespace StellarOps
 {
@@ -31,10 +32,7 @@ namespace StellarOps
         {
             Matrix globalTransform = LocalTransform * parentTransform;
 
-            Vector2 position;
-            Vector2 scale;
-            float rotation;
-            DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
+            DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
             WorldPosition = position;
 
             if (MainGame.Camera.Focus == this)
@@ -46,9 +44,7 @@ namespace StellarOps
                 {
                     Vector2 direction = Vector2.Normalize(targetPosition - position);
 
-                    Vector2 parentPosition;
-                    Vector2 parentScale;
-                    DecomposeMatrix(ref parentTransform, out parentPosition, out parentRotation, out parentScale);
+                    DecomposeMatrix(ref parentTransform, out Vector2 parentPosition, out parentRotation, out Vector2 parentScale);
                     Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
 
                     if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.D))
@@ -65,7 +61,7 @@ namespace StellarOps
                             relativeHeading = (float)Math.Atan2(1, 0) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
                             Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
-                            if (!NewPositionBlocked(newMovement))
+                            if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
                             }
@@ -75,7 +71,7 @@ namespace StellarOps
                             relativeHeading = (float)Math.Atan2(-1, 0) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
                             Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
-                            if (!NewPositionBlocked(newMovement))
+                            if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
                             }
@@ -85,7 +81,7 @@ namespace StellarOps
                             relativeHeading = (float)Math.Atan2(0, 1) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
                             Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
-                            if (!NewPositionBlocked(newMovement))
+                            if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
                             }
@@ -95,7 +91,7 @@ namespace StellarOps
                             relativeHeading = (float)Math.Atan2(0, -1) - parentRotation;
                             Vector2 newMoveDirection = Vector2.Normalize(new Vector2((float)Math.Cos(relativeHeading), (float)Math.Sin(relativeHeading)));
                             Vector2 newMovement = newMoveDirection * (float)gameTime.ElapsedGameTime.TotalSeconds * movementSpeed;
-                            if (!NewPositionBlocked(newMovement))
+                            if (!IsMovingTowardsCollision(newMovement))
                             {
                                 moveDirection += newMoveDirection;
                             }
@@ -120,11 +116,8 @@ namespace StellarOps
             // Calculate global transform
             Matrix globalTransform = LocalTransform * parentTransform;
 
-            //// Get values from GlobalTransform for SpriteBatch and render sprite
-            Vector2 position;
-            Vector2 scale;
-            float rotation;
-            DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
+            // Get values from GlobalTransform for SpriteBatch and render sprite
+            DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
             spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
 
             if (MainGame.IsDebugging)
@@ -134,20 +127,58 @@ namespace StellarOps
             }
         }
 
-        private bool NewPositionBlocked(Vector2 newMovement)
+        private bool IsMovingTowardsCollision(Vector2 newMovement)
         {
-            Vector2 futurePosition = Position - Vector2.Normalize(newMovement) * Radius;
+            Vector2 futurePosition = Position - newMovement;
             Vector2 imageCenter = new Vector2(Parent.Image.Width / 2, Parent.Image.Height / 2);
             Vector2 playerCenterPosition = futurePosition + imageCenter;
+            ShipCore parent = (ShipCore)Parent;
 
-            int x = (int)Math.Floor(playerCenterPosition.X / 35);
-            int y = (int)Math.Floor(playerCenterPosition.Y / 35);
+            int tileX = (int)Math.Floor(playerCenterPosition.X / 35);
+            int tileY = (int)Math.Floor(playerCenterPosition.Y / 35);
 
-            if (((ShipCore)Parent).GetCollision(x, y))
+            for (int y = tileY - 1; y <= tileY + 1; y++)
+            {
+                for (int x = tileX - 1; x <= tileX + 1; x++)
+                {
+                    if (x >= 0 && y >= 0)
+                    {
+                        if (parent.GetCollision(x, y)
+                            && IsTileCollided(futurePosition, parent.GetTileRectangle(x, y)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+        private bool IsTileCollided(Vector2 newPosition, Rectangle tile)
+        {
+            float halfWidth = tile.Width / 2;
+            float halfHeight = tile.Height / 2;
+            float distanceX = Math.Abs((float)Math.Round(newPosition.X) - (tile.Left + halfWidth));
+            float distanceY = Math.Abs((float)Math.Round(newPosition.Y) - (tile.Top + halfHeight));
+
+            if (distanceX >= Radius + halfWidth || distanceY >= Radius + halfHeight)
+            {
+                return false;
+            }
+            if (distanceX < halfWidth || distanceY < halfHeight)
             {
                 return true;
             }
 
+            // get the distance to the corner
+            distanceX -= halfWidth;
+            distanceY -= halfHeight;
+
+            // Find distance to corner and compare to circle radius
+            if (distanceX * distanceX + distanceY * distanceY < Radius * Radius)
+            {
+                return true;
+            }
             return false;
         }
     }

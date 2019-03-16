@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace StellarOps.Ships
 {
@@ -25,10 +24,12 @@ namespace StellarOps.Ships
 
         public ShipCore()
         {
-            debugTiles = new Dictionary<int, Texture2D>();
-            debugTiles.Add(0, MainGame.Instance.DrawTileRectangle(35, 35, Color.DimGray * 0.2f, Color.DimGray * 0.3f));
-            debugTiles.Add(1, MainGame.Instance.DrawTileRectangle(35, 35, Color.Blue * 0.2f, Color.Blue * 0.3f));
-            debugTiles.Add(2, MainGame.Instance.DrawTileRectangle(35, 35, Color.Red * 0.2f, Color.Red * 0.3f));
+            debugTiles = new Dictionary<int, Texture2D>
+            {
+                { 0, MainGame.Instance.DrawTileRectangle(35, 35, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
+                { 1, MainGame.Instance.DrawTileRectangle(35, 35, Color.Blue * 0.2f, Color.Blue * 0.3f) },
+                { 2, MainGame.Instance.DrawTileRectangle(35, 35, Color.Red * 0.2f, Color.Red * 0.3f) }
+            };
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -110,10 +111,7 @@ namespace StellarOps.Ships
             Matrix globalTransform = LocalTransform * parentTransform;
 
             // Get values from GlobalTransform for SpriteBatch and render sprite
-            Vector2 position;
-            Vector2 scale;
-            float rotation;
-            DecomposeMatrix(ref globalTransform, out position, out rotation, out scale);
+            DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
             spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
 
             // Draw Children
@@ -205,6 +203,14 @@ namespace StellarOps.Ships
         public bool GetCollision(int x, int y)
         {
             return TileMap[y, x] == 1;
+        }
+
+        public Rectangle GetTileRectangle(int x, int y)
+        {
+            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
+            Vector2 tilePosition = new Vector2(x * 35, y * 35);
+            tilePosition -= imageCenter;
+            return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, 35, 35);
         }
 
         /// <summary>
