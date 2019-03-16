@@ -4,6 +4,8 @@ Stellar Ops is planned to be a single-player top-down sandbox sci-fi role playin
 
 This game is currently in very, very early development. The plan is to slowly grow the game from basic game loops into the above stated goal piece by piece. Ideally once the initial game engine is completed and the first basic gameplay loop implemented the game will enter it's alpha phase where, as new features are added, the game will remain in a playable state so that players will be able to enjoy Stellar Ops during active development.
 
+Latest build can be found here: https://drive.google.com/open?id=1TVb5f-6QyaNAKOHTCNJhjhikRteomJvH
+
 # Controls
 
 ## Ship
