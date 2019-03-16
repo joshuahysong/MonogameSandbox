@@ -18,6 +18,7 @@ namespace StellarOps.Ships
         public bool InteriorIsDisplayed;
         public int[,] TileMap;
         public Vector2 WorldPosition { get; set; }
+        public int ShipTileSize => 35;
 
         protected Dictionary<int, Texture2D> debugTiles;
 
@@ -28,9 +29,9 @@ namespace StellarOps.Ships
         {
             debugTiles = new Dictionary<int, Texture2D>
             {
-                { 0, MainGame.Instance.DrawTileRectangle(35, 35, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
-                { 1, MainGame.Instance.DrawTileRectangle(35, 35, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, MainGame.Instance.DrawTileRectangle(35, 35, Color.Red * 0.2f, Color.Red * 0.3f) }
+                { 0, MainGame.Instance.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
+                { 1, MainGame.Instance.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
+                { 2, MainGame.Instance.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) }
             };
         }
 
@@ -72,7 +73,16 @@ namespace StellarOps.Ships
             }
 
             Children.ForEach(c => c.Update(gameTime, LocalTransform));
-            MainGame.Instance.DebugText.Add(_currentTurnRate.ToString());
+
+            if (MainGame.IsDebugging)
+            {
+                MainGame.Instance.ShipDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
+                MainGame.Instance.ShipDebugEntries["Velocity"] = $"{Math.Round(Velocity.X)}, {Math.Round(Velocity.Y)}";
+                MainGame.Instance.ShipDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
+                MainGame.Instance.ShipDebugEntries["Velocity Heading"] = $"{Math.Round(Math.Atan2(Velocity.Y, Velocity.X), 2)}";
+                MainGame.Instance.ShipDebugEntries["World Tile"] = $"{Math.Floor(Position.X / MainGame.WorldTileSize)}, {Math.Floor(Position.Y / MainGame.WorldTileSize)}";
+                MainGame.Instance.ShipDebugEntries["Current Turn Rate"] = $"{Math.Round(_currentTurnRate, 2)}";
+            }
         }
 
         public void HandleInput(float deltaTime)
@@ -183,7 +193,8 @@ namespace StellarOps.Ships
             {
                 double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
                 double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                double turnRateDegrees = Math.PI * 2 * (_currentTurnRate * deltaTime) / 100 * 360 * 2;
+                double turnRateDegrees = Math.PI * (MaxTurnRate * deltaTime) / 180.0;
+                //double turnRateDegrees = Math.PI * 2 * (_currentTurnRate * deltaTime) / 100 * 360 * 2;
                 double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
 
                 if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
@@ -234,9 +245,9 @@ namespace StellarOps.Ships
         public Rectangle GetTileRectangle(int x, int y)
         {
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            Vector2 tilePosition = new Vector2(x * 35, y * 35);
+            Vector2 tilePosition = new Vector2(x * ShipTileSize, y * ShipTileSize);
             tilePosition -= imageCenter;
-            return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, 35, 35);
+            return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, ShipTileSize, ShipTileSize);
         }
 
         private void SlowDownManueveringThrust()

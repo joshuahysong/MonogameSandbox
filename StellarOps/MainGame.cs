@@ -10,25 +10,26 @@ namespace StellarOps
     public class MainGame : Game
     {
         public static MainGame Instance { get; private set; }
+        public static Camera Camera { get; set; }
+        public static Player Player { get; set; }
+        public static ShipCore Ship { get; set; }
+        public static bool IsDebugging { get; set; }
+
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-        public static Random Random = new Random();
-        public static bool IsDebugging = false;
-        public static Player Player;
-        public static ShipCore Ship;
+        public static Random Random => new Random();
+        public static int WorldTileSize => 1000;
 
-        public static Camera Camera { get; set; }
+        public Dictionary<string, string> PlayerDebugEntries { get; set; }
+        public Dictionary<string, string> ShipDebugEntries { get; set; }
+        public Dictionary<string, string> SystemDebugEntries { get; set; }
 
-        public List<string> DebugText { get; set; }
-
-        private int TileSize => 1000;
         private Texture2D starTile;
         private Texture2D debugTile;
-
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Vector2 tilePosition;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+        private Vector2 tilePosition;
 
         public MainGame()
         {
@@ -44,9 +45,13 @@ namespace StellarOps
 
         protected override void Initialize()
         {
+            IsDebugging = false;
             Camera = new Camera();
-            starTile = DrawStars(DrawTileRectangle(TileSize, TileSize, Color.TransparentBlack, Color.TransparentBlack));
-            debugTile = DrawTileRectangle(TileSize, TileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
+            starTile = DrawStars(DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
+            debugTile = DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
+            PlayerDebugEntries = new Dictionary<string, string>();
+            ShipDebugEntries = new Dictionary<string, string>();
+            SystemDebugEntries = new Dictionary<string, string>();
 
             base.Initialize();
             Player = new Player();
@@ -73,6 +78,15 @@ namespace StellarOps
             Camera.Update(Camera.Focus);
             EntityManager.Update(gameTime, Matrix.Identity);
             base.Update(gameTime);
+
+            if (IsDebugging)
+            {
+                SystemDebugEntries["FPS"] = $"{Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
+                SystemDebugEntries["Camera Focus"] = $"{Camera.Focus.GetType().Name}";
+                SystemDebugEntries["Camera Zoom"] = $"{Camera.Scale}";
+                SystemDebugEntries["Mouse Screen Position"] = $"{Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}";
+                SystemDebugEntries["Mouse World Position"] = $"{Math.Round(Input.WorldMousePosition.X)}, {Math.Round(Input.WorldMousePosition.Y)}";
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -94,23 +108,39 @@ namespace StellarOps
             {
                 Entity focus = (Entity)Camera.Focus;
                 float velocityHeading = (float)Math.Atan2(focus.Velocity.Y, focus.Velocity.X);
-                // Left Topfocus
-                spriteBatch.DrawString(Art.DebugFont, $"Position: {Math.Round(focus.Position.X)}, {Math.Round(focus.Position.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 5), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Velocity: {Math.Round(focus.Velocity.X)}, {Math.Round(focus.Velocity.Y)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 20), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Heading: {Math.Round(focus.Heading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 35), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Velocity Heading: {Math.Round(velocityHeading, 2)}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 50), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Tile: {tilePosition.X}, {tilePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 65), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Zoom: {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 80), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Mouse Screen Position: \r {Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 95), Color.White);
-                spriteBatch.DrawString(Art.DebugFont, $"Mouse World Position: \r {Input.WorldMousePosition.X}, {Input.WorldMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 110), Color.White);
 
+                int xTextOffset = 5;
+                int yTextOffset = 5;
+                spriteBatch.DrawString(Art.DebugFont, "Player", new Vector2(xTextOffset, yTextOffset), Color.White);
+                foreach (KeyValuePair<string, string> debugEntry in PlayerDebugEntries)
+                {
+                    yTextOffset += 15;
+                    spriteBatch.DrawString(Art.DebugFont, $"{debugEntry.Key}: {debugEntry.Value}", new Vector2(xTextOffset, yTextOffset), Color.White);
+                }
 
+                xTextOffset = Viewport.Width / 2 - 200;
+                yTextOffset = 5;
+                spriteBatch.DrawString(Art.DebugFont, "Ship", new Vector2(xTextOffset, yTextOffset), Color.White);
+                foreach (KeyValuePair<string, string> debugEntry in ShipDebugEntries)
+                {
+                    yTextOffset += 15;
+                    spriteBatch.DrawString(Art.DebugFont, $"{debugEntry.Key}: {debugEntry.Value}", new Vector2(xTextOffset, yTextOffset), Color.White);
+                }
+
+                yTextOffset = 5;
+                spriteBatch.DrawString(Art.DebugFont, "Ship", new Vector2(xTextOffset, yTextOffset), Color.White);
+                foreach (KeyValuePair<string, string> debugEntry in SystemDebugEntries)
+                {
+                    string text = $"{debugEntry.Key}: {debugEntry.Value}";
+                    xTextOffset = (int)(Viewport.Width - 5 - Art.DebugFont.MeasureString(text).X);
+                    spriteBatch.DrawString(Art.DebugFont, $"{debugEntry.Key}: {debugEntry.Value}", new Vector2(xTextOffset, yTextOffset), Color.White);
+                    yTextOffset += 15;
+                }
 
                 // Right Top
-                string fps = $"FPS : {Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
-                spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);
-                string focusName = $"Camera Focus: {Camera.Focus.GetType().Name}";
-                spriteBatch.DrawString(Art.DebugFont, focusName, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(focusName).X, Viewport.Bounds.Y + 20), Color.White);
+                //spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);
+                //string focusName = $"Camera Focus: {Camera.Focus.GetType().Name}";
+                //spriteBatch.DrawString(Art.DebugFont, focusName, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(focusName).X, Viewport.Bounds.Y + 20), Color.White);
             }
             spriteBatch.End();
 
@@ -173,12 +203,12 @@ namespace StellarOps
         private void DrawBackground(SpriteBatch spriteBatch, bool areDrawingDebugTiles = false)
         {
             Vector2 startLocation = Vector2.Zero;
-            int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / TileSize) / Camera.Scale);
-            int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / TileSize) / Camera.Scale);
-            tilePosition.X = (int)Math.Floor(Camera.Position.X / TileSize);
-            tilePosition.Y = (int)Math.Floor(Camera.Position.Y / TileSize);
+            int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / WorldTileSize) / Camera.Scale);
+            int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / WorldTileSize) / Camera.Scale);
+            tilePosition.X = (int)Math.Floor(Camera.Position.X / WorldTileSize);
+            tilePosition.Y = (int)Math.Floor(Camera.Position.Y / WorldTileSize);
 
-            startLocation.X = startLocation.X- TileSize;
+            startLocation.X = startLocation.X- WorldTileSize;
 
             int minX = (int)Math.Floor(tilePosition.X - (double)numberOfTilesX / 2);
             int maxX = (int)Math.Ceiling(tilePosition.X + (double)numberOfTilesX / 2);

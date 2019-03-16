@@ -14,7 +14,7 @@ namespace StellarOps
         public Texture2D Image;
 
         protected Color color = Color.White;
-        protected Texture2D boundingBox => MainGame.Instance.DrawTileRectangle(Image.Width, Image.Height, Color.Green* 0.2f, Color.Green * 0.3f);
+        protected Vector2 parentTile;
 
         public Vector2 ImageCenter => new Vector2(Image.Width / 2, Image.Height / 2);
         public Matrix LocalTransform {
