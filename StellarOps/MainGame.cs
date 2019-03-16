@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StellarOps.Ships;
 using System;
+using System.Collections.Generic;
 
 namespace StellarOps
 {
@@ -16,7 +17,10 @@ namespace StellarOps
         public static bool IsDebugging = false;
         public static Player Player;
         public static ShipCore Ship;
+
         public static Camera Camera { get; set; }
+
+        public List<string> DebugText { get; set; }
 
         private int TileSize => 1000;
         private Texture2D starTile;
@@ -99,6 +103,9 @@ namespace StellarOps
                 spriteBatch.DrawString(Art.DebugFont, $"Zoom: {Camera.Scale}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 80), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Mouse Screen Position: \r {Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 95), Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"Mouse World Position: \r {Input.WorldMousePosition.X}, {Input.WorldMousePosition.Y}", new Vector2(Viewport.Bounds.X + 5, Viewport.Bounds.Y + 110), Color.White);
+
+
+
                 // Right Top
                 string fps = $"FPS : {Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
                 spriteBatch.DrawString(Art.DebugFont, fps, new Vector2(Viewport.Width - 5 - Art.DebugFont.MeasureString(fps).X, Viewport.Bounds.Y + 5), Color.White);

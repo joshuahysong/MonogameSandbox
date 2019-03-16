@@ -11,7 +11,7 @@ namespace StellarOps.Ships
     {
         public Texture2D InteriorImage;
         public float Thrust;
-        public float TurnRate;
+        public float MaxTurnRate;
         public float ManeuveringThrust;
         public float MaxVelocity;
         public List<Weapon> Weapons;
@@ -22,6 +22,7 @@ namespace StellarOps.Ships
         protected Dictionary<int, Texture2D> debugTiles;
 
         private Vector2 _acceleration;
+        private float _currentTurnRate;
 
         public ShipCore()
         {
@@ -38,6 +39,15 @@ namespace StellarOps.Ships
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             HandleInput(deltaTime);
+
+            if (_currentTurnRate > 0)
+            {
+                RotateClockwise(deltaTime);
+            }
+            else if (_currentTurnRate < 0)
+            {
+                RotateCounterClockwise(deltaTime);
+            }
 
             Velocity += _acceleration * deltaTime;
 
@@ -62,6 +72,7 @@ namespace StellarOps.Ships
             }
 
             Children.ForEach(c => c.Update(gameTime, LocalTransform));
+            MainGame.Instance.DebugText.Add(_currentTurnRate.ToString());
         }
 
         public void HandleInput(float deltaTime)
@@ -77,12 +88,14 @@ namespace StellarOps.Ships
                 // Rotate Counter-Clockwise
                 if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
                 {
-                    RotateCounterClockwise(deltaTime);
+                    _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
+                        : _currentTurnRate - ManeuveringThrust;
                 }
                 // Rotate Clockwise
                 else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
                 {
-                    RotateClockwise(deltaTime);
+                    _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
+                        : _currentTurnRate + ManeuveringThrust;
                 }
                 // Rotate to face retro thurst heading
                 else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
@@ -94,6 +107,10 @@ namespace StellarOps.Ships
                 {
                     RotateToRetro(deltaTime, true);
                 }
+                else
+                {
+                    SlowDownManueveringThrust();
+                }
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
                 {
                     Input.ManagedKeys.Add(Keys.F);
@@ -103,6 +120,10 @@ namespace StellarOps.Ships
                         MainGame.Camera.Scale = 2F;
                     }
                 }
+            }
+            else
+            {
+                SlowDownManueveringThrust();
             }
         }
 
@@ -138,7 +159,7 @@ namespace StellarOps.Ships
 
         private void RotateClockwise(float deltaTime)
         {
-            Heading += TurnRate * deltaTime;
+            Heading += _currentTurnRate * deltaTime;
             if (Heading > Math.PI)
             {
                 Heading = (float)-Math.PI;
@@ -147,7 +168,7 @@ namespace StellarOps.Ships
 
         private void RotateCounterClockwise(float deltaTime)
         {
-            Heading -= TurnRate * deltaTime;
+            Heading += _currentTurnRate * deltaTime;
             if (Heading < -Math.PI)
             {
                 Heading = (float)Math.PI;
@@ -162,7 +183,7 @@ namespace StellarOps.Ships
             {
                 double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
                 double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                double turnRateDegrees = Math.PI * 2 * (TurnRate * deltaTime) / 100 * 360 * 2;
+                double turnRateDegrees = Math.PI * 2 * (_currentTurnRate * deltaTime) / 100 * 360 * 2;
                 double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
 
                 if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
@@ -173,10 +194,14 @@ namespace StellarOps.Ships
                 {
                     if (retroOffset < 180)
                     {
+                        _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
+                            : _currentTurnRate - ManeuveringThrust;
                         RotateCounterClockwise(deltaTime);
                     }
                     else
                     {
+                        _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
+                            : _currentTurnRate + ManeuveringThrust;
                         RotateClockwise(deltaTime);
                     }
                 }
@@ -214,12 +239,16 @@ namespace StellarOps.Ships
             return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, 35, 35);
         }
 
-        /// <summary>
-        /// Gets the bounding rectangle of a tile in world space.
-        /// </summary>
-        public Rectangle GetBounds(int x, int y)
+        private void SlowDownManueveringThrust()
         {
-            return new Rectangle(x * 35, y * 35, 35, 35);
+            if (_currentTurnRate < 0)
+            {
+                _currentTurnRate = _currentTurnRate + ManeuveringThrust > 0 ? 0 : _currentTurnRate + ManeuveringThrust;
+            }
+            else if (_currentTurnRate > 0)
+            {
+                _currentTurnRate = _currentTurnRate - ManeuveringThrust < 0 ? 0 : _currentTurnRate - ManeuveringThrust;
+            }
         }
     }
 }
