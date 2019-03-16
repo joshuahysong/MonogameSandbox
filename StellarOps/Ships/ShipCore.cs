@@ -195,18 +195,23 @@ namespace StellarOps.Ships
         {
             float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
-            if (Heading != retroHeading && !IsWithinBrakingRange())
+            if (Heading != retroHeading  && !IsWithinBrakingRange())
             {
                 double retroDegrees = (retroHeading + Math.PI) * (180.0 / Math.PI);
                 double headingDegrees = (Heading + Math.PI) * (180.0 / Math.PI);
-                double turnRateDegrees = Math.PI * (_currentTurnRate * deltaTime) / 180.0;
+                double turnRateDegrees = Math.PI * 2 * (_currentTurnRate * deltaTime) / 100 * 360 * 2;
+                turnRateDegrees = turnRateDegrees < 0 ? turnRateDegrees * -1 : turnRateDegrees;
                 double retroOffset = headingDegrees < retroDegrees ? (headingDegrees + 360) - retroDegrees : headingDegrees - retroDegrees;
+
+                double thrustMagnitude = Math.Round(_currentTurnRate / ManeuveringThrust * _currentTurnRate);
+                thrustMagnitude = thrustMagnitude < 0 ? thrustMagnitude * -1 : thrustMagnitude;
 
                 if (retroOffset >= 360 - turnRateDegrees || retroOffset <= turnRateDegrees)
                 {
                     Heading = retroHeading;
+                    _currentTurnRate = 0;
                 }
-                else
+                else if (retroOffset > thrustMagnitude && 360 - retroOffset > thrustMagnitude)
                 {
                     if (retroOffset < 180)
                     {
@@ -218,6 +223,10 @@ namespace StellarOps.Ships
                         _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
                             : _currentTurnRate + ManeuveringThrust;
                     }
+                }
+                else
+                {
+                    SlowDownManueveringThrust();
                 }
             }
             else if (IsBraking)

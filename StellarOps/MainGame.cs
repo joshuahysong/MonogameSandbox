@@ -40,11 +40,11 @@ namespace StellarOps
             };
             Content.RootDirectory = "Content";
             Instance = this;
+            IsDebugging = true;
         }
 
         protected override void Initialize()
         {
-            IsDebugging = false;
             Camera = new Camera();
             starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
             debugTile = Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
@@ -103,11 +103,10 @@ namespace StellarOps
 
             spriteBatch.Begin();
             spriteBatch.Draw(Art.Pointer, new Vector2(Input.MouseState.X, Input.MouseState.Y), Color.White);
+
+            // Debug Text
             if (IsDebugging)
             {
-                Entity focus = (Entity)Camera.Focus;
-                float velocityHeading = (float)Math.Atan2(focus.Velocity.Y, focus.Velocity.X);
-
                 int xTextOffset = 5;
                 int yTextOffset = 5;
                 spriteBatch.DrawString(Art.DebugFont, "Player", new Vector2(xTextOffset, yTextOffset), Color.White);
@@ -136,8 +135,8 @@ namespace StellarOps
                     yTextOffset += 15;
                 }
             }
-            spriteBatch.End();
 
+            spriteBatch.End();
             base.Draw(gameTime);
         }
 
