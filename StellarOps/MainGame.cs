@@ -30,6 +30,8 @@ namespace StellarOps
         private SpriteBatch spriteBatch;
         private Vector2 tilePosition;
 
+        private Vector2 testPosition;
+
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this)
@@ -41,6 +43,7 @@ namespace StellarOps
             Content.RootDirectory = "Content";
             Instance = this;
             IsDebugging = true;
+            testPosition = Vector2.Zero;
         }
 
         protected override void Initialize()
@@ -82,7 +85,7 @@ namespace StellarOps
             {
                 SystemDebugEntries["FPS"] = $"{Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
                 SystemDebugEntries["Camera Focus"] = $"{Camera.Focus.GetType().Name}";
-                SystemDebugEntries["Camera Zoom"] = $"{Camera.Scale}";
+                SystemDebugEntries["Camera Zoom"] = $"{Math.Round(Camera.Scale,2)}";
                 SystemDebugEntries["Mouse Screen Position"] = $"{Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}";
                 SystemDebugEntries["Mouse World Position"] = $"{Math.Round(Input.WorldMousePosition.X)}, {Math.Round(Input.WorldMousePosition.Y)}";
             }
@@ -95,10 +98,6 @@ namespace StellarOps
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Camera.Transform);
             DrawBackground(spriteBatch);
             EntityManager.Draw(spriteBatch, Matrix.Identity);
-            if (IsDebugging)
-            {
-                DrawBackground(spriteBatch, true);
-            }
             spriteBatch.End();
 
             spriteBatch.Begin();
@@ -175,11 +174,11 @@ namespace StellarOps
             return tile;
         }
 
-        private void DrawBackground(SpriteBatch spriteBatch, bool areDrawingDebugTiles = false)
+        private void DrawBackground(SpriteBatch spriteBatch)
         {
             Vector2 startLocation = Vector2.Zero;
-            int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / WorldTileSize) / Camera.Scale);
-            int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / WorldTileSize) / Camera.Scale);
+            int numberOfTilesX = (int)Math.Ceiling((double)Viewport.Bounds.Width / WorldTileSize / Camera.Scale);
+            int numberOfTilesY = (int)Math.Ceiling((double)Viewport.Bounds.Height / WorldTileSize / Camera.Scale);
             tilePosition.X = (int)Math.Floor(Camera.Position.X / WorldTileSize);
             tilePosition.Y = (int)Math.Floor(Camera.Position.Y / WorldTileSize);
 
@@ -190,26 +189,25 @@ namespace StellarOps
             int minY = (int)Math.Floor(tilePosition.Y - (double)numberOfTilesY / 2);
             int maxY = (int)Math.Ceiling(tilePosition.Y + (double)numberOfTilesY / 2);
 
+            Rectangle backgroundRectangle = new Rectangle((int)(testPosition.X * 0.8), (int)(testPosition.Y * 0.8), Viewport.Width * 2, Viewport.Height * 2);
+            spriteBatch.Draw(Art.Background, backgroundRectangle, Color.White);
+
             for (int x = minX; x <= maxX; x++) 
             {
                 for (int y = minY; y <= maxY; y++)
                 {
-                    DrawTile(x, y, areDrawingDebugTiles);
+                    DrawTile(x, y);
                 }
             }
         }
 
-        private void DrawTile(int x, int y, bool IsDrawingDebugTile)
+        private void DrawTile(int x, int y)
         {
-            Texture2D tileToDraw = starTile;
-            if (IsDrawingDebugTile)
+            Vector2 position = new Vector2(starTile.Bounds.Width * x, starTile.Bounds.Height * y);
+            spriteBatch.Draw(starTile, position, Color.White);
+            if (IsDebugging && Camera.Scale >= 0.5)
             {
-                tileToDraw = debugTile;
-            }
-            Vector2 position = new Vector2(tileToDraw.Bounds.Width * x, tileToDraw.Bounds.Height * y);
-            spriteBatch.Draw(tileToDraw, position, Color.White);
-            if (IsDebugging)
-            {
+                spriteBatch.Draw(debugTile, position, Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
             }
         }
