@@ -58,7 +58,6 @@ namespace StellarOps
             Player.Parent = Ship;
             Camera.Focus = Ship;
             Ship.Children.Add(Player);
-            Player.Container = Ship;
             EntityManager.Add(Ship);
         }
 

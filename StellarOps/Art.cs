@@ -7,6 +7,7 @@ namespace StellarOps
 {
     public static class Art
     {
+        public static Texture2D Pixel { get; set; }
         public static Texture2D TestShip { get; set; }
         public static Texture2D TestShipInterior { get; set; }
         public static Texture2D Player { get; set; }
@@ -20,6 +21,7 @@ namespace StellarOps
 
         public static void Load(ContentManager content)
         {
+            Pixel = DrawTileRectangle(1, 1, Color.White, Color.White);
             Player = content.Load<Texture2D>("Pawns/TestPawn1");
             Background = content.Load<Texture2D>("starfield2");
             Seeker = content.Load<Texture2D>("Seeker");

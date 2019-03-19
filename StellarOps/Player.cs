@@ -21,7 +21,7 @@ namespace StellarOps
         {
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
-            Position = Vector2.Zero;
+            Position = new Vector2(243,-15);
             Bounds = Art.CreateCircle((int)Radius - 1, Color.Green * 0.5f);
             _currentSpeed = MaxSpeed;
         }
@@ -114,11 +114,7 @@ namespace StellarOps
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
                 {
                     Input.ManagedKeys.Add(Keys.F);
-                    MainGame.Camera.Focus = MainGame.Ship;
-                    if (MainGame.Camera.Scale > 1f)
-                    {
-                        MainGame.Camera.Scale = 1F;
-                    }
+                    ((ShipCore)Parent).PerformUseAtTile(Position);
                 }
             }
         }
@@ -132,6 +128,18 @@ namespace StellarOps
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
             spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
 
+            if (MainGame.Camera.Focus == this)
+            {
+                string tileText = ((ShipCore)Parent).GetTileText(Position);
+                if (!string.IsNullOrWhiteSpace(tileText))
+                {
+                    Vector2 textSize = Art.DebugFont.MeasureString(tileText);
+                    Vector2 textLocation = new Vector2(position.X - textSize.X / 2, position.Y + 10 + Radius);
+                    spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
+                    spriteBatch.DrawString(Art.DebugFont, tileText, textLocation, Color.White);
+                }
+            }
+
             if (MainGame.IsDebugging)
             {
                 var origin = new Vector2(Bounds.Width / 2, Bounds.Height / 2);
@@ -141,16 +149,13 @@ namespace StellarOps
 
         private bool IsMovingTowardsCollision(Vector2 newMovement)
         {
-            Vector2 futurePosition = Position - newMovement;
-            Vector2 playerRelativePosition = futurePosition + Parent.ImageCenter;
             ShipCore parent = (ShipCore)Parent;
+            Vector2 futurePosition = Position - newMovement;
+            Vector2 shipTile = parent.GetTileAtPosition(futurePosition);
 
-            int tileX = (int)Math.Floor(playerRelativePosition.X / parent.ShipTileSize);
-            int tileY = (int)Math.Floor(playerRelativePosition.Y / parent.ShipTileSize);
-
-            for (int y = tileY - 1; y <= tileY + 1; y++)
+            for (int y = (int)shipTile.Y - 1; y <= (int)shipTile.Y + 1; y++)
             {
-                for (int x = tileX - 1; x <= tileX + 1; x++)
+                for (int x = (int)shipTile.X - 1; x <= (int)shipTile.X + 1; x++)
                 {
                     if (x >= 0 && y >= 0)
                     {

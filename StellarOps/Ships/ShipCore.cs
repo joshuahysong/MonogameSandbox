@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace StellarOps.Ships
 {
-    public class ShipCore : Entity, IFocusable
+    public abstract class ShipCore : Entity, IFocusable
     {
         public Texture2D InteriorImage;
         public float Thrust;
@@ -31,7 +31,8 @@ namespace StellarOps.Ships
             {
                 { 0, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
                 { 1, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) }
+                { 2, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) },
+                { 3, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Yellow * 0.2f, Color.Yellow * 0.3f) }
             };
         }
 
@@ -261,6 +262,36 @@ namespace StellarOps.Ships
             tilePosition -= imageCenter;
             return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, ShipTileSize, ShipTileSize);
         }
+
+        public abstract void PerformUseAtTile(Vector2 position);
+
+        public abstract string GetTileText(Vector2 Position);
+
+        /// <summary>
+        /// Get the X, Y coordinates of the tile at the given position as a Vector2
+        /// </summary>
+        /// <param name="position">Position to check</param>
+        /// <returns>X, Y of tile as Vector2</returns>
+        public Vector2 GetTileAtPosition(Vector2 position)
+        {
+            Vector2 relativePosition = position + ImageCenter;
+            ShipCore parent = (ShipCore)Parent;
+
+            int tileX = (int)Math.Floor(relativePosition.X / ShipTileSize);
+            int tileY = (int)Math.Floor(relativePosition.Y / ShipTileSize);
+
+            return new Vector2(tileX, tileY);
+        }
+
+        protected void SwitchControlToShip()
+        {
+            MainGame.Camera.Focus = this;
+            if (MainGame.Camera.Scale > 1f)
+            {
+                MainGame.Camera.Scale = 1F;
+            }
+        }
+
 
         private void SlowDownManueveringThrust()
         {

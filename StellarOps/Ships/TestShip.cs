@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
 namespace StellarOps.Ships
 {
@@ -21,13 +20,30 @@ namespace StellarOps.Ships
                 {0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0},
                 {0,1,1,1,1,1,1,2,2,1,1,1,0,0,0,0,0},
                 {1,1,2,2,2,2,1,2,2,2,2,1,1,1,1,1,1},
-                {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1},
+                {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,3,1},
                 {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1},
                 {1,1,2,2,2,2,1,2,2,2,2,1,1,1,1,1,1},
                 {0,1,1,1,1,1,1,2,2,1,1,1,0,0,0,0,0},
                 {0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0},
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0}
             };
+        }
+
+        public override void PerformUseAtTile(Vector2 position)
+        {
+            if (GetTileAtPosition(position) == new Vector2(15,4))
+            {
+                SwitchControlToShip();
+            }
+        }
+
+        public override string GetTileText(Vector2 position)
+        {
+            if (GetTileAtPosition(position) == new Vector2(15, 4))
+            {
+                return "Use Flight Control";
+            }
+            return string.Empty;
         }
     }
 }

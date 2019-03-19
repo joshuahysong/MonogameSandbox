@@ -19,9 +19,7 @@ namespace StellarOps
         public Vector2 ImageCenter => new Vector2(Image.Width / 2, Image.Height / 2);
         public Matrix LocalTransform {
             get {
-                // Transform = -Origin * Scale * Rotation * Translation
-                return //Matrix.CreateTranslation(-Image.Width / 2f, -Image.Height / 2f, 0f) *
-                    Matrix.CreateTranslation(0, 0, 0f) *
+                return Matrix.CreateTranslation(0, 0, 0f) *
                     Matrix.CreateScale(1f, 1f, 1f) *
                     Matrix.CreateRotationZ(Heading) *
                     Matrix.CreateTranslation(Position.X, Position.Y, 0f);
@@ -29,7 +27,6 @@ namespace StellarOps
         }
         public bool IsChild => Parent != null;
 
-        public ShipCore Container; // Genericize away from ship
         public Entity Parent;
         public List<Entity> Children;
 
