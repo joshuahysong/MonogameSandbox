@@ -18,19 +18,17 @@ namespace StellarOps
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-        public static int WorldTileSize => 1000;
+        public static int WorldTileSize => 4000;
 
         public Dictionary<string, string> PlayerDebugEntries { get; set; }
         public Dictionary<string, string> ShipDebugEntries { get; set; }
         public Dictionary<string, string> SystemDebugEntries { get; set; }
 
-        private Texture2D starTile;
+        //private Texture2D starTile;
         private Texture2D debugTile;
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private Vector2 tilePosition;
-
-        private Vector2 testPosition;
 
         public MainGame()
         {
@@ -43,13 +41,12 @@ namespace StellarOps
             Content.RootDirectory = "Content";
             Instance = this;
             IsDebugging = true;
-            testPosition = Vector2.Zero;
         }
 
         protected override void Initialize()
         {
             Camera = new Camera();
-            starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
+            //starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
             debugTile = Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
             PlayerDebugEntries = new Dictionary<string, string>();
             ShipDebugEntries = new Dictionary<string, string>();
@@ -160,11 +157,11 @@ namespace StellarOps
             {
                 if (!(i < tile.Width || i % tile.Width == 0 || i > tile.Width * tile.Width - tile.Width || (i + 1) % tile.Width == 0))
                 {
-                    if (Random.Next(1, 10000) == 1)
+                    if (Random.Next(1, 50000) == 1)
                     {
                         data[i] = Color.White;
                     }
-                    else if (Random.Next(1, 10000) == 1)
+                    else if (Random.Next(1, 50000) == 1)
                     {
                         data[i] = Color.DimGray;
                     }
@@ -189,13 +186,13 @@ namespace StellarOps
             int minY = (int)Math.Floor(tilePosition.Y - (double)numberOfTilesY / 2);
             int maxY = (int)Math.Ceiling(tilePosition.Y + (double)numberOfTilesY / 2);
 
-            Rectangle backgroundRectangle = new Rectangle((int)(testPosition.X * 0.8), (int)(testPosition.Y * 0.8), Viewport.Width * 2, Viewport.Height * 2);
-            spriteBatch.Draw(Art.Background, backgroundRectangle, Color.White);
-
             for (int x = minX; x <= maxX; x++) 
             {
                 for (int y = minY; y <= maxY; y++)
                 {
+                    Rectangle backgroundRectangle = new Rectangle(WorldTileSize * x, WorldTileSize * y, WorldTileSize, WorldTileSize);
+                    spriteBatch.Draw(Art.Background, backgroundRectangle, Color.White);
+
                     DrawTile(x, y);
                 }
             }
@@ -203,8 +200,9 @@ namespace StellarOps
 
         private void DrawTile(int x, int y)
         {
-            Vector2 position = new Vector2(starTile.Bounds.Width * x, starTile.Bounds.Height * y);
-            spriteBatch.Draw(starTile, position, Color.White);
+            //Vector2 position = new Vector2(starTile.Bounds.Width * x, starTile.Bounds.Height * y);
+            //spriteBatch.Draw(starTile, position, Color.White);
+            Vector2 position = new Vector2(debugTile.Bounds.Width * x, debugTile.Bounds.Height * y);
             if (IsDebugging && Camera.Scale >= 0.5)
             {
                 spriteBatch.Draw(debugTile, position, Color.White);
