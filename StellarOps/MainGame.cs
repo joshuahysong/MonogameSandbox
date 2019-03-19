@@ -18,13 +18,13 @@ namespace StellarOps
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-        public static int WorldTileSize => 1000;
+        public static int WorldTileSize => 4000;
 
         public Dictionary<string, string> PlayerDebugEntries { get; set; }
         public Dictionary<string, string> ShipDebugEntries { get; set; }
         public Dictionary<string, string> SystemDebugEntries { get; set; }
 
-        private Texture2D starTile;
+        //private Texture2D starTile;
         private Texture2D debugTile;
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -46,7 +46,7 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
+            //starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
             debugTile = Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
             PlayerDebugEntries = new Dictionary<string, string>();
             ShipDebugEntries = new Dictionary<string, string>();
@@ -82,7 +82,7 @@ namespace StellarOps
             {
                 SystemDebugEntries["FPS"] = $"{Math.Round(1 / gameTime.ElapsedGameTime.TotalSeconds)}";
                 SystemDebugEntries["Camera Focus"] = $"{Camera.Focus.GetType().Name}";
-                SystemDebugEntries["Camera Zoom"] = $"{Camera.Scale}";
+                SystemDebugEntries["Camera Zoom"] = $"{Math.Round(Camera.Scale,2)}";
                 SystemDebugEntries["Mouse Screen Position"] = $"{Input.ScreenMousePosition.X}, {Input.ScreenMousePosition.Y}";
                 SystemDebugEntries["Mouse World Position"] = $"{Math.Round(Input.WorldMousePosition.X)}, {Math.Round(Input.WorldMousePosition.Y)}";
             }
@@ -95,10 +95,6 @@ namespace StellarOps
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Camera.Transform);
             DrawBackground(spriteBatch);
             EntityManager.Draw(spriteBatch, Matrix.Identity);
-            if (IsDebugging)
-            {
-                DrawBackground(spriteBatch, true);
-            }
             spriteBatch.End();
 
             spriteBatch.Begin();
@@ -161,11 +157,11 @@ namespace StellarOps
             {
                 if (!(i < tile.Width || i % tile.Width == 0 || i > tile.Width * tile.Width - tile.Width || (i + 1) % tile.Width == 0))
                 {
-                    if (Random.Next(1, 10000) == 1)
+                    if (Random.Next(1, 50000) == 1)
                     {
                         data[i] = Color.White;
                     }
-                    else if (Random.Next(1, 10000) == 1)
+                    else if (Random.Next(1, 50000) == 1)
                     {
                         data[i] = Color.DimGray;
                     }
@@ -175,11 +171,11 @@ namespace StellarOps
             return tile;
         }
 
-        private void DrawBackground(SpriteBatch spriteBatch, bool areDrawingDebugTiles = false)
+        private void DrawBackground(SpriteBatch spriteBatch)
         {
             Vector2 startLocation = Vector2.Zero;
-            int numberOfTilesX = (int)Math.Ceiling(((double)Viewport.Bounds.Width / WorldTileSize) / Camera.Scale);
-            int numberOfTilesY = (int)Math.Ceiling(((double)Viewport.Bounds.Height / WorldTileSize) / Camera.Scale);
+            int numberOfTilesX = (int)Math.Ceiling((double)Viewport.Bounds.Width / WorldTileSize / Camera.Scale);
+            int numberOfTilesY = (int)Math.Ceiling((double)Viewport.Bounds.Height / WorldTileSize / Camera.Scale);
             tilePosition.X = (int)Math.Floor(Camera.Position.X / WorldTileSize);
             tilePosition.Y = (int)Math.Floor(Camera.Position.Y / WorldTileSize);
 
@@ -194,22 +190,22 @@ namespace StellarOps
             {
                 for (int y = minY; y <= maxY; y++)
                 {
-                    DrawTile(x, y, areDrawingDebugTiles);
+                    Rectangle backgroundRectangle = new Rectangle(WorldTileSize * x, WorldTileSize * y, WorldTileSize, WorldTileSize);
+                    spriteBatch.Draw(Art.Background, backgroundRectangle, Color.White);
+
+                    DrawTile(x, y);
                 }
             }
         }
 
-        private void DrawTile(int x, int y, bool IsDrawingDebugTile)
+        private void DrawTile(int x, int y)
         {
-            Texture2D tileToDraw = starTile;
-            if (IsDrawingDebugTile)
+            //Vector2 position = new Vector2(starTile.Bounds.Width * x, starTile.Bounds.Height * y);
+            //spriteBatch.Draw(starTile, position, Color.White);
+            Vector2 position = new Vector2(debugTile.Bounds.Width * x, debugTile.Bounds.Height * y);
+            if (IsDebugging && Camera.Scale >= 0.5)
             {
-                tileToDraw = debugTile;
-            }
-            Vector2 position = new Vector2(tileToDraw.Bounds.Width * x, tileToDraw.Bounds.Height * y);
-            spriteBatch.Draw(tileToDraw, position, Color.White);
-            if (IsDebugging)
-            {
+                spriteBatch.Draw(debugTile, position, Color.White);
                 spriteBatch.DrawString(Art.DebugFont, $"{x},{y}", new Vector2(position.X + 5, position.Y + 5), Color.DimGray);
             }
         }
