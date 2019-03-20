@@ -153,12 +153,13 @@ namespace StellarOps
         {
             ShipCore parent = (ShipCore)Parent;
             Vector2 futurePosition = Position - newMovement;
-            Tile tile = Container.GetTile(futurePosition);
+            Tile currentTile = Container.GetTile(futurePosition);
 
-            for (int y = tile.Location.Y - 1; y <= tile.Location.Y + 1; y++)
+            for (int y = currentTile.Location.Y - 1; y <= currentTile.Location.Y + 1; y++)
             {
-                for (int x = tile.Location.X - 1; x <= tile.Location.X + 1; x++)
+                for (int x = currentTile.Location.X - 1; x <= currentTile.Location.X + 1; x++)
                 {
+                    Tile tile = Container.GetTile(new Point(x, y));
                     if (tile.Collidable && IsTileCollided(futurePosition, tile.Bounds))
                     {
                         return true;

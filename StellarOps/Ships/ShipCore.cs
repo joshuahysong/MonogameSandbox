@@ -262,7 +262,12 @@ namespace StellarOps.Ships
             ShipCore parent = (ShipCore)Parent;
             int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
             int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
-            return TileMap.FirstOrDefault(t => t.Location.X == tileX && t.Location.Y == tileY);
+            return TileMap.FirstOrDefault(t => t.Location == new Point(tileX, tileY));
+        }
+
+        public Tile GetTile(Point location)
+        {
+            return TileMap.FirstOrDefault(t => t.Location == location);
         }
 
         protected void SwitchControlToShip()

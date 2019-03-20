@@ -16,6 +16,8 @@ namespace StellarOps.Contracts
 
         Tile GetTile(Vector2 position);
 
+        Tile GetTile(Point location);
+
         void UseTile(Vector2 position);
 
         string GetUsePrompt(Vector2 position);
