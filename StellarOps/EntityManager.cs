@@ -55,7 +55,7 @@ namespace StellarOps
 
         public static void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            foreach (Entity entity in entities.Where(e => !e.IsChild))
+            foreach (Entity entity in entities)
             {
                 entity.Draw(spriteBatch, parentTransform);
             }

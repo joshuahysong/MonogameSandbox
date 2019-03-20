@@ -69,7 +69,6 @@ namespace StellarOps.Ships
             Position += Velocity * deltaTime;
             WorldPosition = Position;
 
-            Children.ForEach(c => c.Update(gameTime, LocalTransform));
             Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
             if (MainGame.IsDebugging)
@@ -77,7 +76,7 @@ namespace StellarOps.Ships
                 MainGame.Instance.ShipDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
                 MainGame.Instance.ShipDebugEntries["Velocity"] = $"{Math.Round(Velocity.X)}, {Math.Round(Velocity.Y)}";
                 MainGame.Instance.ShipDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
-                MainGame.Instance.ShipDebugEntries["Velocity Heading"] = $"{Math.Round(Math.Atan2(Velocity.Y, Velocity.X), 2)}";
+                MainGame.Instance.ShipDebugEntries["Velocity Heading"] = $"{Math.Round(Velocity.ToAngle(), 2)}";
                 MainGame.Instance.ShipDebugEntries["World Tile"] = $"{Math.Floor(Position.X / MainGame.WorldTileSize)}, {Math.Floor(Position.Y / MainGame.WorldTileSize)}";
                 MainGame.Instance.ShipDebugEntries["Current Turn Rate"] = $"{Math.Round(_currentTurnRate, 2)}";
             }
@@ -151,7 +150,6 @@ namespace StellarOps.Ships
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
             spriteBatch.Draw(Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
 
-            Children.ForEach(c => c.Draw(spriteBatch, globalTransform));
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
 
             //Debug Tilemap
@@ -191,7 +189,7 @@ namespace StellarOps.Ships
 
         private void RotateToRetro(float deltaTime, bool IsBraking)
         {
-            float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            float movementHeading = Velocity.ToAngle();
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
             if (Heading != retroHeading  && !IsWithinBrakingRange())
             {
@@ -259,7 +257,6 @@ namespace StellarOps.Ships
         public Tile GetTile(Vector2 position)
         {
             Vector2 relativePosition = position + ImageCenter;
-            ShipCore parent = (ShipCore)Parent;
             int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
             int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
             return TileMap.FirstOrDefault(t => t.Location == new Point(tileX, tileY));

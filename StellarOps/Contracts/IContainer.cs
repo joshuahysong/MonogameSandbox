@@ -6,11 +6,11 @@ namespace StellarOps.Contracts
 {
     public interface IContainer
     {
-        Vector2 Position { get; set; }
+        Vector2 Position { get; }
 
         Vector2 ImageCenter { get; }
 
-        List<Tile> TileMap { get; set; }
+        List<Tile> TileMap { get; }
 
         List<IPawn> Pawns { get; set; }
 

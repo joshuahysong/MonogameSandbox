@@ -2,9 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
-using StellarOps.Ships;
 using System;
-using System.Collections.Generic;
 
 namespace StellarOps
 {
@@ -59,7 +57,7 @@ namespace StellarOps
                     Vector2 direction = Vector2.Normalize(targetPosition - position);
 
                     DecomposeMatrix(ref parentTransform, out Vector2 parentPosition, out parentRotation, out Vector2 parentScale);
-                    Heading = (float)Math.Atan2(direction.Y, direction.X) - parentRotation;
+                    Heading = direction.ToAngle() - parentRotation;
 
                     if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.D))
                     {
@@ -151,7 +149,6 @@ namespace StellarOps
 
         private bool IsMovingTowardsCollision(Vector2 newMovement)
         {
-            ShipCore parent = (ShipCore)Parent;
             Vector2 futurePosition = Position - newMovement;
             Tile currentTile = Container.GetTile(futurePosition);
 

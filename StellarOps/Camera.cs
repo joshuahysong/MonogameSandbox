@@ -32,21 +32,6 @@ namespace StellarOps
             Position = focus.WorldPosition;
         }
 
-        public bool IsInView(Vector2 position, Texture2D texture)
-        {
-            if ((position.X + texture.Width) < (Position.X - Origin.X) || (position.X) > (Position.X + Origin.X))
-            {
-                return false;
-            }
-
-            if ((position.Y + texture.Height) < (Position.Y - Origin.Y) || (position.Y) > (Position.Y + Origin.Y))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public void HandleInput()
         {
             if (Input.MouseState.ScrollWheelValue < previousScrollValue)
