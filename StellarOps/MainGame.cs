@@ -18,7 +18,9 @@ namespace StellarOps
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
-        public static int WorldTileSize => 4000;
+
+        public const int WorldTileSize = 4000;
+        public const int TileSize =  35;
 
         public Dictionary<string, string> PlayerDebugEntries { get; set; }
         public Dictionary<string, string> ShipDebugEntries { get; set; }
@@ -55,9 +57,9 @@ namespace StellarOps
             base.Initialize();
             Player = new Player();
             Ship = new TestShip(Vector2.Zero);
-            Player.Parent = Ship;
+            Ship.Pawns.Add(Player);
+            Player.Container = Ship;
             Camera.Focus = Ship;
-            Ship.Children.Add(Player);
             EntityManager.Add(Ship);
         }
 

@@ -17,6 +17,7 @@ namespace StellarOps
         protected Vector2 parentTile;
 
         public Vector2 ImageCenter => new Vector2(Image.Width / 2, Image.Height / 2);
+
         public Matrix LocalTransform {
             get {
                 return Matrix.CreateTranslation(0, 0, 0f) *
@@ -30,7 +31,6 @@ namespace StellarOps
         public Entity Parent;
         public List<Entity> Children;
 
-        public float Radius;
         public bool IsExpired;
 
         public Vector2 Size
