@@ -20,7 +20,9 @@ namespace StellarOps
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
 
         public const int WorldTileSize = 4000;
-        public const int TileSize =  20;
+        public const int TileSize =  32;
+        public const float TileScale = 0.5f;
+        public const float PawnScale = 0.4f;
 
         public Dictionary<string, string> PlayerDebugEntries { get; set; }
         public Dictionary<string, string> ShipDebugEntries { get; set; }
@@ -42,6 +44,7 @@ namespace StellarOps
             Content.RootDirectory = "Content";
             Instance = this;
             IsDebugging = true;
+            IsMouseVisible = true;
         }
 
         protected override void Initialize()
@@ -97,7 +100,20 @@ namespace StellarOps
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.Draw(Art.Pointer, new Vector2(Input.ScreenMousePosition.X, Input.ScreenMousePosition.Y), Color.White);
+            //spriteBatch.Draw(Art.Pointer, new Vector2(Input.ScreenMousePosition.X, Input.ScreenMousePosition.Y), Color.White);
+
+            // Player prompt text
+            if (Camera.Focus == Player)
+            {
+                string promptText = Player.Container.GetUsePrompt(Player.Position);
+                if (!string.IsNullOrWhiteSpace(promptText))
+                {
+                    Vector2 textSize = Art.DebugFont.MeasureString(promptText);
+                    Vector2 textLocation = new Vector2(ScreenCenter.X - textSize.X / 2, ScreenCenter.Y + Player.Radius * 2f);
+                    spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
+                    spriteBatch.DrawString(Art.DebugFont, promptText, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                }
+            }
 
             // Debug Text
             if (IsDebugging)
