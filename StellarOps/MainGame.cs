@@ -26,7 +26,6 @@ namespace StellarOps
         public Dictionary<string, string> ShipDebugEntries { get; set; }
         public Dictionary<string, string> SystemDebugEntries { get; set; }
 
-        //private Texture2D starTile;
         private Texture2D debugTile;
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -48,7 +47,6 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            //starTile = DrawStars(Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.TransparentBlack));
             debugTile = Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
             PlayerDebugEntries = new Dictionary<string, string>();
             ShipDebugEntries = new Dictionary<string, string>();
@@ -72,7 +70,7 @@ namespace StellarOps
         protected override void Update(GameTime gameTime)
         {
             Input.Update();
-            this.HandleInput();
+            HandleInput();
             Camera.HandleInput();
 
             Camera.Update(Camera.Focus);
