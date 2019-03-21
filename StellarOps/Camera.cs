@@ -32,24 +32,9 @@ namespace StellarOps
             Position = focus.WorldPosition;
         }
 
-        public bool IsInView(Vector2 position, Texture2D texture)
-        {
-            if ((position.X + texture.Width) < (Position.X - Origin.X) || (position.X) > (Position.X + Origin.X))
-            {
-                return false;
-            }
-
-            if ((position.Y + texture.Height) < (Position.Y - Origin.Y) || (position.Y) > (Position.Y + Origin.Y))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public void HandleInput()
         {
-            if (Input.MouseState.ScrollWheelValue < previousScrollValue)
+            if (Input.MouseScrollWheelValue < previousScrollValue)
             {
                 Scale -= 0.1f;
                 if (Scale < 1f && Focus == MainGame.Player)
@@ -61,7 +46,7 @@ namespace StellarOps
                     Scale = 0.1f;
                 }
             }
-            else if (Input.MouseState.ScrollWheelValue > previousScrollValue)
+            else if (Input.MouseScrollWheelValue > previousScrollValue)
             {
                 Scale += 0.1f;
                 if (Scale > 4f)
@@ -69,7 +54,7 @@ namespace StellarOps
                     Scale = 4f;
                 }
             }
-            previousScrollValue = Input.MouseState.ScrollWheelValue;
+            previousScrollValue = Input.MouseScrollWheelValue;
         }
     }
 }

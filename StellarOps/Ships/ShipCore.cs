@@ -4,35 +4,39 @@ using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StellarOps.Ships
 {
-    public abstract class ShipCore : Entity, IFocusable
+    public abstract class ShipCore : Entity, IContainer, IFocusable
     {
-        public Texture2D InteriorImage;
-        public float Thrust;
-        public float MaxTurnRate;
-        public float ManeuveringThrust;
-        public float MaxVelocity;
-        public List<Weapon> Weapons;
-        public bool InteriorIsDisplayed;
-        public int[,] TileMap;
         public Vector2 WorldPosition { get; set; }
-        public int ShipTileSize => 35;
+        public List<Tile> TileMap { get; set; }
+        public List<IPawn> Pawns { get; set; }
 
-        protected Dictionary<int, Texture2D> debugTiles;
+        protected int[,] TileMapData;
+        protected float Thrust;
+        protected float ManeuveringThrust;
+        protected float MaxTurnRate;
+        protected float MaxVelocity;
 
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
+        // TODO Temporary
+        private Dictionary<int, Texture2D> debugTiles;
+
         public ShipCore()
         {
+            Pawns = new List<IPawn>();
+
+            // TODO Temporary
             debugTiles = new Dictionary<int, Texture2D>
             {
-                { 0, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
-                { 1, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Red * 0.2f, Color.Red * 0.3f) },
-                { 3, Art.DrawTileRectangle(ShipTileSize, ShipTileSize, Color.Yellow * 0.2f, Color.Yellow * 0.3f) }
+                { 0, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
+                { 1, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
+                { 2, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.Red * 0.2f, Color.Red * 0.3f) },
+                { 4, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.Yellow * 0.2f, Color.Yellow * 0.3f) }
             };
         }
 
@@ -42,6 +46,7 @@ namespace StellarOps.Ships
 
             HandleInput(deltaTime);
 
+            // Continue rotation until turn rate reaches zero to simulate slowing
             if (_currentTurnRate > 0)
             {
                 RotateClockwise(deltaTime);
@@ -53,6 +58,7 @@ namespace StellarOps.Ships
 
             Velocity += _acceleration * deltaTime;
 
+            // Cap velocity to max velocity
             if (Velocity.LengthSquared() > MaxVelocity * MaxVelocity)
             {
                 Velocity.Normalize();
@@ -63,24 +69,14 @@ namespace StellarOps.Ships
             Position += Velocity * deltaTime;
             WorldPosition = Position;
 
-            // Interior Display
-            if (MainGame.Camera.Scale > 1.2)
-            {
-                InteriorIsDisplayed = true;
-            }
-            else
-            {
-                InteriorIsDisplayed = false;
-            }
-
-            Children.ForEach(c => c.Update(gameTime, LocalTransform));
+            Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
             if (MainGame.IsDebugging)
             {
                 MainGame.Instance.ShipDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
                 MainGame.Instance.ShipDebugEntries["Velocity"] = $"{Math.Round(Velocity.X)}, {Math.Round(Velocity.Y)}";
                 MainGame.Instance.ShipDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
-                MainGame.Instance.ShipDebugEntries["Velocity Heading"] = $"{Math.Round(Math.Atan2(Velocity.Y, Velocity.X), 2)}";
+                MainGame.Instance.ShipDebugEntries["Velocity Heading"] = $"{Math.Round(Velocity.ToAngle(), 2)}";
                 MainGame.Instance.ShipDebugEntries["World Tile"] = $"{Math.Floor(Position.X / MainGame.WorldTileSize)}, {Math.Floor(Position.Y / MainGame.WorldTileSize)}";
                 MainGame.Instance.ShipDebugEntries["Current Turn Rate"] = $"{Math.Round(_currentTurnRate, 2)}";
             }
@@ -125,6 +121,7 @@ namespace StellarOps.Ships
                         SlowDownManueveringThrust();
                     }
                 }
+                // Toggle to Player pawn control
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
                 {
                     Input.ManagedKeys.Add(Keys.F);
@@ -151,26 +148,24 @@ namespace StellarOps.Ships
 
             // Get values from GlobalTransform for SpriteBatch and render sprite
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-            spriteBatch.Draw(InteriorIsDisplayed ? InteriorImage : Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
 
-            // Draw Children
-            Children.ForEach(c => c.Draw(spriteBatch, globalTransform));
+            Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
 
             //Debug Tilemap
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
             Vector2 origin = imageCenter;
             if (MainGame.IsDebugging)
             {
-                for (int y = 0; y < TileMap.GetLength(0); y++)
+                TileMap.ForEach(tile =>
                 {
-                    for (int x = 0; x < TileMap.GetLength(1); x++)
-                    {
-                        Texture2D tileToDraw = debugTiles[TileMap[y, x]];
-                        Vector2 offset = new Vector2(x * tileToDraw.Width, y * tileToDraw.Height);
-                        origin = imageCenter - offset;
-                        spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
-                    }
-                }
+                    // TODO Temp
+                    Texture2D tileToDraw = debugTiles[(int)tile.TileType];
+
+                    Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
+                    origin = imageCenter - offset;
+                    spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
+                });
             }
         }
 
@@ -194,7 +189,7 @@ namespace StellarOps.Ships
 
         private void RotateToRetro(float deltaTime, bool IsBraking)
         {
-            float movementHeading = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            float movementHeading = Velocity.ToAngle();
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
             if (Heading != retroHeading  && !IsWithinBrakingRange())
             {
@@ -250,37 +245,26 @@ namespace StellarOps.Ships
             return Velocity.X < brakingRange && Velocity.X > -brakingRange && Velocity.Y < brakingRange && Velocity.Y > -brakingRange;
         }
 
-        public bool GetCollision(int x, int y)
-        {
-            return TileMap[y, x] == 1;
-        }
+        public abstract void UseTile(Vector2 position);
 
-        public Rectangle GetTileRectangle(int x, int y)
-        {
-            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            Vector2 tilePosition = new Vector2(x * ShipTileSize, y * ShipTileSize);
-            tilePosition -= imageCenter;
-            return new Rectangle((int)tilePosition.X, (int)tilePosition.Y, ShipTileSize, ShipTileSize);
-        }
-
-        public abstract void PerformUseAtTile(Vector2 position);
-
-        public abstract string GetTileText(Vector2 Position);
+        public abstract string GetUsePrompt(Vector2 Position);
 
         /// <summary>
-        /// Get the X, Y coordinates of the tile at the given position as a Vector2
+        /// Gets the tile object at the given position
         /// </summary>
         /// <param name="position">Position to check</param>
-        /// <returns>X, Y of tile as Vector2</returns>
-        public Vector2 GetTileAtPosition(Vector2 position)
+        /// <returns>Tile at position</returns>
+        public Tile GetTile(Vector2 position)
         {
             Vector2 relativePosition = position + ImageCenter;
-            ShipCore parent = (ShipCore)Parent;
+            int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
+            int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
+            return TileMap.FirstOrDefault(t => t.Location == new Point(tileX, tileY));
+        }
 
-            int tileX = (int)Math.Floor(relativePosition.X / ShipTileSize);
-            int tileY = (int)Math.Floor(relativePosition.Y / ShipTileSize);
-
-            return new Vector2(tileX, tileY);
+        public Tile GetTile(Point location)
+        {
+            return TileMap.FirstOrDefault(t => t.Location == location);
         }
 
         protected void SwitchControlToShip()
@@ -290,6 +274,28 @@ namespace StellarOps.Ships
             {
                 MainGame.Camera.Scale = 1F;
             }
+        }
+
+        protected List<Tile> GetTileMap()
+        {
+            List<Tile> tileMap = new List<Tile>();
+            for (int y = 0; y < TileMapData.GetLength(0); y++)
+            {
+                for (int x = 0; x < TileMapData.GetLength(1); x++)
+                {
+                    Tile tile = new Tile
+                    {
+                        Location = new Point(x, y),
+                        Collidable = (TileType)TileMapData[y, x] == TileType.Hull,
+                        TileType = (TileType)TileMapData[y, x]
+                    };
+                    Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
+                    relativePosition -= ImageCenter;
+                    tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
+                    tileMap.Add(tile);
+                }
+            }
+            return tileMap;
         }
 
 

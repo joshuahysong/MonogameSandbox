@@ -8,7 +8,6 @@ namespace StellarOps
     public static class EntityManager
     {
         static List<Entity> entities = new List<Entity>();
-        static List<Bullet> bullets = new List<Bullet>();
 
         static bool isUpdating;
         static List<Entity> addedEntities = new List<Entity>();
@@ -30,10 +29,6 @@ namespace StellarOps
         private static void AddEntity(Entity entity)
         {
             entities.Add(entity);
-            if (entity is Bullet)
-            {
-                bullets.Add(entity as Bullet);
-            }
         }
 
         public static void Update(GameTime gameTime, Matrix parentTransform)
@@ -56,12 +51,11 @@ namespace StellarOps
 
             // remove any expired entities.
             entities = entities.Where(x => !x.IsExpired).ToList();
-            bullets = bullets.Where(x => !x.IsExpired).ToList();
         }
 
         public static void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            foreach (Entity entity in entities.Where(e => !e.IsChild))
+            foreach (Entity entity in entities)
             {
                 entity.Draw(spriteBatch, parentTransform);
             }
