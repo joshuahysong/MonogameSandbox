@@ -15,14 +15,12 @@ namespace StellarOps
         private float MaxSpeed = 50f;
 
         private float _currentSpeed;
-        private Texture2D DebugImage;
 
         public Player()
         {
-            Image = Art.Player;
+            Image = Art.CreateCircle(6, Color.Wheat, Color.Wheat);
             Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
-            Position = new Vector2(243,-15);
-            DebugImage = Art.CreateCircle((int)Radius - 1, Color.Green * 0.5f);
+            Position = new Vector2(140,-10);
             _currentSpeed = MaxSpeed;
         }
 
@@ -138,12 +136,6 @@ namespace StellarOps
                     spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
                     spriteBatch.DrawString(Art.DebugFont, promptText, textLocation, Color.White);
                 }
-            }
-
-            if (MainGame.IsDebugging)
-            {
-                var origin = new Vector2(DebugImage.Width / 2, DebugImage.Height / 2);
-                spriteBatch.Draw(DebugImage, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), origin, scale, SpriteEffects.None, 0.0f);
             }
         }
 

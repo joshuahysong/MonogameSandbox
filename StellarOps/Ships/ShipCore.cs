@@ -33,10 +33,10 @@ namespace StellarOps.Ships
             // TODO Temporary
             debugTiles = new Dictionary<int, Texture2D>
             {
-                { 0, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
-                { 1, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.Red * 0.2f, Color.Red * 0.3f) },
-                { 4, Art.DrawTileRectangle(MainGame.TileSize, MainGame.TileSize, Color.Yellow * 0.2f, Color.Yellow * 0.3f) }
+                { 0, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
+                { 1, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
+                { 2, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Red * 0.2f, Color.Red * 0.3f) },
+                { 4, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Yellow * 0.2f, Color.Yellow * 0.3f) }
             };
         }
 

@@ -21,7 +21,7 @@ namespace StellarOps
 
         public static void Load(ContentManager content)
         {
-            Pixel = DrawTileRectangle(1, 1, Color.White, Color.White);
+            Pixel = CreateRectangle(1, 1, Color.White, Color.White);
             Player = content.Load<Texture2D>("Pawns/TestPawn1");
             Background = content.Load<Texture2D>("starfield2");
             Seeker = content.Load<Texture2D>("Seeker");
@@ -34,7 +34,7 @@ namespace StellarOps
             DebugFont = content.Load<SpriteFont>("DebugFont");
         }
 
-        public static Texture2D DrawTileRectangle(int width, int height, Color fillColor, Color borderColor)
+        public static Texture2D CreateRectangle(int width, int height, Color fillColor, Color borderColor)
         {
             Texture2D tile = new Texture2D(MainGame.Instance.GraphicsDevice, width, height);
             Color[] data = new Color[width * height];

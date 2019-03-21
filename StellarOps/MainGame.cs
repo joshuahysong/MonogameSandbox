@@ -20,7 +20,7 @@ namespace StellarOps
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
 
         public const int WorldTileSize = 4000;
-        public const int TileSize =  35;
+        public const int TileSize =  20;
 
         public Dictionary<string, string> PlayerDebugEntries { get; set; }
         public Dictionary<string, string> ShipDebugEntries { get; set; }
@@ -47,14 +47,14 @@ namespace StellarOps
         protected override void Initialize()
         {
             Camera = new Camera();
-            debugTile = Art.DrawTileRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
+            debugTile = Art.CreateRectangle(WorldTileSize, WorldTileSize, Color.TransparentBlack, Color.DimGray * 0.5f);
             PlayerDebugEntries = new Dictionary<string, string>();
             ShipDebugEntries = new Dictionary<string, string>();
             SystemDebugEntries = new Dictionary<string, string>();
 
             base.Initialize();
             Player = new Player();
-            Ship = new TestShip(Vector2.Zero);
+            Ship = new TestShip2(Vector2.Zero);
             Ship.Pawns.Add(Player);
             Player.Container = Ship;
             Camera.Focus = Ship;
