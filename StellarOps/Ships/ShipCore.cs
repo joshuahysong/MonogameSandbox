@@ -31,9 +31,9 @@ namespace StellarOps.Ships
 
             tileSprites = new Dictionary<TileType, Texture2D>
             {
-                { TileType.Hull, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.DimGray, Color.Gray) },
-                { TileType.Floor, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.White, Color.WhiteSmoke) },
-                { TileType.FlightConsole, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Khaki, Color.WhiteSmoke) },
+                { TileType.Hull, Art.Hull },
+                { TileType.Floor, Art.Floor },
+                { TileType.FlightConsole, Art.CreateRectangle((int)Math.Ceiling(MainGame.TileSize / MainGame.TileScale), (int)Math.Ceiling(MainGame.TileSize / MainGame.TileScale), Color.Khaki, Color.WhiteSmoke) },
             };
         }
 
@@ -155,7 +155,7 @@ namespace StellarOps.Ships
                 Texture2D tileToDraw = tileSprites[tile.TileType];
                 Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
                 origin = imageCenter - offset;
-                spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
+                spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
             });
 
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
