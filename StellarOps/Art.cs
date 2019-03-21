@@ -22,7 +22,7 @@ namespace StellarOps
         public static void Load(ContentManager content)
         {
             Pixel = CreateRectangle(1, 1, Color.White, Color.White);
-            Player = content.Load<Texture2D>("Pawns/TestPawn1");
+            Player = content.Load<Texture2D>("Pawns/TestPawn2");
             Background = content.Load<Texture2D>("starfield2");
             Seeker = content.Load<Texture2D>("Seeker");
             Wanderer = content.Load<Texture2D>("Wanderer");

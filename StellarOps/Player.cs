@@ -18,8 +18,8 @@ namespace StellarOps
 
         public Player()
         {
-            Image = Art.CreateCircle(6, Color.Wheat, Color.Wheat);
-            Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
+            Image = Art.Player;
+            Radius = 7;//(float)Math.Ceiling((double)Image.Width / 2) + 1;
             Position = new Vector2(140,-10);
             _currentSpeed = MaxSpeed;
         }
@@ -124,7 +124,7 @@ namespace StellarOps
 
             // Get values from GlobalTransform for SpriteBatch and render sprite
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-            spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale * 0.07f, SpriteEffects.None, 0.0f);
 
             if (MainGame.Camera.Focus == this)
             {

@@ -23,20 +23,17 @@ namespace StellarOps.Ships
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
-        // TODO Temporary
-        private Dictionary<int, Texture2D> debugTiles;
+        private Dictionary<TileType, Texture2D> tileSprites;
 
         public ShipCore()
         {
             Pawns = new List<IPawn>();
 
-            // TODO Temporary
-            debugTiles = new Dictionary<int, Texture2D>
+            tileSprites = new Dictionary<TileType, Texture2D>
             {
-                { 0, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.DimGray * 0.2f, Color.DimGray * 0.3f) },
-                { 1, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Blue * 0.2f, Color.Blue * 0.3f) },
-                { 2, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Red * 0.2f, Color.Red * 0.3f) },
-                { 4, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Yellow * 0.2f, Color.Yellow * 0.3f) }
+                { TileType.Hull, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.DimGray, Color.Gray) },
+                { TileType.Floor, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.White, Color.WhiteSmoke) },
+                { TileType.FlightConsole, Art.CreateRectangle(MainGame.TileSize, MainGame.TileSize, Color.Khaki, Color.WhiteSmoke) },
             };
         }
 
@@ -150,23 +147,18 @@ namespace StellarOps.Ships
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
             spriteBatch.Draw(Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
 
-            Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
-
-            //Debug Tilemap
+            // Tiles
             Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
             Vector2 origin = imageCenter;
-            if (MainGame.IsDebugging)
+            TileMap.Where(t => tileSprites.Keys.Contains(t.TileType)).ToList().ForEach(tile =>
             {
-                TileMap.ForEach(tile =>
-                {
-                    // TODO Temp
-                    Texture2D tileToDraw = debugTiles[(int)tile.TileType];
+                Texture2D tileToDraw = tileSprites[tile.TileType];
+                Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
+                origin = imageCenter - offset;
+                spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
+            });
 
-                    Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
-                    origin = imageCenter - offset;
-                    spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin, 1f, SpriteEffects.None, 1f);
-                });
-            }
+            Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
         }
 
         private void RotateClockwise(float deltaTime)
