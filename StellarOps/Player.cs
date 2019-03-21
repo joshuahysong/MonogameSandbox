@@ -49,7 +49,7 @@ namespace StellarOps
 
             if (MainGame.Camera.Focus == this)
             {
-                Vector2 targetPosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
+                Vector2 targetPosition = Input.WorldMousePosition;
                 float parentRotation = 0;
 
                 if (!float.IsNaN(targetPosition.X) && !float.IsNaN(targetPosition.X))

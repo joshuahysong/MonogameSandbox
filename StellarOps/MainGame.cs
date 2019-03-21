@@ -99,7 +99,7 @@ namespace StellarOps
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.Draw(Art.Pointer, new Vector2(Input.MouseState.X, Input.MouseState.Y), Color.White);
+            spriteBatch.Draw(Art.Pointer, new Vector2(Input.ScreenMousePosition.X, Input.ScreenMousePosition.Y), Color.White);
 
             // Debug Text
             if (IsDebugging)

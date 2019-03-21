@@ -34,7 +34,7 @@ namespace StellarOps
 
         public void HandleInput()
         {
-            if (Input.MouseState.ScrollWheelValue < previousScrollValue)
+            if (Input.MouseScrollWheelValue < previousScrollValue)
             {
                 Scale -= 0.1f;
                 if (Scale < 1f && Focus == MainGame.Player)
@@ -46,7 +46,7 @@ namespace StellarOps
                     Scale = 0.1f;
                 }
             }
-            else if (Input.MouseState.ScrollWheelValue > previousScrollValue)
+            else if (Input.MouseScrollWheelValue > previousScrollValue)
             {
                 Scale += 0.1f;
                 if (Scale > 4f)
@@ -54,7 +54,7 @@ namespace StellarOps
                     Scale = 4f;
                 }
             }
-            previousScrollValue = Input.MouseState.ScrollWheelValue;
+            previousScrollValue = Input.MouseScrollWheelValue;
         }
     }
 }

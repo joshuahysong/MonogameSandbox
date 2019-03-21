@@ -6,15 +6,17 @@ namespace StellarOps
 {
     public static class Input
     {
-        public static KeyboardState KeyboardState;
-        public static KeyboardState LastKeyboardState;
-        public static MouseState MouseState;
-        public static MouseState LastMouseState;
-        public static GamePadState GamepadState;
-        public static GamePadState LastGamepadState;
-        public static Vector2 ScreenMousePosition;
-        public static Vector2 WorldMousePosition;
-        public static List<Keys> ManagedKeys;
+        public static List<Keys> ManagedKeys { get; set; }
+        public static Vector2 ScreenMousePosition { get; private set; }
+        public static Vector2 WorldMousePosition { get; private set; }
+        public static int MouseScrollWheelValue { get; private set; }
+
+        private static MouseState MouseState;
+        private static KeyboardState KeyboardState;
+        private static KeyboardState LastKeyboardState;
+        private static MouseState LastMouseState;
+        private static GamePadState GamepadState;
+        private static GamePadState LastGamepadState;
 
         public static void Update()
         {
@@ -28,7 +30,8 @@ namespace StellarOps
             GamepadState = GamePad.GetState(PlayerIndex.One);
 
             ScreenMousePosition = new Vector2(MouseState.X, MouseState.Y);
-            WorldMousePosition = Vector2.Transform(Input.MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
+            WorldMousePosition = Vector2.Transform(MouseState.Position.ToVector2(), Matrix.Invert(MainGame.Camera.Transform));
+            MouseScrollWheelValue = MouseState.ScrollWheelValue;
         }
 
         public static bool IsKeyPressed(Keys key)
