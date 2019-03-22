@@ -7,7 +7,7 @@ namespace StellarOps.Ships
         {
             Position = Vector2.Zero;
             Heading = 0.0f;
-            Image = Art.CreateRectangle(17 * MainGame.TileSize, 10 * MainGame.TileSize, Color.Transparent, Color.Transparent);
+            Size = new Vector2(17 * MainGame.TileSize, 10 * MainGame.TileSize);
             Thrust = 250f;
             MaxTurnRate = 0.65f;
             ManeuveringThrust = 0.01f;

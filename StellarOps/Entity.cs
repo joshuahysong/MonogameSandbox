@@ -8,8 +8,8 @@ namespace StellarOps
         public Vector2 Position { get; protected set; }
         public bool IsExpired { get; set; }
 
-        public Vector2 ImageCenter => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
-        public Vector2 Size => Image == null ? Vector2.Zero : new Vector2(Image.Width, Image.Height);
+        //public Vector2 ImageCenter => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
+        //public Vector2 Size => Image == null ? Vector2.Zero : new Vector2(Image.Width, Image.Height);
         public Matrix LocalTransform =>
             Matrix.CreateTranslation(0, 0, 0f) *
             Matrix.CreateScale(1f, 1f, 1f) *
@@ -18,7 +18,6 @@ namespace StellarOps
 
         protected Vector2 Velocity;
         protected float Heading;
-        protected Texture2D Image;
 
         protected Color color = Color.White;
 

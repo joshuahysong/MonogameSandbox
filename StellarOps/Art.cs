@@ -18,6 +18,7 @@ namespace StellarOps
         public static Texture2D Background { get; set; }
         public static Texture2D Hull { get; set; }
         public static Texture2D Floor { get; set; }
+        public static Texture2D FlightConsole { get; set; }
 
         public static SpriteFont DebugFont { get; private set; }
 
@@ -34,6 +35,7 @@ namespace StellarOps
             TestShipInterior = content.Load<Texture2D>("Ships/TestShip_Interior2");
             Hull = content.Load<Texture2D>("Tiles/Hull");
             Floor = content.Load<Texture2D>("Tiles/Floor");
+            FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
 
             DebugFont = content.Load<SpriteFont>("DebugFont");
         }

@@ -11,6 +11,8 @@ namespace StellarOps
         public Vector2 WorldPosition { get; set; }
         public float Radius { get; set; }
         public IContainer Container { get; set; }
+        public Texture2D Image { get; set; }
+        public Vector2 Center => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
 
         private float MaxSpeed = 50f;
 
@@ -20,7 +22,7 @@ namespace StellarOps
         {
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
-            Position = new Vector2(140,-10);
+            Position = new Vector2(224,-16);
             _currentSpeed = MaxSpeed;
         }
 
@@ -33,7 +35,7 @@ namespace StellarOps
                 MainGame.Instance.PlayerDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
                 MainGame.Instance.PlayerDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
                 MainGame.Instance.PlayerDebugEntries["Speed"] = $"{_currentSpeed}";
-                Vector2 playerRelativePosition = Position + Container.ImageCenter;
+                Vector2 playerRelativePosition = Position + Container.Center;
                 MainGame.Instance.PlayerDebugEntries["Container Tile"] = $"{Math.Floor(playerRelativePosition.X / MainGame.TileSize)}, {Math.Floor(playerRelativePosition.Y / MainGame.TileSize)}";
             }
         }
@@ -124,7 +126,7 @@ namespace StellarOps
 
             // Get values from GlobalTransform for SpriteBatch and render sprite
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-            spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale * MainGame.PawnScale, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), Center, scale * MainGame.PawnScale, SpriteEffects.None, 0.0f);
         }
 
         private bool IsMovingTowardsCollision(Vector2 newMovement)

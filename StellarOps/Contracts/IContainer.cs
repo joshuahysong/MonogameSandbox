@@ -8,7 +8,9 @@ namespace StellarOps.Contracts
     {
         Vector2 Position { get; }
 
-        Vector2 ImageCenter { get; }
+        Vector2 Center { get; }
+
+        Vector2 Size { get; }
 
         List<Tile> TileMap { get; }
 

@@ -12,6 +12,8 @@ namespace StellarOps.Ships
     {
         public Vector2 WorldPosition { get; set; }
         public List<Tile> TileMap { get; set; }
+        public Vector2 Size { get; set; }
+        public Vector2 Center => Size == null ? Vector2.Zero : new Vector2(Size.X / 2, Size.Y / 2);
         public List<IPawn> Pawns { get; set; }
 
         protected int[,] TileMapData;
@@ -33,7 +35,7 @@ namespace StellarOps.Ships
             {
                 { TileType.Hull, Art.Hull },
                 { TileType.Floor, Art.Floor },
-                { TileType.FlightConsole, Art.CreateRectangle((int)Math.Ceiling(MainGame.TileSize / MainGame.TileScale), (int)Math.Ceiling(MainGame.TileSize / MainGame.TileScale), Color.Khaki, Color.WhiteSmoke) },
+                { TileType.FlightConsole, Art.FlightConsole },
             };
         }
 
@@ -145,16 +147,14 @@ namespace StellarOps.Ships
 
             // Get values from GlobalTransform for SpriteBatch and render sprite
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-            spriteBatch.Draw(Image, position, null, Color.White, rotation, ImageCenter, scale, SpriteEffects.None, 0.0f);
 
             // Tiles
-            Vector2 imageCenter = new Vector2(Image.Width / 2, Image.Height / 2);
-            Vector2 origin = imageCenter;
+            Vector2 origin = Center;
             TileMap.Where(t => tileSprites.Keys.Contains(t.TileType)).ToList().ForEach(tile =>
             {
                 Texture2D tileToDraw = tileSprites[tile.TileType];
                 Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
-                origin = imageCenter - offset;
+                origin = Center - offset;
                 spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
             });
 
@@ -248,7 +248,7 @@ namespace StellarOps.Ships
         /// <returns>Tile at position</returns>
         public Tile GetTile(Vector2 position)
         {
-            Vector2 relativePosition = position + ImageCenter;
+            Vector2 relativePosition = position + Center;
             int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
             int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
             return TileMap.FirstOrDefault(t => t.Location == new Point(tileX, tileY));
@@ -282,7 +282,7 @@ namespace StellarOps.Ships
                         TileType = (TileType)TileMapData[y, x]
                     };
                     Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
-                    relativePosition -= ImageCenter;
+                    relativePosition -= Center;
                     tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
                     tileMap.Add(tile);
                 }
