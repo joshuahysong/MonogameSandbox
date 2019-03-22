@@ -7,6 +7,10 @@ namespace StellarOps.Contracts
     {
         IContainer Container { get; set; }
 
+        Texture2D Image { get; set; }
+
+        Vector2 Center { get; }
+
         float Radius { get; set; }
 
         void Update(GameTime gameTime, Matrix parentTransform);
