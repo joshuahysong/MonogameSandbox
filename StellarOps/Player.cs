@@ -157,7 +157,7 @@ namespace StellarOps
                 for (int x = currentTile.Location.X - 1; x <= currentTile.Location.X + 1; x++)
                 {
                     Tile tile = Container.GetTile(new Point(x, y));
-                    if (tile.Collidable && IsTileCollided(futurePosition, tile.Bounds))
+                    if (tile.CollisionType == CollisionType.Collision && IsTileCollided(futurePosition, tile.Bounds))
                     {
                         return true;
                     }

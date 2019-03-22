@@ -14,7 +14,8 @@ namespace StellarOps.Ships
         public List<Tile> TileMap { get; set; }
         public List<IPawn> Pawns { get; set; }
 
-        protected int[,] TileMapData;
+        protected int[,] TileMapArtData;
+        protected int[,] TileMapCollisionData;
         protected float Thrust;
         protected float ManeuveringThrust;
         protected float MaxTurnRate;
@@ -279,15 +280,22 @@ namespace StellarOps.Ships
         protected List<Tile> GetTileMap()
         {
             List<Tile> tileMap = new List<Tile>();
-            for (int y = 0; y < TileMapData.GetLength(0); y++)
+            int? rows = TileMapArtData.GetLength(0);
+            int? columns = TileMapArtData.GetLength(1);
+            for (int y = 0; y < rows; y++)
             {
-                for (int x = 0; x < TileMapData.GetLength(1); x++)
+                for (int x = 0; x < columns; x++)
                 {
                     Tile tile = new Tile
                     {
                         Location = new Point(x, y),
-                        Collidable = (TileType)TileMapData[y, x] == TileType.Hull,
-                        TileType = (TileType)TileMapData[y, x]
+                        CollisionType = (CollisionType)TileMapCollisionData[y, x],
+                        TileType = (TileType)TileMapArtData[y, x],
+                        Health = 100,
+                        North = y == 0 ? null : columns * y - columns + x,
+                        South = y == rows - 1 ? null : columns * y + columns + x,
+                        East = x == columns -1 ? null : (int?)tileMap.Count() + 1,
+                        West = x == 0 ? null : (int?)tileMap.Count() - 1,
                     };
                     Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
                     relativePosition -= ImageCenter;
