@@ -57,7 +57,7 @@ namespace StellarOps
 
             base.Initialize();
             Player = new Player();
-            Ship = new TestShip2(Vector2.Zero);
+            Ship = new TestShip(Vector2.Zero);
             Ship.Pawns.Add(Player);
             Player.Container = Ship;
             Camera.Focus = Ship;

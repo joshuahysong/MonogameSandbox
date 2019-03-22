@@ -58,7 +58,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ships\ShipCore.cs" />
     <Compile Include="Ships\TestShip.cs" />
-    <Compile Include="Ships\TestShip2.cs" />
     <Compile Include="Tile.cs" />
   </ItemGroup>
   <ItemGroup>

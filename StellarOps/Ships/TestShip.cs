@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-
 namespace StellarOps.Ships
 {
     public class TestShip : ShipCore
@@ -8,6 +7,7 @@ namespace StellarOps.Ships
         {
             Position = Vector2.Zero;
             Heading = 0.0f;
+            Size = new Vector2(17 * MainGame.TileSize, 10 * MainGame.TileSize);
             Thrust = 250f;
             MaxTurnRate = 0.65f;
             ManeuveringThrust = 0.01f;
