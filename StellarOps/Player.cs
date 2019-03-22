@@ -11,18 +11,18 @@ namespace StellarOps
         public Vector2 WorldPosition { get; set; }
         public float Radius { get; set; }
         public IContainer Container { get; set; }
+        public Texture2D Image { get; set; }
+        public Vector2 Center => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
 
         private float MaxSpeed = 50f;
 
         private float _currentSpeed;
-        private Texture2D DebugImage;
 
         public Player()
         {
             Image = Art.Player;
-            Radius = (float)Math.Ceiling((double)Image.Width / 2) + 1;
-            Position = new Vector2(243,-15);
-            DebugImage = Art.CreateCircle((int)Radius - 1, Color.Green * 0.5f);
+            Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
+            Position = new Vector2(224,-16);
             _currentSpeed = MaxSpeed;
         }
 
@@ -35,7 +35,7 @@ namespace StellarOps
                 MainGame.Instance.PlayerDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
                 MainGame.Instance.PlayerDebugEntries["Heading"] = $"{Math.Round(Heading, 2)}";
                 MainGame.Instance.PlayerDebugEntries["Speed"] = $"{_currentSpeed}";
-                Vector2 playerRelativePosition = Position + Container.ImageCenter;
+                Vector2 playerRelativePosition = Position + Container.Center;
                 MainGame.Instance.PlayerDebugEntries["Container Tile"] = $"{Math.Floor(playerRelativePosition.X / MainGame.TileSize)}, {Math.Floor(playerRelativePosition.Y / MainGame.TileSize)}";
             }
         }
@@ -126,25 +126,7 @@ namespace StellarOps
 
             // Get values from GlobalTransform for SpriteBatch and render sprite
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-            spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), ImageCenter, scale, SpriteEffects.None, 0.0f);
-
-            if (MainGame.Camera.Focus == this)
-            {
-                string promptText = Container.GetUsePrompt(Position);
-                if (!string.IsNullOrWhiteSpace(promptText))
-                {
-                    Vector2 textSize = Art.DebugFont.MeasureString(promptText);
-                    Vector2 textLocation = new Vector2(position.X - textSize.X / 2, position.Y + 10 + Radius);
-                    spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
-                    spriteBatch.DrawString(Art.DebugFont, promptText, textLocation, Color.White);
-                }
-            }
-
-            if (MainGame.IsDebugging)
-            {
-                var origin = new Vector2(DebugImage.Width / 2, DebugImage.Height / 2);
-                spriteBatch.Draw(DebugImage, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), origin, scale, SpriteEffects.None, 0.0f);
-            }
+            spriteBatch.Draw(Image, position, null, Color.White, rotation - (float)(Math.PI * 0.5f), Center, scale * MainGame.PawnScale, SpriteEffects.None, 0.0f);
         }
 
         private bool IsMovingTowardsCollision(Vector2 newMovement)

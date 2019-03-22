@@ -16,13 +16,16 @@ namespace StellarOps
         public static Texture2D Bullet { get; set; }
         public static Texture2D Pointer { get; set; }
         public static Texture2D Background { get; set; }
+        public static Texture2D Hull { get; set; }
+        public static Texture2D Floor { get; set; }
+        public static Texture2D FlightConsole { get; set; }
 
         public static SpriteFont DebugFont { get; private set; }
 
         public static void Load(ContentManager content)
         {
-            Pixel = DrawTileRectangle(1, 1, Color.White, Color.White);
-            Player = content.Load<Texture2D>("Pawns/TestPawn1");
+            Pixel = CreateRectangle(1, 1, Color.White, Color.White);
+            Player = content.Load<Texture2D>("Pawns/TestPawn3");
             Background = content.Load<Texture2D>("starfield2");
             Seeker = content.Load<Texture2D>("Seeker");
             Wanderer = content.Load<Texture2D>("Wanderer");
@@ -30,11 +33,14 @@ namespace StellarOps
             Pointer = content.Load<Texture2D>("Pointer");
             TestShip = content.Load<Texture2D>("Ships/TestShip_Interior2");
             TestShipInterior = content.Load<Texture2D>("Ships/TestShip_Interior2");
+            Hull = content.Load<Texture2D>("Tiles/Hull");
+            Floor = content.Load<Texture2D>("Tiles/Floor");
+            FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
 
             DebugFont = content.Load<SpriteFont>("DebugFont");
         }
 
-        public static Texture2D DrawTileRectangle(int width, int height, Color fillColor, Color borderColor)
+        public static Texture2D CreateRectangle(int width, int height, Color fillColor, Color borderColor)
         {
             Texture2D tile = new Texture2D(MainGame.Instance.GraphicsDevice, width, height);
             Color[] data = new Color[width * height];
