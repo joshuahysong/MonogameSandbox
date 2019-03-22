@@ -100,20 +100,29 @@ namespace StellarOps
             spriteBatch.End();
 
             spriteBatch.Begin();
-            //spriteBatch.Draw(Art.Pointer, new Vector2(Input.ScreenMousePosition.X, Input.ScreenMousePosition.Y), Color.White);
 
             // Player prompt text
+            Vector2 textSize;
+            Vector2 textLocation;
             if (Camera.Focus == Player)
             {
                 string promptText = Player.Container.GetUsePrompt(Player.Position);
                 if (!string.IsNullOrWhiteSpace(promptText))
                 {
-                    Vector2 textSize = Art.DebugFont.MeasureString(promptText);
-                    Vector2 textLocation = new Vector2(ScreenCenter.X - textSize.X / 2, ScreenCenter.Y + Player.Radius * 2f);
+                    textSize = Art.UIFont.MeasureString(promptText);
+                    textLocation = new Vector2(ScreenCenter.X - textSize.X / 2, ScreenCenter.Y + textSize.Y + Player.Radius);
                     spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
-                    spriteBatch.DrawString(Art.DebugFont, promptText, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                    spriteBatch.DrawString(Art.UIFont, promptText, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 }
             }
+
+            // Tile Text
+            Tile mouseoverTile = Ship.GetTile(Input.WorldMousePosition);
+            string tileText = $"Tile: {mouseoverTile.Location.X}, {mouseoverTile.Location.Y}";
+            textSize = Art.UIFont.MeasureString(tileText);
+            textLocation = new Vector2(ScreenCenter.X - textSize.X / 2, ScreenCenter.Y + textSize.Y + Player.Radius);
+            //spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
+            //spriteBatch.DrawString(Art.UIFont, tileText, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
             // Debug Text
             if (IsDebugging)

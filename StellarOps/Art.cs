@@ -16,11 +16,17 @@ namespace StellarOps
         public static Texture2D Bullet { get; set; }
         public static Texture2D Pointer { get; set; }
         public static Texture2D Background { get; set; }
+
+        #region ShipTiles
         public static Texture2D Hull { get; set; }
         public static Texture2D Floor { get; set; }
         public static Texture2D FlightConsole { get; set; }
+        #endregion
 
+        #region Fonts
         public static SpriteFont DebugFont { get; private set; }
+        public static SpriteFont UIFont { get; private set; }
+        #endregion
 
         public static void Load(ContentManager content)
         {
@@ -37,7 +43,8 @@ namespace StellarOps
             Floor = content.Load<Texture2D>("Tiles/Floor");
             FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
 
-            DebugFont = content.Load<SpriteFont>("DebugFont");
+            DebugFont = content.Load<SpriteFont>("Fonts/Debug");
+            UIFont = content.Load<SpriteFont>("Fonts/UI");
         }
 
         public static Texture2D CreateRectangle(int width, int height, Color fillColor, Color borderColor)
