@@ -122,7 +122,7 @@ namespace StellarOps
             int yTextOffset = 5;
             if (Camera.Focus == Ship)
             {
-                Maybe<Tile> hoveredTile = Ship.GetTile(Input.WorldMousePosition);
+                Maybe<Tile> hoveredTile = Ship.GetTileByWorldPosition(Input.WorldMousePosition);
                 if (hoveredTile.HasValue)
                 {
                     text = $"Damage: {(hoveredTile.Value.Health - 100) * -1}";

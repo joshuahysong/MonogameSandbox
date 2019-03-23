@@ -131,6 +131,24 @@ namespace StellarOps.Ships
                         MainGame.Camera.Scale = 2F;
                     }
                 }
+                // Tile click
+                // TODO TEMP FOR DAMAGE TESTING
+                if (Input.WasLeftMouseButtonClicked())
+                {
+                    Maybe<Tile> targetTile = GetTileByWorldPosition(Input.WorldMousePosition);
+                    if (targetTile.HasValue)
+                    {
+                        if (targetTile.Value.Health > 0)
+                        {
+                            targetTile.Value.Health = targetTile.Value.Health - 25 < 0 ? 0 : targetTile.Value.Health - 25;
+                            if (targetTile.Value.Health == 0)
+                            {
+                                targetTile.Value.TileType = TileType.Empty;
+                                targetTile.Value.CollisionType = CollisionType.Open;
+                            }
+                        }
+                    }
+                }
             }
             else
             {
@@ -242,20 +260,25 @@ namespace StellarOps.Ships
 
         public abstract string GetUsePrompt(Vector2 Position);
 
+        public Maybe<Tile> GetTileByWorldPosition(Vector2 position)
+        {
+            return GetTileByRelativePosition(Vector2.Transform(position, Matrix.Invert(LocalTransform)));
+        }
+
         /// <summary>
         /// Gets the tile object at the given position
         /// </summary>
-        /// <param name="position">Position to check</param>
+        /// <param name="position">Relative Position to check</param>
         /// <returns>Tile at position</returns>
-        public Maybe<Tile> GetTile(Vector2 position)
+        public Maybe<Tile> GetTileByRelativePosition(Vector2 position)
         {
             Vector2 relativePosition = position + Center;
-            int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
-            int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
-            return GetTile(new Point(tileX, tileY));
+            return TileMap.Any(t => t.Bounds.Contains(position))
+                ? Maybe<Tile>.Some(TileMap.First(t => t.Bounds.Contains(position)))
+                : Maybe<Tile>.None;
         }
 
-        public Maybe<Tile> GetTile(Point location)
+        public Maybe<Tile> GetTileByPoint(Point location)
         {
             return TileMap.Any(t => t.Location == location)
                 ? Maybe<Tile>.Some(TileMap.First(t => t.Location == location))

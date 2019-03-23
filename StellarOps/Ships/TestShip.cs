@@ -43,7 +43,7 @@ namespace StellarOps.Ships
 
         public override void UseTile(Vector2 position)
         {
-            Maybe<Tile> tile = GetTile(position);
+            Maybe<Tile> tile = GetTileByRelativePosition(position);
             if (tile.HasValue && tile.Value.TileType == TileType.FlightConsole)
             {
                 SwitchControlToShip();
@@ -52,7 +52,7 @@ namespace StellarOps.Ships
 
         public override string GetUsePrompt(Vector2 position)
         {
-            Maybe<Tile> tile = GetTile(position);
+            Maybe<Tile> tile = GetTileByRelativePosition(position);
             if (tile.HasValue && tile.Value.TileType == TileType.FlightConsole)
             {
                 return "Use Flight Control";

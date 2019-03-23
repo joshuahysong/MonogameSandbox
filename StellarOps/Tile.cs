@@ -2,7 +2,7 @@
 
 namespace StellarOps
 {
-    public struct Tile
+    public class Tile
     {
         public Point Location { get; set; }
 
