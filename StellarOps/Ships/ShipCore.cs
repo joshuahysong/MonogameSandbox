@@ -247,17 +247,19 @@ namespace StellarOps.Ships
         /// </summary>
         /// <param name="position">Position to check</param>
         /// <returns>Tile at position</returns>
-        public Tile GetTile(Vector2 position)
+        public Maybe<Tile> GetTile(Vector2 position)
         {
             Vector2 relativePosition = position + Center;
             int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
             int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
-            return TileMap.FirstOrDefault(t => t.Location == new Point(tileX, tileY));
+            return GetTile(new Point(tileX, tileY));
         }
 
-        public Tile GetTile(Point location)
+        public Maybe<Tile> GetTile(Point location)
         {
-            return TileMap.FirstOrDefault(t => t.Location == location);
+            return TileMap.Any(t => t.Location == location)
+                ? Maybe<Tile>.Some(TileMap.First(t => t.Location == location))
+                : Maybe<Tile>.None;
         }
 
         protected void SwitchControlToShip()

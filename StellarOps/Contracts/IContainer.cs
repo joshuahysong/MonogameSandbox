@@ -16,9 +16,9 @@ namespace StellarOps.Contracts
 
         List<IPawn> Pawns { get; set; }
 
-        Tile GetTile(Vector2 position);
+        Maybe<Tile> GetTile(Vector2 position);
 
-        Tile GetTile(Point location);
+        Maybe<Tile> GetTile(Point location);
 
         void UseTile(Vector2 position);
 

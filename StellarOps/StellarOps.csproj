@@ -53,6 +53,7 @@
     <Compile Include="Input.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="MathUtil.cs" />
+    <Compile Include="Maybe.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

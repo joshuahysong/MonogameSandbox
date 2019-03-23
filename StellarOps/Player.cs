@@ -132,14 +132,15 @@ namespace StellarOps
         private bool IsMovingTowardsCollision(Vector2 newMovement)
         {
             Vector2 futurePosition = Position - newMovement;
-            Tile currentTile = Container.GetTile(futurePosition);
+            Tile currentTile = Container.GetTile(futurePosition).Value;
 
             for (int y = currentTile.Location.Y - 1; y <= currentTile.Location.Y + 1; y++)
             {
                 for (int x = currentTile.Location.X - 1; x <= currentTile.Location.X + 1; x++)
                 {
-                    Tile tile = Container.GetTile(new Point(x, y));
-                    if (tile.CollisionType == CollisionType.Collision && IsTileCollided(futurePosition, tile.Bounds))
+                    Maybe<Tile> tile = Container.GetTile(new Point(x, y));
+                    if (tile.HasValue && tile.Value.CollisionType == CollisionType.Collision
+                        && IsTileCollided(futurePosition, tile.Value.Bounds))
                     {
                         return true;
                     }
