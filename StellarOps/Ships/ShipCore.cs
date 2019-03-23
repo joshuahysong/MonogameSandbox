@@ -310,9 +310,13 @@ namespace StellarOps.Ships
                         TileType = (TileType)TileMapArtData[y, x],
                         Health = 100,
                         North = y == 0 ? null : columns * y - columns + x,
+                        NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
+                        East = x == columns - 1 ? null : (int?)tileMap.Count() + 1,
+                        SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
                         South = y == rows - 1 ? null : columns * y + columns + x,
-                        East = x == columns -1 ? null : (int?)tileMap.Count() + 1,
+                        SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
                         West = x == 0 ? null : (int?)tileMap.Count() - 1,
+                        NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
                     };
                     Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
                     relativePosition -= Center;

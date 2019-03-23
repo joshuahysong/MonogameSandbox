@@ -12,15 +12,16 @@ namespace StellarOps
 
         public TileType TileType { get; set; }
 
-        public int? North { get; set; }
-
-        public int? East { get; set; }
-
-        public int? South { get; set; }
-
-        public int? West { get; set; }
-
         public int Health { get; set; }
+
+        public int? North { get; set; }
+        public int? NorthEast { get; set; }
+        public int? East { get; set; }
+        public int? SouthEast { get; set; }
+        public int? South { get; set; }
+        public int? SouthWest { get; set; }
+        public int? West { get; set; }
+        public int? NorthWest { get; set; }
     }
 
     public enum CollisionType
