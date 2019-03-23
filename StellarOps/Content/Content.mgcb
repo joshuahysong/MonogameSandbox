@@ -44,20 +44,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Debug.spritefont
 
-#begin Fonts/Debug.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:Fonts/Debug.spritefont
-
-#begin Fonts/UI.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:Fonts/UI.spritefont
-
 #begin Fonts/UI.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -220,6 +206,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:starfield2.jpg
+
+#begin Tiles/DamageOverlay25.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/DamageOverlay25.png
+
+#begin Tiles/DamageOverlay50.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/DamageOverlay50.png
+
+#begin Tiles/DamageOverlay75.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tiles/DamageOverlay75.png
 
 #begin Tiles/FlightConsole.png
 /importer:TextureImporter

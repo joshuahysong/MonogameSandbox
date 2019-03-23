@@ -18,6 +18,7 @@ namespace StellarOps.Ships
 
         protected int[,] TileMapArtData;
         protected int[,] TileMapCollisionData;
+        protected int[,] TileMapHealthData;
         protected float Thrust;
         protected float ManeuveringThrust;
         protected float MaxTurnRate;
@@ -175,6 +176,18 @@ namespace StellarOps.Ships
                 Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
                 origin = Center - offset;
                 spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                if (tile.Health < 100 && tile. Health >= 75)
+                {
+                    spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
+                if (tile.Health < 75 && tile.Health >= 50)
+                {
+                    spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
+                if (tile.Health < 50)
+                {
+                    spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
             });
 
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
@@ -308,7 +321,7 @@ namespace StellarOps.Ships
                         Location = new Point(x, y),
                         CollisionType = (CollisionType)TileMapCollisionData[y, x],
                         TileType = (TileType)TileMapArtData[y, x],
-                        Health = 100,
+                        Health = TileMapHealthData[y, x],
                         North = y == 0 ? null : columns * y - columns + x,
                         NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
                         East = x == columns - 1 ? null : (int?)tileMap.Count() + 1,

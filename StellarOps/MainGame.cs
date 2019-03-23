@@ -43,7 +43,7 @@ namespace StellarOps
             };
             Content.RootDirectory = "Content";
             Instance = this;
-            IsDebugging = true;
+            IsDebugging = false;
             IsMouseVisible = true;
         }
 
@@ -72,9 +72,13 @@ namespace StellarOps
 
         protected override void Update(GameTime gameTime)
         {
-            Input.Update();
-            HandleInput();
-            Camera.HandleInput();
+            // We only want to handle input if the game is actually active
+            if (IsActive)
+            {
+                Input.Update();
+                HandleInput();
+                Camera.HandleInput();
+            }
 
             Camera.Update(Camera.Focus);
             EntityManager.Update(gameTime, Matrix.Identity);
@@ -125,11 +129,14 @@ namespace StellarOps
                 Maybe<Tile> hoveredTile = Ship.GetTileByWorldPosition(Input.WorldMousePosition);
                 if (hoveredTile.HasValue)
                 {
-                    text = $"Damage: {(hoveredTile.Value.Health - 100) * -1}";
-                    textSize = Art.UIFont.MeasureString(text);
-                    textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
-                    spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                    yTextOffset += 15;
+                    if (hoveredTile.Value.Health > 0)
+                    {
+                        text = $"Damage: {(hoveredTile.Value.Health - 100) * -1}";
+                        textSize = Art.UIFont.MeasureString(text);
+                        textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
+                        spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                        yTextOffset += 15;
+                    }
                     text = $"{hoveredTile.Value.TileType.ToString().SplitCamelCase()}";
                     textSize = Art.UIFont.MeasureString(text);
                     textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
