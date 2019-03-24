@@ -39,7 +39,7 @@ namespace StellarOps.Ships
             HandleInput(deltaTime);
 
             // Set Tile Images
-            TileMap.ForEach(tile => tile.Image = GetTileImage(tile));
+            //TileMap.ForEach(tile => tile.Image = GetTileImage(tile));
 
             // Continue rotation until turn rate reaches zero to simulate slowing
             if (_currentTurnRate > 0)
@@ -164,11 +164,12 @@ namespace StellarOps.Ships
 
             // Tiles
             Vector2 origin = Center;
-            TileMap.Where(t => t.Image != null).ToList().ForEach(tile =>
+            TileMap.Where(t => t.TileType != TileType.Empty).ToList().ForEach(tile =>
             {
                 Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
                 origin = Center - offset;
-                spriteBatch.Draw(tile.Image, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                Tuple<Texture2D, Rectangle> tileArtData = GetTileImage(tile);
+                spriteBatch.Draw(tileArtData.Item1, Position, tileArtData.Item2, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                 if (tile.Health < 100 && tile. Health >= 75)
                 {
                     spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
@@ -347,15 +348,15 @@ namespace StellarOps.Ships
             }
         }
 
-        private Texture2D GetTileImage(Tile tile)
+        private Tuple<Texture2D, Rectangle> GetTileImage(Tile tile)
         {
             if (tile.TileType == TileType.Floor)
             {
-                return Art.Floor;
+                return new Tuple<Texture2D, Rectangle>(Art.Floor, new Rectangle(0,0, Art.TileSize, Art.TileSize));
             }
             if (tile.TileType == TileType.FlightConsole)
             {
-                return Art.FlightConsole;
+                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
             }
             if (tile.TileType == TileType.Hull)
             {
@@ -363,52 +364,52 @@ namespace StellarOps.Ships
                 bool east = tile.East == null ? false : TileMap[(int)tile.East].TileType == TileType.Hull;
                 bool south = tile.South == null ? false : TileMap[(int)tile.South].TileType == TileType.Hull;
                 bool west = tile.West == null ? false : TileMap[(int)tile.West].TileType == TileType.Hull;
-                if (north && east && south && west)
-                {
-                    return Art.HullFull;
-                }
+                //if (north && east && south && west)
+                //{
+                //    return Art.HullFull;
+                //}
                 if (north && east && !south && !west)
                 {
-                    return Art.HullNE;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(3 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (!north && east && south && !west)
                 {
-                    return Art.HullES;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(2 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (!north && !east && south && west)
                 {
-                    return Art.HullSW;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 2 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (north && !east && !south && west)
                 {
-                    return Art.HullWN;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 2 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (north && !east && south && !west)
                 {
-                    return Art.HullNS;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (!north && east && !south && west)
                 {
-                    return Art.HullEW;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (north && !east && !south && !west)
                 {
-                    return Art.HullN;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (!north && east && !south && !west)
                 {
-                    return Art.HullE;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(2 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (!north && !east && south && !west)
                 {
-                    return Art.HullS;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
                 if (!north && !east && !south && west)
                 {
-                    return Art.HullW;
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(3 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
                 }
             }
-            return null;
+            return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, 0, 0));
         }
     }
 }

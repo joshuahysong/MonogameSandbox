@@ -7,6 +7,8 @@ namespace StellarOps
 {
     public static class Art
     {
+        public static int TileSize => 64;
+
         public static Texture2D Pixel { get; set; }
         public static Texture2D TestShip { get; set; }
         public static Texture2D TestShipInterior { get; set; }
@@ -21,17 +23,7 @@ namespace StellarOps
         public static Texture2D Damage25 { get; set; }
         public static Texture2D Damage50 { get; set; }
         public static Texture2D Damage75 { get; set; }
-        public static Texture2D HullEW { get; set; }
-        public static Texture2D HullNS { get; set; }
-        public static Texture2D HullNE { get; set; }
-        public static Texture2D HullES { get; set; }
-        public static Texture2D HullSW { get; set; }
-        public static Texture2D HullWN { get; set; }
-        public static Texture2D HullN { get; set; }
-        public static Texture2D HullE { get; set; }
-        public static Texture2D HullS { get; set; }
-        public static Texture2D HullW { get; set; }
-        public static Texture2D HullFull { get; set; }
+        public static Texture2D Hull { get; set; }
         public static Texture2D Floor { get; set; }
         public static Texture2D FlightConsole { get; set; }
         #endregion
@@ -55,17 +47,7 @@ namespace StellarOps
             Damage25 = content.Load<Texture2D>("Tiles/DamageOverlay25");
             Damage50 = content.Load<Texture2D>("Tiles/DamageOverlay50");
             Damage75 = content.Load<Texture2D>("Tiles/DamageOverlay75");
-            HullEW = content.Load<Texture2D>("Tiles/HullEW");
-            HullNS = content.Load<Texture2D>("Tiles/HullNS");
-            HullNE = content.Load<Texture2D>("Tiles/HullNE");
-            HullES = content.Load<Texture2D>("Tiles/HullES");
-            HullSW = content.Load<Texture2D>("Tiles/HullSW");
-            HullWN = content.Load<Texture2D>("Tiles/HullWN");
-            HullN = content.Load<Texture2D>("Tiles/HullN");
-            HullE = content.Load<Texture2D>("Tiles/HullE");
-            HullS = content.Load<Texture2D>("Tiles/HullS");
-            HullW = content.Load<Texture2D>("Tiles/HullW");
-            HullFull = content.Load<Texture2D>("Tiles/HullFull");
+            Hull = content.Load<Texture2D>("Tiles/Hull");
             Floor = content.Load<Texture2D>("Tiles/Floor");
             FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
 
