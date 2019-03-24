@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace StellarOps
 {
     public class Tile
     {
+        public Texture2D Image { get; set; }
+
         public Point Location { get; set; }
 
         public Rectangle Bounds { get; set; }

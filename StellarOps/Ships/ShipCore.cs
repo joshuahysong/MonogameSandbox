@@ -27,18 +27,9 @@ namespace StellarOps.Ships
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
-        private Dictionary<TileType, Texture2D> tileSprites;
-
         public ShipCore()
         {
             Pawns = new List<IPawn>();
-
-            tileSprites = new Dictionary<TileType, Texture2D>
-            {
-                { TileType.Hull, Art.Hull },
-                { TileType.Floor, Art.Floor },
-                { TileType.FlightConsole, Art.FlightConsole },
-            };
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -46,6 +37,9 @@ namespace StellarOps.Ships
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             HandleInput(deltaTime);
+
+            // Set Tile Images
+            TileMap.ForEach(tile => tile.Image = GetTileImage(tile));
 
             // Continue rotation until turn rate reaches zero to simulate slowing
             if (_currentTurnRate > 0)
@@ -170,12 +164,11 @@ namespace StellarOps.Ships
 
             // Tiles
             Vector2 origin = Center;
-            TileMap.Where(t => tileSprites.Keys.Contains(t.TileType)).ToList().ForEach(tile =>
+            TileMap.Where(t => t.Image != null).ToList().ForEach(tile =>
             {
-                Texture2D tileToDraw = tileSprites[tile.TileType];
                 Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
                 origin = Center - offset;
-                spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                spriteBatch.Draw(tile.Image, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                 if (tile.Health < 100 && tile. Health >= 75)
                 {
                     spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
@@ -337,6 +330,7 @@ namespace StellarOps.Ships
                     tileMap.Add(tile);
                 }
             }
+
             return tileMap;
         }
 
@@ -351,6 +345,70 @@ namespace StellarOps.Ships
             {
                 _currentTurnRate = _currentTurnRate - ManeuveringThrust < 0 ? 0 : _currentTurnRate - ManeuveringThrust;
             }
+        }
+
+        private Texture2D GetTileImage(Tile tile)
+        {
+            if (tile.TileType == TileType.Floor)
+            {
+                return Art.Floor;
+            }
+            if (tile.TileType == TileType.FlightConsole)
+            {
+                return Art.FlightConsole;
+            }
+            if (tile.TileType == TileType.Hull)
+            {
+                bool north = tile.North == null ? false : TileMap[(int)tile.North].TileType == TileType.Hull;
+                bool east = tile.East == null ? false : TileMap[(int)tile.East].TileType == TileType.Hull;
+                bool south = tile.South == null ? false : TileMap[(int)tile.South].TileType == TileType.Hull;
+                bool west = tile.West == null ? false : TileMap[(int)tile.West].TileType == TileType.Hull;
+                if (north && east && south && west)
+                {
+                    return Art.HullFull;
+                }
+                if (north && east && !south && !west)
+                {
+                    return Art.HullNE;
+                }
+                if (!north && east && south && !west)
+                {
+                    return Art.HullES;
+                }
+                if (!north && !east && south && west)
+                {
+                    return Art.HullSW;
+                }
+                if (north && !east && !south && west)
+                {
+                    return Art.HullWN;
+                }
+                if (north && !east && south && !west)
+                {
+                    return Art.HullNS;
+                }
+                if (!north && east && !south && west)
+                {
+                    return Art.HullEW;
+                }
+                if (north && !east && !south && !west)
+                {
+                    return Art.HullN;
+                }
+                if (!north && east && !south && !west)
+                {
+                    return Art.HullE;
+                }
+                if (!north && !east && south && !west)
+                {
+                    return Art.HullS;
+                }
+                if (!north && !east && !south && west)
+                {
+                    return Art.HullW;
+                }
+            }
+            return null;
         }
     }
 }
