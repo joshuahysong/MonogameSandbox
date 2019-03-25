@@ -58,5 +58,10 @@ namespace StellarOps
         {
             return LastGamepadState.IsButtonUp(button) && GamepadState.IsButtonDown(button);
         }
+
+        public static bool WasLeftMouseButtonClicked()
+        {
+            return LastMouseState.LeftButton == ButtonState.Released && MouseState.LeftButton == ButtonState.Pressed;
+        }
     }
 }

@@ -13,6 +13,8 @@ namespace StellarOps.Contracts
 
         float Radius { get; set; }
 
+        int Health { get; set; }
+
         void Update(GameTime gameTime, Matrix parentTransform);
 
         void Draw(SpriteBatch spriteBatch, Matrix parentTransform);

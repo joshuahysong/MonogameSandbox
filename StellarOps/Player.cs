@@ -12,6 +12,8 @@ namespace StellarOps
         public float Radius { get; set; }
         public IContainer Container { get; set; }
         public Texture2D Image { get; set; }
+        public int Health { get; set; }
+
         public Vector2 Center => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
 
         private float MaxSpeed = 50f;
@@ -22,6 +24,7 @@ namespace StellarOps
         {
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
+            Health = 100;
             Position = new Vector2(224,-16);
             _currentSpeed = MaxSpeed;
         }
@@ -132,14 +135,15 @@ namespace StellarOps
         private bool IsMovingTowardsCollision(Vector2 newMovement)
         {
             Vector2 futurePosition = Position - newMovement;
-            Tile currentTile = Container.GetTile(futurePosition);
+            Tile currentTile = Container.GetTileByRelativePosition(futurePosition).Value;
 
             for (int y = currentTile.Location.Y - 1; y <= currentTile.Location.Y + 1; y++)
             {
                 for (int x = currentTile.Location.X - 1; x <= currentTile.Location.X + 1; x++)
                 {
-                    Tile tile = Container.GetTile(new Point(x, y));
-                    if (tile.Collidable && IsTileCollided(futurePosition, tile.Bounds))
+                    Maybe<Tile> tile = Container.GetTileByPoint(new Point(x, y));
+                    if (tile.HasValue && tile.Value.CollisionType == CollisionType.Collision
+                        && IsTileCollided(futurePosition, tile.Value.Bounds))
                     {
                         return true;
                     }

@@ -43,7 +43,7 @@ namespace StellarOps
             };
             Content.RootDirectory = "Content";
             Instance = this;
-            IsDebugging = true;
+            IsDebugging = false;
             IsMouseVisible = true;
         }
 
@@ -72,9 +72,13 @@ namespace StellarOps
 
         protected override void Update(GameTime gameTime)
         {
-            Input.Update();
-            HandleInput();
-            Camera.HandleInput();
+            // We only want to handle input if the game is actually active
+            if (IsActive)
+            {
+                Input.Update();
+                HandleInput();
+                Camera.HandleInput();
+            }
 
             Camera.Update(Camera.Focus);
             EntityManager.Update(gameTime, Matrix.Identity);
@@ -100,26 +104,51 @@ namespace StellarOps
             spriteBatch.End();
 
             spriteBatch.Begin();
-            //spriteBatch.Draw(Art.Pointer, new Vector2(Input.ScreenMousePosition.X, Input.ScreenMousePosition.Y), Color.White);
 
             // Player prompt text
+            string text;
+            Vector2 textSize;
+            Vector2 textLocation;
             if (Camera.Focus == Player)
             {
                 string promptText = Player.Container.GetUsePrompt(Player.Position);
                 if (!string.IsNullOrWhiteSpace(promptText))
                 {
-                    Vector2 textSize = Art.DebugFont.MeasureString(promptText);
-                    Vector2 textLocation = new Vector2(ScreenCenter.X - textSize.X / 2, ScreenCenter.Y + Player.Radius * 2f);
+                    textSize = Art.UIFont.MeasureString(promptText);
+                    textLocation = new Vector2(ScreenCenter.X - textSize.X / 2, ScreenCenter.Y + textSize.Y + Player.Radius);
                     spriteBatch.Draw(Art.Pixel, new Rectangle((int)textLocation.X - 3, (int)textLocation.Y - 3, (int)textSize.X + 6, (int)textSize.Y + 6), Color.DarkCyan * 0.9f);
-                    spriteBatch.DrawString(Art.DebugFont, promptText, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                    spriteBatch.DrawString(Art.UIFont, promptText, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                }
+            }
+
+            // Tile Text
+            int xTextOffset = 5;
+            int yTextOffset = 5;
+            if (Camera.Focus == Ship)
+            {
+                Maybe<Tile> hoveredTile = Ship.GetTileByWorldPosition(Input.WorldMousePosition);
+                if (hoveredTile.HasValue)
+                {
+                    if (hoveredTile.Value.Health > 0)
+                    {
+                        text = $"Damage: {(hoveredTile.Value.Health - 100) * -1}";
+                        textSize = Art.UIFont.MeasureString(text);
+                        textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
+                        spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                        yTextOffset += 15;
+                    }
+                    text = $"{hoveredTile.Value.TileType.ToString().SplitCamelCase()}";
+                    textSize = Art.UIFont.MeasureString(text);
+                    textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
+                    spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 }
             }
 
             // Debug Text
             if (IsDebugging)
             {
-                int xTextOffset = 5;
-                int yTextOffset = 5;
+                xTextOffset = 5;
+                yTextOffset = 5;
                 spriteBatch.DrawString(Art.DebugFont, "Player", new Vector2(xTextOffset, yTextOffset), Color.White);
                 foreach (KeyValuePair<string, string> debugEntry in PlayerDebugEntries)
                 {
@@ -140,7 +169,7 @@ namespace StellarOps
                 spriteBatch.DrawString(Art.DebugFont, "Ship", new Vector2(xTextOffset, yTextOffset), Color.White);
                 foreach (KeyValuePair<string, string> debugEntry in SystemDebugEntries)
                 {
-                    string text = $"{debugEntry.Key}: {debugEntry.Value}";
+                    text = $"{debugEntry.Key}: {debugEntry.Value}";
                     xTextOffset = (int)(Viewport.Width - 5 - Art.DebugFont.MeasureString(text).X);
                     spriteBatch.DrawString(Art.DebugFont, $"{debugEntry.Key}: {debugEntry.Value}", new Vector2(xTextOffset, yTextOffset), Color.White);
                     yTextOffset += 15;

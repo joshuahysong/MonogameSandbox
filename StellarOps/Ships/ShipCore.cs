@@ -16,7 +16,9 @@ namespace StellarOps.Ships
         public Vector2 Center => Size == null ? Vector2.Zero : new Vector2(Size.X / 2, Size.Y / 2);
         public List<IPawn> Pawns { get; set; }
 
-        protected int[,] TileMapData;
+        protected int[,] TileMapArtData;
+        protected int[,] TileMapCollisionData;
+        protected int[,] TileMapHealthData;
         protected float Thrust;
         protected float ManeuveringThrust;
         protected float MaxTurnRate;
@@ -25,18 +27,9 @@ namespace StellarOps.Ships
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
-        private Dictionary<TileType, Texture2D> tileSprites;
-
         public ShipCore()
         {
             Pawns = new List<IPawn>();
-
-            tileSprites = new Dictionary<TileType, Texture2D>
-            {
-                { TileType.Hull, Art.Hull },
-                { TileType.Floor, Art.Floor },
-                { TileType.FlightConsole, Art.FlightConsole },
-            };
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -130,6 +123,24 @@ namespace StellarOps.Ships
                         MainGame.Camera.Scale = 2F;
                     }
                 }
+                // Tile click
+                // TODO TEMP FOR DAMAGE TESTING
+                if (Input.WasLeftMouseButtonClicked())
+                {
+                    Maybe<Tile> targetTile = GetTileByWorldPosition(Input.WorldMousePosition);
+                    if (targetTile.HasValue)
+                    {
+                        if (targetTile.Value.Health > 0)
+                        {
+                            targetTile.Value.Health = targetTile.Value.Health - 25 < 0 ? 0 : targetTile.Value.Health - 25;
+                            if (targetTile.Value.Health == 0)
+                            {
+                                targetTile.Value.TileType = TileType.Empty;
+                                targetTile.Value.CollisionType = CollisionType.Open;
+                            }
+                        }
+                    }
+                }
             }
             else
             {
@@ -150,12 +161,24 @@ namespace StellarOps.Ships
 
             // Tiles
             Vector2 origin = Center;
-            TileMap.Where(t => tileSprites.Keys.Contains(t.TileType)).ToList().ForEach(tile =>
+            TileMap.Where(t => t.TileType != TileType.Empty).ToList().ForEach(tile =>
             {
-                Texture2D tileToDraw = tileSprites[tile.TileType];
                 Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
                 origin = Center - offset;
-                spriteBatch.Draw(tileToDraw, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                Tuple<Texture2D, Rectangle> tileArtData = GetTileImage(tile);
+                spriteBatch.Draw(tileArtData.Item1, Position, tileArtData.Item2, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                if (tile.Health < 100 && tile. Health >= 75)
+                {
+                    spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
+                if (tile.Health < 75 && tile.Health >= 50)
+                {
+                    spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
+                if (tile.Health < 50)
+                {
+                    spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
             });
 
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
@@ -241,22 +264,29 @@ namespace StellarOps.Ships
 
         public abstract string GetUsePrompt(Vector2 Position);
 
+        public Maybe<Tile> GetTileByWorldPosition(Vector2 position)
+        {
+            return GetTileByRelativePosition(Vector2.Transform(position, Matrix.Invert(LocalTransform)));
+        }
+
         /// <summary>
         /// Gets the tile object at the given position
         /// </summary>
-        /// <param name="position">Position to check</param>
+        /// <param name="position">Relative Position to check</param>
         /// <returns>Tile at position</returns>
-        public Tile GetTile(Vector2 position)
+        public Maybe<Tile> GetTileByRelativePosition(Vector2 position)
         {
             Vector2 relativePosition = position + Center;
-            int tileX = (int)Math.Floor(relativePosition.X / MainGame.TileSize);
-            int tileY = (int)Math.Floor(relativePosition.Y / MainGame.TileSize);
-            return TileMap.FirstOrDefault(t => t.Location == new Point(tileX, tileY));
+            return TileMap.Any(t => t.Bounds.Contains(position))
+                ? Maybe<Tile>.Some(TileMap.First(t => t.Bounds.Contains(position)))
+                : Maybe<Tile>.None;
         }
 
-        public Tile GetTile(Point location)
+        public Maybe<Tile> GetTileByPoint(Point location)
         {
-            return TileMap.FirstOrDefault(t => t.Location == location);
+            return TileMap.Any(t => t.Location == location)
+                ? Maybe<Tile>.Some(TileMap.First(t => t.Location == location))
+                : Maybe<Tile>.None;
         }
 
         protected void SwitchControlToShip()
@@ -271,15 +301,26 @@ namespace StellarOps.Ships
         protected List<Tile> GetTileMap()
         {
             List<Tile> tileMap = new List<Tile>();
-            for (int y = 0; y < TileMapData.GetLength(0); y++)
+            int? rows = TileMapArtData.GetLength(0);
+            int? columns = TileMapArtData.GetLength(1);
+            for (int y = 0; y < rows; y++)
             {
-                for (int x = 0; x < TileMapData.GetLength(1); x++)
+                for (int x = 0; x < columns; x++)
                 {
                     Tile tile = new Tile
                     {
                         Location = new Point(x, y),
-                        Collidable = (TileType)TileMapData[y, x] == TileType.Hull,
-                        TileType = (TileType)TileMapData[y, x]
+                        CollisionType = (CollisionType)TileMapCollisionData[y, x],
+                        TileType = (TileType)TileMapArtData[y, x],
+                        Health = TileMapHealthData[y, x],
+                        North = y == 0 ? null : columns * y - columns + x,
+                        NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
+                        East = x == columns - 1 ? null : (int?)tileMap.Count() + 1,
+                        SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
+                        South = y == rows - 1 ? null : columns * y + columns + x,
+                        SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
+                        West = x == 0 ? null : (int?)tileMap.Count() - 1,
+                        NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
                     };
                     Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
                     relativePosition -= Center;
@@ -287,6 +328,7 @@ namespace StellarOps.Ships
                     tileMap.Add(tile);
                 }
             }
+
             return tileMap;
         }
 
@@ -301,6 +343,70 @@ namespace StellarOps.Ships
             {
                 _currentTurnRate = _currentTurnRate - ManeuveringThrust < 0 ? 0 : _currentTurnRate - ManeuveringThrust;
             }
+        }
+
+        private Tuple<Texture2D, Rectangle> GetTileImage(Tile tile)
+        {
+            if (tile.TileType == TileType.Floor)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.Floor, new Rectangle(0,0, Art.TileSize, Art.TileSize));
+            }
+            if (tile.TileType == TileType.FlightConsole)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+            }
+            if (tile.TileType == TileType.Hull)
+            {
+                bool north = tile.North == null ? false : TileMap[(int)tile.North].TileType == TileType.Hull;
+                bool east = tile.East == null ? false : TileMap[(int)tile.East].TileType == TileType.Hull;
+                bool south = tile.South == null ? false : TileMap[(int)tile.South].TileType == TileType.Hull;
+                bool west = tile.West == null ? false : TileMap[(int)tile.West].TileType == TileType.Hull;
+                //if (north && east && south && west)
+                //{
+                //    return Art.HullFull;
+                //}
+                if (north && east && !south && !west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(3 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (!north && east && south && !west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(2 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (!north && !east && south && west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 2 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (north && !east && !south && west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 2 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (north && !east && south && !west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (!north && east && !south && west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (north && !east && !south && !west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (!north && east && !south && !west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(2 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (!north && !east && south && !west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+                if (!north && !east && !south && west)
+                {
+                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(3 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
+                }
+            }
+            return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, 0, 0));
         }
     }
 }
