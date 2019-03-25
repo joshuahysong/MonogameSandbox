@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace StellarOps.Ships
 {
-    public abstract class ShipCore : Entity, IContainer, IFocusable
+    public abstract class ShipBase : Entity, IContainer, IFocusable
     {
         public Vector2 WorldPosition { get; set; }
         public List<Tile> TileMap { get; set; }
@@ -27,7 +27,7 @@ namespace StellarOps.Ships
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
-        public ShipCore()
+        public ShipBase()
         {
             Pawns = new List<IPawn>();
         }

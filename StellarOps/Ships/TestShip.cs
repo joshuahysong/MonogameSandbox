@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 namespace StellarOps.Ships
 {
-    public class TestShip : ShipCore
+    public class TestShip : ShipBase
     {
         public TestShip(Vector2 spawnPosition)
         {
