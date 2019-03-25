@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
+using StellarOps.Projectiles;
+using StellarOps.Weapons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +29,12 @@ namespace StellarOps.Ships
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
+        private WeaponBase _weapon;
+
         public ShipBase()
         {
             Pawns = new List<IPawn>();
+            _weapon = new WeaponBase();
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -123,6 +128,11 @@ namespace StellarOps.Ships
                         MainGame.Camera.Scale = 2F;
                     }
                 }
+                if (Input.IsKeyPressed(Keys.Space))
+                {
+                    _weapon.Fire(Heading, Velocity, Position);
+                }
+
                 // Tile click
                 // TODO TEMP FOR DAMAGE TESTING
                 if (Input.WasLeftMouseButtonClicked())
