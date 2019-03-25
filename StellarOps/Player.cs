@@ -12,6 +12,8 @@ namespace StellarOps
         public float Radius { get; set; }
         public IContainer Container { get; set; }
         public Texture2D Image { get; set; }
+        public int Health { get; set; }
+
         public Vector2 Center => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
 
         private float MaxSpeed = 50f;
@@ -22,6 +24,7 @@ namespace StellarOps
         {
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
+            Health = 100;
             Position = new Vector2(224,-16);
             _currentSpeed = MaxSpeed;
         }

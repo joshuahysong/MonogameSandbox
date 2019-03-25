@@ -38,9 +38,6 @@ namespace StellarOps.Ships
 
             HandleInput(deltaTime);
 
-            // Set Tile Images
-            //TileMap.ForEach(tile => tile.Image = GetTileImage(tile));
-
             // Continue rotation until turn rate reaches zero to simulate slowing
             if (_currentTurnRate > 0)
             {
