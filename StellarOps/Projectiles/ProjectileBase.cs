@@ -3,14 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace StellarOps.Projectiles
 {
-    public class ProjectileBase : Entity
+    public abstract class ProjectileBase : Entity
     {
-        public Texture2D Image { get; set; }
-        public float Radius { get; set; }
+        protected Texture2D Image;
+        protected float Radius;
+        protected long TimeToLive;
 
-        public Vector2 Size =>Image == null ? Vector2.Zero : new Vector2(Image.Width, Image.Height);
+        protected Vector2 Size =>Image == null ? Vector2.Zero : new Vector2(Image.Width, Image.Height);
 
-        private long _timeToLive;
         private double _timeAlive;
 
         public ProjectileBase(Vector2 position, Vector2 velocity)
@@ -19,8 +19,6 @@ namespace StellarOps.Projectiles
             Position = position;
             Velocity = velocity;
             Heading = Velocity.ToAngle();
-            Radius = 8;
-            _timeToLive = 100;
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -33,9 +31,8 @@ namespace StellarOps.Projectiles
 
             Position += Velocity * deltaTime;
 
-            // delete bullets that go off-screen
             _timeAlive += gameTime.ElapsedGameTime.TotalSeconds;
-            if (_timeAlive > _timeToLive)
+            if (_timeAlive > TimeToLive)
             {
                 IsExpired = true;
             }

@@ -57,10 +57,12 @@
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Projectiles\ProjectileBase.cs" />
+    <Compile Include="Projectiles\TestProjectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ships\ShipBase.cs" />
     <Compile Include="Ships\TestShip.cs" />
     <Compile Include="Tile.cs" />
+    <Compile Include="Weapons\TestWeapon.cs" />
     <Compile Include="Weapons\WeaponBase.cs" />
   </ItemGroup>
   <ItemGroup>

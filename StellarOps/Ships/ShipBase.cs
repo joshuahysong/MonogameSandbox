@@ -34,7 +34,7 @@ namespace StellarOps.Ships
         public ShipBase()
         {
             Pawns = new List<IPawn>();
-            _weapon = new WeaponBase();
+            _weapon = new TestWeapon(new Vector2(290, 0));
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)

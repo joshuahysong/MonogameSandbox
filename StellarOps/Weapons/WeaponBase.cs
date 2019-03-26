@@ -5,25 +5,22 @@ using System;
 
 namespace StellarOps.Weapons
 {
-    public class WeaponBase : Entity
+    public abstract class WeaponBase : Entity
     {
-        public Texture2D Image { get; set; }
-
+        protected Texture2D Image;
         protected float Cooldown;
         protected float Speed;
         protected float Accuracy;
+        protected Type projectileType;
+
+        protected Vector2 Center => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
 
         private float _cooldownRemaining;
         private static Random _random = new Random();
 
-        public Vector2 Center => Image == null ? Vector2.Zero : new Vector2(Image.Width / 2, Image.Height / 2);
-
-        public WeaponBase()
+        public WeaponBase(Vector2 position)
         {
-            Cooldown = 25f;
-            Speed = 1000f;
-            Accuracy = 99f;
-            Position = new Vector2(285, 0);
+            Position = position;
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform) { }
@@ -50,7 +47,7 @@ namespace StellarOps.Weapons
                 Vector2 vel = MathUtil.FromPolar(heading + randomSpread, Speed);
 
                 Vector2 offset = Vector2.Transform(Position, aimQuat);
-                EntityManager.Add(new ProjectileBase(shipLocation + offset, vel + relativeVelocity));
+                EntityManager.Add((ProjectileBase)Activator.CreateInstance(projectileType, shipLocation + offset, vel + relativeVelocity));
             }
 
             if (_cooldownRemaining > 0)
