@@ -2,13 +2,15 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
+using StellarOps.Projectiles;
+using StellarOps.Weapons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace StellarOps.Ships
 {
-    public abstract class ShipCore : Entity, IContainer, IFocusable
+    public abstract class ShipBase : Entity, IContainer, IFocusable
     {
         public Vector2 WorldPosition { get; set; }
         public List<Tile> TileMap { get; set; }
@@ -23,13 +25,15 @@ namespace StellarOps.Ships
         protected float ManeuveringThrust;
         protected float MaxTurnRate;
         protected float MaxVelocity;
+        protected List<WeaponBase> Weapons;
 
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
-        public ShipCore()
+        public ShipBase()
         {
             Pawns = new List<IPawn>();
+            Weapons = new List<WeaponBase>();
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -123,6 +127,11 @@ namespace StellarOps.Ships
                         MainGame.Camera.Scale = 2F;
                     }
                 }
+                if (Input.IsKeyPressed(Keys.Space))
+                {
+                    Weapons.ForEach(weapon => weapon.Fire(Heading, Velocity, Position));
+                }
+
                 // Tile click
                 // TODO TEMP FOR DAMAGE TESTING
                 if (Input.WasLeftMouseButtonClicked())
@@ -347,13 +356,21 @@ namespace StellarOps.Ships
 
         private Tuple<Texture2D, Rectangle> GetTileImage(Tile tile)
         {
+            if (tile.TileType == TileType.Weapon)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.Weapon, Art.Weapon.Bounds);
+            }
+            if (tile.TileType == TileType.Engine)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.Engine, Art.Engine.Bounds);
+            }
             if (tile.TileType == TileType.Floor)
             {
-                return new Tuple<Texture2D, Rectangle>(Art.Floor, new Rectangle(0,0, Art.TileSize, Art.TileSize));
+                return new Tuple<Texture2D, Rectangle>(Art.Floor, Art.Floor.Bounds);
             }
             if (tile.TileType == TileType.FlightConsole)
             {
-                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, Art.FlightConsole.Bounds);
             }
             if (tile.TileType == TileType.Hull)
             {

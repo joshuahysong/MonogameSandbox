@@ -12,7 +12,7 @@ namespace StellarOps
         public static MainGame Instance { get; private set; }
         public static Camera Camera { get; set; }
         public static Player Player { get; set; }
-        public static ShipCore Ship { get; set; }
+        public static ShipBase Ship { get; set; }
         public static bool IsDebugging { get; set; }
 
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
