@@ -8,7 +8,7 @@ namespace StellarOps.Weapons
         public TestWeapon(Vector2 position) : base(position)
         {
             Cooldown = 25f;
-            Speed = 1000f;
+            Speed = 2000f;
             Accuracy = 99f;
             projectileType = typeof(TestProjectile);
         }

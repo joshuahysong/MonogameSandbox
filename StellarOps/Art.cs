@@ -26,6 +26,9 @@ namespace StellarOps
         public static Texture2D Hull { get; set; }
         public static Texture2D Floor { get; set; }
         public static Texture2D FlightConsole { get; set; }
+        public static Texture2D Engine { get; set; }
+        public static Texture2D Weapon1a { get; set; }
+        public static Texture2D Weapon1b { get; set; }
         #endregion
 
         #region Fonts
@@ -38,18 +41,17 @@ namespace StellarOps
             Pixel = CreateRectangle(1, 1, Color.White, Color.White);
             Player = content.Load<Texture2D>("Pawns/TestPawn3");
             Background = content.Load<Texture2D>("starfield2");
-            Seeker = content.Load<Texture2D>("Seeker");
-            Wanderer = content.Load<Texture2D>("Wanderer");
-            Bullet = content.Load<Texture2D>("Bullet");
-            Pointer = content.Load<Texture2D>("Pointer");
-            TestShip = content.Load<Texture2D>("Ships/TestShip_Interior2");
-            TestShipInterior = content.Load<Texture2D>("Ships/TestShip_Interior2");
+            Bullet = CreateRectangle(10, 10, Color.White, Color.White);
+
             Damage25 = content.Load<Texture2D>("Tiles/DamageOverlay25");
             Damage50 = content.Load<Texture2D>("Tiles/DamageOverlay50");
             Damage75 = content.Load<Texture2D>("Tiles/DamageOverlay75");
             Hull = content.Load<Texture2D>("Tiles/Hull");
             Floor = content.Load<Texture2D>("Tiles/Floor");
             FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
+            Engine = CreateRectangle(TileSize, TileSize, Color.SaddleBrown, Color.Brown);
+            Weapon1a = CreateRectangle(TileSize, TileSize, Color.Crimson, Color.Firebrick);
+            Weapon1b = CreateRectangle(TileSize, TileSize, Color.Crimson, Color.Firebrick);
 
             DebugFont = content.Load<SpriteFont>("Fonts/Debug");
             UIFont = content.Load<SpriteFont>("Fonts/UI");

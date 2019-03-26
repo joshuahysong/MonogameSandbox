@@ -39,6 +39,9 @@ namespace StellarOps
         Hull,
         Floor,
         Door,
-        FlightConsole
+        FlightConsole,
+        Engine,
+        Weapon1,
+        Weapon2
     }
 }

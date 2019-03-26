@@ -356,6 +356,18 @@ namespace StellarOps.Ships
 
         private Tuple<Texture2D, Rectangle> GetTileImage(Tile tile)
         {
+            if (tile.TileType == TileType.Weapon1)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.Weapon1a, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+            }
+            if (tile.TileType == TileType.Weapon2)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.Weapon1b, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+            }
+            if (tile.TileType == TileType.Engine)
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.Engine, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+            }
             if (tile.TileType == TileType.Floor)
             {
                 return new Tuple<Texture2D, Rectangle>(Art.Floor, new Rectangle(0,0, Art.TileSize, Art.TileSize));

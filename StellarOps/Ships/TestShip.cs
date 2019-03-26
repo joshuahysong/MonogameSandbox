@@ -14,19 +14,19 @@ namespace StellarOps.Ships
             MaxTurnRate = 0.65f;
             ManeuveringThrust = 0.01f;
             MaxVelocity = 500f;
-            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 1 * MainGame.TileSize) - Center + new Vector2(0, MainGame.TileSize / 2)));
-            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 8 * MainGame.TileSize) - Center + new Vector2(0, MainGame.TileSize / 2)));
+            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 1 * MainGame.TileSize) - Center));
+            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 8 * MainGame.TileSize) - Center));
             TileMapArtData = new int[,]
             {
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
-                {0,5,5,5,5,5,5,1,1,1,0,6,6,0,0,0,0},
+                {0,5,5,5,5,5,5,1,1,1,0,6,7,0,0,0,0},
                 {0,1,1,1,1,1,1,2,2,1,1,1,0,0,0,0,0},
                 {1,1,2,2,2,2,1,2,2,2,2,1,1,1,1,1,1},
                 {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,4,1},
                 {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1},
                 {1,1,2,2,2,2,1,2,2,2,2,1,1,1,1,1,1},
                 {0,1,1,1,1,1,1,2,2,1,1,1,0,0,0,0,0},
-                {0,5,5,5,5,5,5,1,1,1,0,6,6,0,0,0,0},
+                {0,5,5,5,5,5,5,1,1,1,0,6,7,0,0,0,0},
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0}
             };
             TileMapCollisionData = new int[,]

@@ -20,7 +20,7 @@ namespace StellarOps.Weapons
 
         public WeaponBase(Vector2 position)
         {
-            Position = position;
+            Position = position + new Vector2(MainGame.TileSize / 2, MainGame.TileSize / 2);
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform) { }
