@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using StellarOps.Weapons;
+
 namespace StellarOps.Ships
 {
     public class TestShip : ShipBase
@@ -12,6 +14,8 @@ namespace StellarOps.Ships
             MaxTurnRate = 0.65f;
             ManeuveringThrust = 0.01f;
             MaxVelocity = 500f;
+            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 1 * MainGame.TileSize) - Center + new Vector2(0, MainGame.TileSize / 2)));
+            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 8 * MainGame.TileSize) - Center + new Vector2(0, MainGame.TileSize / 2)));
             TileMapArtData = new int[,]
             {
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},

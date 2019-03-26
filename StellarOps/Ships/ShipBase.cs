@@ -25,16 +25,15 @@ namespace StellarOps.Ships
         protected float ManeuveringThrust;
         protected float MaxTurnRate;
         protected float MaxVelocity;
+        protected List<WeaponBase> Weapons;
 
         private Vector2 _acceleration;
         private float _currentTurnRate;
 
-        private WeaponBase _weapon;
-
         public ShipBase()
         {
             Pawns = new List<IPawn>();
-            _weapon = new TestWeapon(new Vector2(290, 0));
+            Weapons = new List<WeaponBase>();
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -130,7 +129,7 @@ namespace StellarOps.Ships
                 }
                 if (Input.IsKeyPressed(Keys.Space))
                 {
-                    _weapon.Fire(Heading, Velocity, Position);
+                    Weapons.ForEach(weapon => weapon.Fire(Heading, Velocity, Position));
                 }
 
                 // Tile click
