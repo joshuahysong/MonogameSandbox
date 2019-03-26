@@ -356,25 +356,21 @@ namespace StellarOps.Ships
 
         private Tuple<Texture2D, Rectangle> GetTileImage(Tile tile)
         {
-            if (tile.TileType == TileType.Weapon1)
+            if (tile.TileType == TileType.Weapon)
             {
-                return new Tuple<Texture2D, Rectangle>(Art.Weapon1a, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
-            }
-            if (tile.TileType == TileType.Weapon2)
-            {
-                return new Tuple<Texture2D, Rectangle>(Art.Weapon1b, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+                return new Tuple<Texture2D, Rectangle>(Art.Weapon, Art.Weapon.Bounds);
             }
             if (tile.TileType == TileType.Engine)
             {
-                return new Tuple<Texture2D, Rectangle>(Art.Engine, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+                return new Tuple<Texture2D, Rectangle>(Art.Engine, Art.Engine.Bounds);
             }
             if (tile.TileType == TileType.Floor)
             {
-                return new Tuple<Texture2D, Rectangle>(Art.Floor, new Rectangle(0,0, Art.TileSize, Art.TileSize));
+                return new Tuple<Texture2D, Rectangle>(Art.Floor, Art.Floor.Bounds);
             }
             if (tile.TileType == TileType.FlightConsole)
             {
-                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, Art.TileSize, Art.TileSize));
+                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, Art.FlightConsole.Bounds);
             }
             if (tile.TileType == TileType.Hull)
             {

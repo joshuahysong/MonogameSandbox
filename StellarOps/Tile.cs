@@ -41,7 +41,6 @@ namespace StellarOps
         Door,
         FlightConsole,
         Engine,
-        Weapon1,
-        Weapon2
+        Weapon
     }
 }
