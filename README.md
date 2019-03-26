@@ -16,6 +16,7 @@ Latest build can be found here: https://drive.google.com/open?id=1TVb5f-6QyaNAKO
 * **D**: Rotate the ship to starboard (clockwise)
 * **S**: Rotate the ship to a retro heading
 * **X**: Rotate the ship to a retro heading and apply thrust until the ship comes to a complete stop.
+* **Space**: Fire Weapons
 
 **Other**
 * **F**: Switch control to the player.
@@ -31,7 +32,7 @@ Latest build can be found here: https://drive.google.com/open?id=1TVb5f-6QyaNAKO
 * **Mouse Movement**: The player will face the mouse cursor
 
 **Other**
-* **F**: Switch control to the ship.
+* **F**: Use console.
 
 ## Misc
 * **Esc**: Exit the game.
