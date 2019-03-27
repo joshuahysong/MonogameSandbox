@@ -15,6 +15,8 @@ namespace StellarOps
         public static ShipBase Ship { get; set; }
         public static bool IsDebugging { get; set; }
 
+        public ShipBase Enemy { get; set; }
+
         public static Viewport Viewport => Instance.GraphicsDevice.Viewport;
         public static Vector2 ScreenSize => new Vector2(Viewport.Width, Viewport.Height);
         public static Vector2 ScreenCenter => new Vector2(Viewport.Width / 2, Viewport.Height / 2);
@@ -62,6 +64,10 @@ namespace StellarOps
             Player.Container = Ship;
             Camera.Focus = Ship;
             EntityManager.Add(Ship);
+
+            Enemy = new TestShip(new Vector2(1000, 1000));
+            EntityManager.Add(Enemy);
+
         }
 
         protected override void LoadContent()

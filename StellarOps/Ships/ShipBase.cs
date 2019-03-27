@@ -67,7 +67,7 @@ namespace StellarOps.Ships
 
             Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
-            if (MainGame.IsDebugging)
+            if (MainGame.IsDebugging && MainGame.Ship == this)
             {
                 MainGame.Instance.ShipDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
                 MainGame.Instance.ShipDebugEntries["Velocity"] = $"{Math.Round(Velocity.X)}, {Math.Round(Velocity.Y)}";

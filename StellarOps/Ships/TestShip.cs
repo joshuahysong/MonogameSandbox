@@ -7,7 +7,7 @@ namespace StellarOps.Ships
     {
         public TestShip(Vector2 spawnPosition)
         {
-            Position = Vector2.Zero;
+            Position = spawnPosition;
             Heading = 0.0f;
             Size = new Vector2(17 * MainGame.TileSize, 10 * MainGame.TileSize);
             Thrust = 250f;
