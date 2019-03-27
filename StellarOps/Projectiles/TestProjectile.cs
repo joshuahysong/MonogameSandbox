@@ -8,7 +8,7 @@ namespace StellarOps.Projectiles
         {
             Image = Art.Bullet;
             Radius = 8;
-            TimeToLive = 100;
+            TimeToLive = 20;
         }
     }
 }

@@ -7,12 +7,11 @@ namespace StellarOps
 {
     public static class EntityManager
     {
-        static List<Entity> entities = new List<Entity>();
+        public static List<Entity> Entities = new List<Entity>();
+        private static List<Entity> addedEntities = new List<Entity>();
+        private static bool isUpdating;
 
-        static bool isUpdating;
-        static List<Entity> addedEntities = new List<Entity>();
-
-        public static int Count { get { return entities.Count; } }
+        public static int Count { get { return Entities.Count; } }
 
         public static void Add(Entity entity)
         {
@@ -28,14 +27,14 @@ namespace StellarOps
 
         private static void AddEntity(Entity entity)
         {
-            entities.Add(entity);
+            Entities.Add(entity);
         }
 
         public static void Update(GameTime gameTime, Matrix parentTransform)
         {
             isUpdating = true;
 
-            foreach (Entity entity in entities)
+            foreach (Entity entity in Entities)
             {
                 entity.Update(gameTime, parentTransform);
             }
@@ -44,18 +43,18 @@ namespace StellarOps
 
             foreach (Entity entity in addedEntities)
             {
-                entities.Add(entity);
+                Entities.Add(entity);
             }
 
             addedEntities.Clear();
 
             // remove any expired entities.
-            entities = entities.Where(x => !x.IsExpired).ToList();
+            Entities = Entities.Where(x => !x.IsExpired).ToList();
         }
 
         public static void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            foreach (Entity entity in entities)
+            foreach (Entity entity in Entities)
             {
                 entity.Draw(spriteBatch, parentTransform);
             }

@@ -39,8 +39,8 @@ namespace StellarOps.Ships
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             HandleInput(deltaTime);
+            DetectCollisions();
 
             // Continue rotation until turn rate reaches zero to simulate slowing
             if (_currentTurnRate > 0)
@@ -424,6 +424,20 @@ namespace StellarOps.Ships
                 }
             }
             return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, 0, 0));
+        }
+
+        private void DetectCollisions()
+        {
+            Vector2 upperLeft = WorldPosition - Center;
+            Rectangle shipBounds = new Rectangle((int)upperLeft.X, (int)upperLeft.Y, (int)Size.X, (int)Size.Y);
+            List<ProjectileBase> projectiles = EntityManager.Entities.Where(e => e is ProjectileBase).Select(e => (ProjectileBase)e).ToList();
+            for (var i = 0; i < projectiles.Count(); i++)
+            {
+                if (shipBounds.Contains(projectiles[i].Position) && this != MainGame.Ship)
+                {
+                    Console.WriteLine("HIT!");
+                }
+            }
         }
     }
 }
