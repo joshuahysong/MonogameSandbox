@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StellarOps.Projectiles;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,6 +9,7 @@ namespace StellarOps
     public static class EntityManager
     {
         public static List<Entity> Entities = new List<Entity>();
+        public static List<ProjectileBase> Projectiles = new List<ProjectileBase>();
         private static List<Entity> addedEntities = new List<Entity>();
         private static bool isUpdating;
 
@@ -27,7 +29,14 @@ namespace StellarOps
 
         private static void AddEntity(Entity entity)
         {
-            Entities.Add(entity);
+            if (entity is ProjectileBase)
+            {
+                Projectiles.Add((ProjectileBase)entity);
+            }
+            else
+            {
+                Entities.Add(entity);
+            }
         }
 
         public static void Update(GameTime gameTime, Matrix parentTransform)
@@ -38,18 +47,23 @@ namespace StellarOps
             {
                 entity.Update(gameTime, parentTransform);
             }
+            foreach (ProjectileBase projectile in Projectiles)
+            {
+                projectile.Update(gameTime, parentTransform);
+            }
 
             isUpdating = false;
 
             foreach (Entity entity in addedEntities)
             {
-                Entities.Add(entity);
+                AddEntity(entity);
             }
 
             addedEntities.Clear();
 
             // remove any expired entities.
             Entities = Entities.Where(x => !x.IsExpired).ToList();
+            Projectiles = Projectiles.Where(x => !x.IsExpired).ToList();
         }
 
         public static void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
@@ -57,6 +71,10 @@ namespace StellarOps
             foreach (Entity entity in Entities)
             {
                 entity.Draw(spriteBatch, parentTransform);
+            }
+            foreach (ProjectileBase projectile in Projectiles)
+            {
+                projectile.Draw(spriteBatch, parentTransform);
             }
         }
     }

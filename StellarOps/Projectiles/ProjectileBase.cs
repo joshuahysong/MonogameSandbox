@@ -5,9 +5,11 @@ namespace StellarOps.Projectiles
 {
     public abstract class ProjectileBase : Entity
     {
+        public float Radius { get; set; }
+
         protected Texture2D Image;
-        protected float Radius;
         protected long TimeToLive;
+        protected Vector2 PreviousPosition;
 
         protected Vector2 Size =>Image == null ? Vector2.Zero : new Vector2(Image.Width, Image.Height);
 
@@ -23,6 +25,7 @@ namespace StellarOps.Projectiles
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
+            PreviousPosition = Position;
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Velocity.LengthSquared() > 0)
             {
@@ -42,6 +45,11 @@ namespace StellarOps.Projectiles
         {
             // TODO Only draw if on screen
             spriteBatch.Draw(Image, Position, null, color, Heading, Size / 2f, 1f, 0, 0);
+        }
+
+        private void DetectCollision()
+        {
+
         }
     }
 }

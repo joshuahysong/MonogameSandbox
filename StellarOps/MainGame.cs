@@ -59,13 +59,13 @@ namespace StellarOps
 
             base.Initialize();
             Player = new Player();
-            Ship = new TestShip(Vector2.Zero);
+            Ship = new TestShip(Vector2.Zero, 0);
             Ship.Pawns.Add(Player);
             Player.Container = Ship;
             Camera.Focus = Ship;
             EntityManager.Add(Ship);
 
-            Enemy = new TestShip(new Vector2(1000, 1000));
+            Enemy = new TestShip(new Vector2(1000, 0), (float)Math.PI / 2);
             EntityManager.Add(Enemy);
 
         }

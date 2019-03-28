@@ -428,14 +428,23 @@ namespace StellarOps.Ships
 
         private void DetectCollisions()
         {
-            Vector2 upperLeft = WorldPosition - Center;
-            Rectangle shipBounds = new Rectangle((int)upperLeft.X, (int)upperLeft.Y, (int)Size.X, (int)Size.Y);
-            List<ProjectileBase> projectiles = EntityManager.Entities.Where(e => e is ProjectileBase).Select(e => (ProjectileBase)e).ToList();
+            float Radius = Size.X > Size.Y ? Size.X : Size.Y;
+            List<ProjectileBase> projectiles = EntityManager.Projectiles.Select(e => e).ToList();
             for (var i = 0; i < projectiles.Count(); i++)
             {
-                if (shipBounds.Contains(projectiles[i].Position) && this != MainGame.Ship)
+                if ((projectiles[i].Position - WorldPosition).Length() <= Radius + projectiles[i].Radius)
                 {
-                    Console.WriteLine("HIT!");
+                    Maybe<Tile> tile = GetTileByWorldPosition(projectiles[i].Position);
+                    if (tile.HasValue && tile.Value.TileType != TileType.Empty)
+                    {
+                        tile.Value.Health -= 25;
+                        if (tile.Value.Health <= 0)
+                        {
+                            tile.Value.Health = 0;
+                            tile.Value.TileType = TileType.Empty;
+                        }
+                        projectiles[i].IsExpired = true;
+                    }
                 }
             }
         }

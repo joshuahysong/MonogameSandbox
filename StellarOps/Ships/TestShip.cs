@@ -5,10 +5,10 @@ namespace StellarOps.Ships
 {
     public class TestShip : ShipBase
     {
-        public TestShip(Vector2 spawnPosition)
+        public TestShip(Vector2 spawnPosition, float spawnHeading)
         {
             Position = spawnPosition;
-            Heading = 0.0f;
+            Heading = spawnHeading;
             Size = new Vector2(17 * MainGame.TileSize, 10 * MainGame.TileSize);
             Thrust = 250f;
             MaxTurnRate = 0.65f;
