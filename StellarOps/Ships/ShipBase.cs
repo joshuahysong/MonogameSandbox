@@ -39,8 +39,8 @@ namespace StellarOps.Ships
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             HandleInput(deltaTime);
+            DetectCollisions();
 
             // Continue rotation until turn rate reaches zero to simulate slowing
             if (_currentTurnRate > 0)
@@ -67,7 +67,7 @@ namespace StellarOps.Ships
 
             Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
-            if (MainGame.IsDebugging)
+            if (MainGame.IsDebugging && MainGame.Ship == this)
             {
                 MainGame.Instance.ShipDebugEntries["Position"] = $"{Math.Round(Position.X)}, {Math.Round(Position.Y)}";
                 MainGame.Instance.ShipDebugEntries["Velocity"] = $"{Math.Round(Velocity.X)}, {Math.Round(Velocity.Y)}";
@@ -424,6 +424,29 @@ namespace StellarOps.Ships
                 }
             }
             return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, 0, 0));
+        }
+
+        private void DetectCollisions()
+        {
+            float Radius = Size.X > Size.Y ? Size.X : Size.Y;
+            List<ProjectileBase> projectiles = EntityManager.Projectiles.Select(e => e).ToList();
+            for (var i = 0; i < projectiles.Count(); i++)
+            {
+                if ((projectiles[i].Position - WorldPosition).Length() <= Radius + projectiles[i].Radius)
+                {
+                    Maybe<Tile> tile = GetTileByWorldPosition(projectiles[i].Position);
+                    if (tile.HasValue && tile.Value.TileType != TileType.Empty)
+                    {
+                        tile.Value.Health -= 25;
+                        if (tile.Value.Health <= 0)
+                        {
+                            tile.Value.Health = 0;
+                            tile.Value.TileType = TileType.Empty;
+                        }
+                        projectiles[i].IsExpired = true;
+                    }
+                }
+            }
         }
     }
 }

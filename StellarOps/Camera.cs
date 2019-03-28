@@ -17,7 +17,7 @@ namespace StellarOps
 
         public Camera()
         {
-            Scale = 1f;
+            Scale = 0.5f;
         }
 
         public void Update(IFocusable focus)

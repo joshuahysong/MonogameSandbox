@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace StellarOps.Projectiles
 {
@@ -7,8 +8,8 @@ namespace StellarOps.Projectiles
         public TestProjectile(Vector2 position, Vector2 velocity) : base(position, velocity)
         {
             Image = Art.Bullet;
-            Radius = 8;
-            TimeToLive = 100;
+            Radius = (float)Math.Ceiling((double)(Image.Width / 2));
+            TimeToLive = 20;
         }
     }
 }
