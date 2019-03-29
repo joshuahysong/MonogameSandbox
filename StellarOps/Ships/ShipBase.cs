@@ -17,6 +17,7 @@ namespace StellarOps.Ships
         public Vector2 Size { get; set; }
         public Vector2 Center => Size == null ? Vector2.Zero : new Vector2(Size.X / 2, Size.Y / 2);
         public List<IPawn> Pawns { get; set; }
+        public bool AreManeuveringThrustersFiring { get; set; }
 
         protected int[,] TileMapArtData;
         protected int[,] TileMapCollisionData;
@@ -85,19 +86,17 @@ namespace StellarOps.Ships
                 // Apply thrust
                 if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
                 {
-                    MoveForward();
+                    ApplyForwardThrust();
                 }
                 // Rotate Counter-Clockwise
                 if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
                 {
-                    _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
-                        : _currentTurnRate - ManeuveringThrust;
+                    ApplyPortManeuveringThrusters();
                 }
                 // Rotate Clockwise
                 else if (Input.IsKeyPressed(Keys.D) || Input.IsKeyPressed(Keys.Right))
                 {
-                    _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
-                        : _currentTurnRate + ManeuveringThrust;
+                    ApplyStarboardManeuveringThrusters();
                 }
                 // Rotate to face retro thurst heading
                 else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
@@ -111,10 +110,7 @@ namespace StellarOps.Ships
                 }
                 else
                 {
-                    if (_currentTurnRate != 0)
-                    {
-                        SlowDownManueveringThrust();
-                    }
+                    AreManeuveringThrustersFiring = false;
                 }
                 // Toggle to Player pawn control
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
@@ -150,7 +146,8 @@ namespace StellarOps.Ships
                     }
                 }
             }
-            else
+
+            if (!AreManeuveringThrustersFiring)
             {
                 if (_currentTurnRate != 0)
                 {
@@ -190,6 +187,26 @@ namespace StellarOps.Ships
             });
 
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
+        }
+
+        public void ApplyForwardThrust()
+        {
+            _acceleration.X += Thrust * (float)Math.Cos(Heading);
+            _acceleration.Y += Thrust * (float)Math.Sin(Heading);
+        }
+
+        public void ApplyStarboardManeuveringThrusters()
+        {
+            _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
+                : _currentTurnRate + ManeuveringThrust;
+            AreManeuveringThrustersFiring = true;
+        }
+
+        public void ApplyPortManeuveringThrusters()
+        {
+            _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
+                : _currentTurnRate - ManeuveringThrust;
+            AreManeuveringThrustersFiring = true;
         }
 
         private void RotateClockwise(float deltaTime)
@@ -446,12 +463,6 @@ namespace StellarOps.Ships
                     }
                 }
             }
-        }
-
-        public void MoveForward()
-        {
-            _acceleration.X += Thrust * (float)Math.Cos(Heading);
-            _acceleration.Y += Thrust * (float)Math.Sin(Heading);
         }
     }
 }

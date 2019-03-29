@@ -49,8 +49,28 @@ namespace StellarOps
         {
             while (true)
             {
-                Ship.MoveForward();
-                yield return 0;
+                for (int i = 0; i < 80; i++)
+                {
+                    Ship.ApplyStarboardManeuveringThrusters();
+                    yield return 0;
+                }
+                for (int i = 0; i < 50; i++)
+                {
+                    Ship.AreManeuveringThrustersFiring = false;
+                    Ship.ApplyForwardThrust();
+                    yield return 0;
+                }
+                //for (int i = 0; i < 80; i++)
+                //{
+                //    Ship.ApplyPortManeuveringThrusters();
+                //    yield return 0;
+                //}
+                //for (int i = 0; i < 50; i++)
+                //{
+                //    Ship.AreManeuveringThrustersFiring = false;
+                //    Ship.ApplyForwardThrust();
+                //    yield return 0;
+                //}
             }
         }
     }
