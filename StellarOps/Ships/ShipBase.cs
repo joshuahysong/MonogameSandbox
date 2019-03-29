@@ -85,8 +85,7 @@ namespace StellarOps.Ships
                 // Apply thrust
                 if (Input.IsKeyPressed(Keys.W) || Input.IsKeyPressed(Keys.Up))
                 {
-                    _acceleration.X += Thrust * (float)Math.Cos(Heading);
-                    _acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                    MoveForward();
                 }
                 // Rotate Counter-Clockwise
                 if (Input.IsKeyPressed(Keys.A) || Input.IsKeyPressed(Keys.Left))
@@ -447,6 +446,12 @@ namespace StellarOps.Ships
                     }
                 }
             }
+        }
+
+        public void MoveForward()
+        {
+            _acceleration.X += Thrust * (float)Math.Cos(Heading);
+            _acceleration.Y += Thrust * (float)Math.Sin(Heading);
         }
     }
 }
