@@ -124,7 +124,7 @@ namespace StellarOps.Ships
                 }
                 if (Input.IsKeyPressed(Keys.Space))
                 {
-                    Weapons.ForEach(weapon => weapon.Fire(Heading, Velocity, Position));
+                    FireWeapons();
                 }
 
                 // Tile click
@@ -207,6 +207,11 @@ namespace StellarOps.Ships
             _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
                 : _currentTurnRate - ManeuveringThrust;
             AreManeuveringThrustersFiring = true;
+        }
+
+        public void FireWeapons()
+        {
+            Weapons.ForEach(weapon => weapon.Fire(Heading, Velocity, Position));
         }
 
         private void RotateClockwise(float deltaTime)

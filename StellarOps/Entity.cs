@@ -7,6 +7,7 @@ namespace StellarOps
     {
         public Vector2 Position { get; protected set; }
         public bool IsExpired { get; set; }
+        public float Heading { get; set; }
 
         public Matrix LocalTransform =>
             Matrix.CreateTranslation(0, 0, 0f) *
@@ -15,7 +16,6 @@ namespace StellarOps
             Matrix.CreateTranslation(Position.X, Position.Y, 0f);
 
         protected Vector2 Velocity;
-        protected float Heading;
 
         protected Color color = Color.White;
 

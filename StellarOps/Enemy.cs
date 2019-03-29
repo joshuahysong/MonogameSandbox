@@ -9,18 +9,21 @@ namespace StellarOps
     public class Enemy : Entity
     {
         public ShipBase Ship { get; set; }
+        public Entity Target { get; set; }
 
         private List<IEnumerator<int>> behaviours = new List<IEnumerator<int>>();
 
         public Enemy(ShipBase ship)
         {
             Ship = ship;
+            Target = MainGame.Ship;
             AddBehavior(MoveForward());
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             ApplyBehaviours();
+            Position = Ship.Position;
             Ship.Update(gameTime, parentTransform);
         }
 
@@ -52,26 +55,39 @@ namespace StellarOps
                 for (int i = 0; i < 80; i++)
                 {
                     Ship.ApplyStarboardManeuveringThrusters();
+                    if (IsTargetInRange())
+                    {
+                        Ship.FireWeapons();
+                    }
                     yield return 0;
                 }
-                for (int i = 0; i < 50; i++)
+                for (int i = 0; i < 40; i++)
                 {
                     Ship.AreManeuveringThrustersFiring = false;
                     Ship.ApplyForwardThrust();
+                    if (IsTargetInRange())
+                    {
+                        Ship.FireWeapons();
+                    }
                     yield return 0;
                 }
-                //for (int i = 0; i < 80; i++)
-                //{
-                //    Ship.ApplyPortManeuveringThrusters();
-                //    yield return 0;
-                //}
-                //for (int i = 0; i < 50; i++)
-                //{
-                //    Ship.AreManeuveringThrustersFiring = false;
-                //    Ship.ApplyForwardThrust();
-                //    yield return 0;
-                //}
             }
+        }
+
+        private bool IsTargetInRange()
+        {
+            float distanceToTarget = (Position - Target.Position).Length();
+            if (distanceToTarget > 5000)
+            {
+                return false;
+            }
+
+            float angleToTarget = (Position - Target.Position).ToAngle();
+            double degreesToTarget = angleToTarget.ToDegrees();
+            double headingDegrees = Ship.Heading.ToDegrees();
+            double targetDifference = headingDegrees < degreesToTarget ? (headingDegrees + 360) - degreesToTarget : headingDegrees - degreesToTarget;
+
+            return targetDifference <= 200 && targetDifference >= 160;
         }
     }
 }
