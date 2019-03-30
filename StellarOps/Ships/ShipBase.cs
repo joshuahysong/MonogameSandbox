@@ -18,6 +18,7 @@ namespace StellarOps.Ships
         public Vector2 Center => Size == null ? Vector2.Zero : new Vector2(Size.X / 2, Size.Y / 2);
         public List<IPawn> Pawns { get; set; }
         public bool AreManeuveringThrustersFiring { get; set; }
+        public bool IsMainThrustFiring { get; set; }
 
         protected int[,] TileMapArtData;
         protected int[,] TileMapCollisionData;
@@ -66,6 +67,14 @@ namespace StellarOps.Ships
             Position += Velocity * deltaTime;
             WorldPosition = Position;
 
+            if (!AreManeuveringThrustersFiring)
+            {
+                if (_currentTurnRate != 0)
+                {
+                    SlowDownManueveringThrust();
+                }
+            }
+
             Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
             if (MainGame.IsDebugging && MainGame.Ship == this)
@@ -99,18 +108,9 @@ namespace StellarOps.Ships
                     ApplyStarboardManeuveringThrusters();
                 }
                 // Rotate to face retro thurst heading
-                else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
+                else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down) || Input.IsKeyPressed(Keys.X))
                 {
-                    RotateToRetro(deltaTime, false);
-                }
-                // Rotate to face retro thurst heading and thrust to brake
-                else if (Input.IsKeyPressed(Keys.X))
-                {
-                    RotateToRetro(deltaTime, true);
-                }
-                else
-                {
-                    AreManeuveringThrustersFiring = false;
+                    RotateToRetro(deltaTime, Input.IsKeyPressed(Keys.X));
                 }
                 // Toggle to Player pawn control
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
@@ -146,14 +146,6 @@ namespace StellarOps.Ships
                     }
                 }
             }
-
-            if (!AreManeuveringThrustersFiring)
-            {
-                if (_currentTurnRate != 0)
-                {
-                    SlowDownManueveringThrust();
-                }
-            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
@@ -184,15 +176,24 @@ namespace StellarOps.Ships
                 {
                     spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                 }
+                // Thruster effect
+                if (tile.TileType == TileType.Engine && IsMainThrustFiring)
+                {
+                    origin -= new Vector2(-MainGame.TileSize, 0);
+                    spriteBatch.Draw(Art.MainThruster, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                }
             });
 
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
+            AreManeuveringThrustersFiring = false;
+            IsMainThrustFiring = false;
         }
 
         public void ApplyForwardThrust()
         {
             _acceleration.X += Thrust * (float)Math.Cos(Heading);
             _acceleration.Y += Thrust * (float)Math.Sin(Heading);
+            IsMainThrustFiring = true;
         }
 
         public void ApplyStarboardManeuveringThrusters()
@@ -234,6 +235,7 @@ namespace StellarOps.Ships
 
         private void RotateToRetro(float deltaTime, bool IsBraking)
         {
+            AreManeuveringThrustersFiring = true;
             float movementHeading = Velocity.ToAngle();
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
             if (Heading != retroHeading  && !IsWithinBrakingRange())
