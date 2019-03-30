@@ -11,6 +11,11 @@ namespace StellarOps
             return (float)Math.Atan2(vector.Y, vector.X);
         }
 
+        public static double ToDegrees(this float radians)
+        {
+            return (radians + Math.PI) * (180.0 / Math.PI);
+        }
+
         public static string SplitCamelCase(this string str)
         {
             return Regex.Replace(

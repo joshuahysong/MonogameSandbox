@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StellarOps.Contracts;
 
 namespace StellarOps
@@ -17,7 +16,7 @@ namespace StellarOps
 
         public Camera()
         {
-            Scale = 0.5f;
+            Scale = 0.2f;
         }
 
         public void Update(IFocusable focus)
