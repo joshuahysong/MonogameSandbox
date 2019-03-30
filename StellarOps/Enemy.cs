@@ -72,7 +72,7 @@ namespace StellarOps
                 }
                 else
                 {
-                    Ship.AreManeuveringThrustersFiring = false;
+                    Ship.IsManeuvering = false;
                 }
                 yield return 0;
             }

@@ -29,8 +29,10 @@ namespace StellarOps
 
     public enum CollisionType
     {
-        Open,
-        Collision
+        None,
+        All,
+        Pawn,
+        Projectile
     }
 
     public enum TileType
@@ -41,6 +43,9 @@ namespace StellarOps
         Door,
         FlightConsole,
         Engine,
-        Weapon
+        Weapon,
+        MainThrust,
+        PortThrust,
+        StarboardThrust
     }
 }
