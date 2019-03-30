@@ -17,7 +17,7 @@ namespace StellarOps
         {
             Ship = ship;
             Target = MainGame.Ship;
-            AddBehavior(MoveForward());
+            AddBehavior(HuntPlayer());
         }
 
         public override void Update(GameTime gameTime, Matrix parentTransform)
@@ -48,46 +48,39 @@ namespace StellarOps
             }
         }
 
-        private IEnumerable<int> MoveForward()
+        private IEnumerable<int> HuntPlayer()
         {
             while (true)
             {
-                for (int i = 0; i < 80; i++)
+                float distanceToTarget = (Position - Target.Position).Length();
+                double degreesToTarget = GetDegreesToTarget();
+                if (distanceToTarget > 1000)
                 {
-                    Ship.ApplyStarboardManeuveringThrusters();
-                    if (IsTargetInRange())
-                    {
-                        Ship.FireWeapons();
-                    }
-                    yield return 0;
+                    Ship.ApplyForwardThrust();
                 }
-                for (int i = 0; i < 40; i++)
+                if (degreesToTarget > 160 && degreesToTarget < 200)
                 {
                     Ship.AreManeuveringThrustersFiring = false;
-                    Ship.ApplyForwardThrust();
-                    if (IsTargetInRange())
-                    {
-                        Ship.FireWeapons();
-                    }
-                    yield return 0;
+                    Ship.FireWeapons();
                 }
+                else if (degreesToTarget <= 180)
+                {
+                    Ship.ApplyStarboardManeuveringThrusters();
+                }
+                else
+                {
+                    Ship.ApplyPortManeuveringThrusters();
+                }
+                yield return 0;
             }
         }
 
-        private bool IsTargetInRange()
+        private double GetDegreesToTarget()
         {
-            float distanceToTarget = (Position - Target.Position).Length();
-            if (distanceToTarget > 5000)
-            {
-                return false;
-            }
-
             float angleToTarget = (Position - Target.Position).ToAngle();
             double degreesToTarget = angleToTarget.ToDegrees();
             double headingDegrees = Ship.Heading.ToDegrees();
-            double targetDifference = headingDegrees < degreesToTarget ? (headingDegrees + 360) - degreesToTarget : headingDegrees - degreesToTarget;
-
-            return targetDifference <= 200 && targetDifference >= 160;
+            return headingDegrees < degreesToTarget ? (headingDegrees + 360) - degreesToTarget : headingDegrees - degreesToTarget;
         }
     }
 }

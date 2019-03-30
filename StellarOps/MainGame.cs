@@ -65,9 +65,8 @@ namespace StellarOps
             Camera.Focus = Ship;
             EntityManager.Add(Ship);
 
-            Enemy = new Enemy(new TestShip(new Vector2(1000, 0), (float)Math.PI / 2));
+            Enemy = new Enemy(new TestShip(new Vector2(2000, 0), -(float)Math.PI / 2));
             EntityManager.Add(Enemy);
-
         }
 
         protected override void LoadContent()
