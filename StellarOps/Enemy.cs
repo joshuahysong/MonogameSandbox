@@ -58,18 +58,21 @@ namespace StellarOps
                 {
                     Ship.ApplyForwardThrust();
                 }
-                if (degreesToTarget > 160 && degreesToTarget < 200)
+                if (degreesToTarget > 175 && degreesToTarget < 185)
                 {
-                    Ship.AreManeuveringThrustersFiring = false;
                     Ship.FireWeapons();
                 }
-                else if (degreesToTarget <= 180)
+                if (degreesToTarget <= 179)
                 {
                     Ship.ApplyStarboardManeuveringThrusters();
                 }
-                else
+                else if (degreesToTarget > 181)
                 {
                     Ship.ApplyPortManeuveringThrusters();
+                }
+                else
+                {
+                    Ship.IsManeuvering = false;
                 }
                 yield return 0;
             }

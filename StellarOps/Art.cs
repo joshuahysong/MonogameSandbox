@@ -28,6 +28,7 @@ namespace StellarOps
         public static Texture2D FlightConsole { get; set; }
         public static Texture2D Engine { get; set; }
         public static Texture2D Weapon { get; set; }
+        public static Texture2D MainThruster { get; set; }
         #endregion
 
         #region Fonts
@@ -50,6 +51,7 @@ namespace StellarOps
             FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
             Engine = CreateRectangle(TileSize, TileSize, Color.SaddleBrown, Color.Brown);
             Weapon = content.Load<Texture2D>("Tiles/Weapon");
+            MainThruster = CreateRectangle(TileSize, TileSize, Color.LightCyan, Color.LightCyan);
 
             DebugFont = content.Load<SpriteFont>("Fonts/Debug");
             UIFont = content.Load<SpriteFont>("Fonts/UI");

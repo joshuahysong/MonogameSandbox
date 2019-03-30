@@ -17,7 +17,7 @@ namespace StellarOps.Ships
         public Vector2 Size { get; set; }
         public Vector2 Center => Size == null ? Vector2.Zero : new Vector2(Size.X / 2, Size.Y / 2);
         public List<IPawn> Pawns { get; set; }
-        public bool AreManeuveringThrustersFiring { get; set; }
+        public bool IsManeuvering { get; set; }
 
         protected int[,] TileMapArtData;
         protected int[,] TileMapCollisionData;
@@ -30,6 +30,9 @@ namespace StellarOps.Ships
 
         private Vector2 _acceleration;
         private float _currentTurnRate;
+        private bool _isMainThrustFiring;
+        private bool _isPortThrustFiring;
+        private bool _isStarboardThrustFiring;
 
         public ShipBase()
         {
@@ -66,6 +69,14 @@ namespace StellarOps.Ships
             Position += Velocity * deltaTime;
             WorldPosition = Position;
 
+            if (!IsManeuvering)
+            {
+                if (_currentTurnRate != 0)
+                {
+                    SlowDownManueveringThrust();
+                }
+            }
+
             Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
             if (MainGame.IsDebugging && MainGame.Ship == this)
@@ -99,18 +110,9 @@ namespace StellarOps.Ships
                     ApplyStarboardManeuveringThrusters();
                 }
                 // Rotate to face retro thurst heading
-                else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down))
+                else if (Input.IsKeyPressed(Keys.S) || Input.IsKeyPressed(Keys.Down) || Input.IsKeyPressed(Keys.X))
                 {
-                    RotateToRetro(deltaTime, false);
-                }
-                // Rotate to face retro thurst heading and thrust to brake
-                else if (Input.IsKeyPressed(Keys.X))
-                {
-                    RotateToRetro(deltaTime, true);
-                }
-                else
-                {
-                    AreManeuveringThrustersFiring = false;
+                    RotateToRetro(deltaTime, Input.IsKeyPressed(Keys.X));
                 }
                 // Toggle to Player pawn control
                 if (Input.IsKeyToggled(Keys.F) && !Input.ManagedKeys.Contains(Keys.F))
@@ -140,18 +142,10 @@ namespace StellarOps.Ships
                             if (targetTile.Value.Health == 0)
                             {
                                 targetTile.Value.TileType = TileType.Empty;
-                                targetTile.Value.CollisionType = CollisionType.Open;
+                                targetTile.Value.CollisionType = CollisionType.None;
                             }
                         }
                     }
-                }
-            }
-
-            if (!AreManeuveringThrustersFiring)
-            {
-                if (_currentTurnRate != 0)
-                {
-                    SlowDownManueveringThrust();
                 }
             }
         }
@@ -172,41 +166,51 @@ namespace StellarOps.Ships
                 origin = Center - offset;
                 Tuple<Texture2D, Rectangle> tileArtData = GetTileImage(tile);
                 spriteBatch.Draw(tileArtData.Item1, Position, tileArtData.Item2, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                if (tile.Health < 100 && tile. Health >= 75)
+                if (tile.CollisionType == CollisionType.All || tile.CollisionType == CollisionType.Projectile)
                 {
-                    spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                }
-                if (tile.Health < 75 && tile.Health >= 50)
-                {
-                    spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                }
-                if (tile.Health < 50)
-                {
-                    spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    if (tile.Health < 100 && tile.Health >= 75)
+                    {
+                        spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
+                    if (tile.Health < 75 && tile.Health >= 50)
+                    {
+                        spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
+                    if (tile.Health < 50)
+                    {
+                        spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
                 }
             });
 
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
+            IsManeuvering = false;
+            _isMainThrustFiring = false;
+            _isPortThrustFiring = false;
+            _isStarboardThrustFiring = false;
         }
 
         public void ApplyForwardThrust()
         {
             _acceleration.X += Thrust * (float)Math.Cos(Heading);
             _acceleration.Y += Thrust * (float)Math.Sin(Heading);
+            _isMainThrustFiring = true;
         }
 
         public void ApplyStarboardManeuveringThrusters()
         {
             _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
                 : _currentTurnRate + ManeuveringThrust;
-            AreManeuveringThrustersFiring = true;
+            IsManeuvering = true;
+            _isStarboardThrustFiring = true;
         }
 
         public void ApplyPortManeuveringThrusters()
         {
             _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
                 : _currentTurnRate - ManeuveringThrust;
-            AreManeuveringThrustersFiring = true;
+            IsManeuvering = true;
+            _isPortThrustFiring = true;
         }
 
         public void FireWeapons()
@@ -234,6 +238,7 @@ namespace StellarOps.Ships
 
         private void RotateToRetro(float deltaTime, bool IsBraking)
         {
+            IsManeuvering = true;
             float movementHeading = Velocity.ToAngle();
             float retroHeading = movementHeading < 0 ? movementHeading + (float)Math.PI : movementHeading - (float)Math.PI;
             if (Heading != retroHeading  && !IsWithinBrakingRange())
@@ -258,11 +263,13 @@ namespace StellarOps.Ships
                     {
                         _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
                             : _currentTurnRate - ManeuveringThrust;
+                        _isPortThrustFiring = true;
                     }
                     else
                     {
                         _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
                             : _currentTurnRate + ManeuveringThrust;
+                        _isStarboardThrustFiring = true;
                     }
                 }
                 else
@@ -393,6 +400,12 @@ namespace StellarOps.Ships
             {
                 return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, Art.FlightConsole.Bounds);
             }
+            if ((tile.TileType == TileType.MainThrust && _isMainThrustFiring)
+                || (tile.TileType == TileType.PortThrust && _isPortThrustFiring)
+                || (tile.TileType == TileType.StarboardThrust && _isStarboardThrustFiring))
+            {
+                return new Tuple<Texture2D, Rectangle>(Art.MainThruster, Art.FlightConsole.Bounds);
+            }
             if (tile.TileType == TileType.Hull)
             {
                 bool north = tile.North == null ? false : TileMap[(int)tile.North].TileType == TileType.Hull;
@@ -456,7 +469,8 @@ namespace StellarOps.Ships
                 if ((projectiles[i].Position - WorldPosition).Length() <= Radius + projectiles[i].Radius)
                 {
                     Maybe<Tile> tile = GetTileByWorldPosition(projectiles[i].Position);
-                    if (tile.HasValue && tile.Value.TileType != TileType.Empty)
+                    if (tile.HasValue
+                        && (tile.Value.CollisionType == CollisionType.All || tile.Value.CollisionType == CollisionType.Projectile))
                     {
                         tile.Value.Health -= 25;
                         if (tile.Value.Health <= 0)
