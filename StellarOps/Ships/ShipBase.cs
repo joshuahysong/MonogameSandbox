@@ -140,8 +140,9 @@ namespace StellarOps.Ships
                         if (targetTile.Value.Health > 0)
                         {
                             targetTile.Value.Health = targetTile.Value.Health - 25 < 0 ? 0 : targetTile.Value.Health - 25;
-                            if (targetTile.Value.Health == 0)
+                            if (targetTile.Value.Health <= 0)
                             {
+                                targetTile.Value.Health = 0;
                                 targetTile.Value.TileType = TileType.Empty;
                                 targetTile.Value.CollisionType = CollisionType.None;
                             }
@@ -153,45 +154,11 @@ namespace StellarOps.Ships
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            // Calculate global transform
             Matrix globalTransform = LocalTransform * parentTransform;
-
-            // Get values from GlobalTransform for SpriteBatch and render sprite
-            DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-
-            // Tiles
-
-            var test = Matrix.CreateTranslation(0, 0, 0f) *
-            Matrix.CreateScale(1f, 1f, 1f) *
-            Matrix.CreateRotationZ(Heading) *
-            Matrix.CreateTranslation(Position.X, Position.Y, 0f);
-
-            //Vector2 origin = Center;
-            //TileMap.Where(t => t.TileType != TileType.Empty).ToList().ForEach(tile =>
-            //{
-            //    //Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
-            //    //origin = Center - offset;
-            //    //Tuple<Texture2D, Rectangle, float> tileArtData = GetTileImage(tile);
-            //    //spriteBatch.Draw(tileArtData.Item1, Position, tileArtData.Item2, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-            //    //if (tile.CollisionType == CollisionType.All || tile.CollisionType == CollisionType.Projectile)
-            //    //{
-            //    //    if (tile.Health < 100 && tile.Health >= 75)
-            //    //    {
-            //    //        spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-            //    //    }
-            //    //    if (tile.Health < 75 && tile.Health >= 50)
-            //    //    {
-            //    //        spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-            //    //    }
-            //    //    if (tile.Health < 50)
-            //    //    {
-            //    //        spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-            //    //    }
-            //    //}
-            //});
 
             Tiles.ForEach(t => t.Draw(spriteBatch, globalTransform));
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
+
             IsManeuvering = false;
             IsMainThrustFiring = false;
             IsPortThrustFiring = false;
@@ -408,6 +375,7 @@ namespace StellarOps.Ships
                         {
                             tile.Value.Health = 0;
                             tile.Value.TileType = TileType.Empty;
+                            tile.Value.CollisionType = CollisionType.None;
                         }
                         projectiles[i].IsExpired = true;
                     }

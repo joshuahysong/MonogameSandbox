@@ -26,9 +26,7 @@ namespace StellarOps
         public Vector2 DrawCenter = new Vector2(Art.TileSize / 2, Art.TileSize / 2);
         public Vector2 TileCenter = new Vector2(MainGame.TileSize / 2, MainGame.TileSize / 2);
 
-        public override void Update(GameTime gameTime, Matrix parentTransform)
-        {
-        }
+        public override void Update(GameTime gameTime, Matrix parentTransform) { }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
@@ -39,6 +37,21 @@ namespace StellarOps
                 Matrix globalTransform = LocalTransform * parentTransform;
                 DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
                 spriteBatch.Draw(Image, position, tileArtData.Item2, Color.White, rotation - tileArtData.Item3, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                if (CollisionType != CollisionType.None)
+                {
+                    if (Health < 100 && Health >= 75)
+                    {
+                        spriteBatch.Draw(Art.Damage25, position, null, Color.White, rotation - tileArtData.Item3, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
+                    if (Health < 75 && Health >= 50)
+                    {
+                        spriteBatch.Draw(Art.Damage50, position, null, Color.White, rotation - tileArtData.Item3, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
+                    if (Health < 50)
+                    {
+                        spriteBatch.Draw(Art.Damage75, position, null, Color.White, rotation - tileArtData.Item3, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
+                }
             }
         }
 
@@ -95,7 +108,6 @@ namespace StellarOps
                 if (north && !east && south && !west)
                 {
                     return new Tuple<Texture2D, Rectangle, float>(Art.Hull, new Rectangle(0 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize), (float)Math.PI / 2);
-                    //return new Tuple<Texture2D, Rectangle, float>(Art.Hull, new Rectangle(1 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize) 0);
                 }
                 if (!north && east && !south && west)
                 {
@@ -118,7 +130,7 @@ namespace StellarOps
                     return new Tuple<Texture2D, Rectangle, float>(Art.Hull, new Rectangle(3 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize), 0);
                 }
             }
-            return null;// new Tuple<Texture2D, Rectangle, float>(Art.Floor, new Rectangle(0, 0, 0, 0), 0);
+            return null;
         }
     }
 }
