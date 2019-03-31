@@ -24,6 +24,7 @@ namespace StellarOps
         public static Texture2D Damage50 { get; set; }
         public static Texture2D Damage75 { get; set; }
         public static Texture2D Hull { get; set; }
+        public static Texture2D HullTest { get; set; }
         public static Texture2D Floor { get; set; }
         public static Texture2D FlightConsole { get; set; }
         public static Texture2D Engine { get; set; }
@@ -47,6 +48,7 @@ namespace StellarOps
             Damage50 = content.Load<Texture2D>("Tiles/DamageOverlay50");
             Damage75 = content.Load<Texture2D>("Tiles/DamageOverlay75");
             Hull = content.Load<Texture2D>("Tiles/Hull");
+            HullTest = content.Load<Texture2D>("Tiles/HullTest");
             Floor = content.Load<Texture2D>("Tiles/Floor");
             FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
             Engine = CreateRectangle(TileSize, TileSize, Color.SaddleBrown, Color.Brown);

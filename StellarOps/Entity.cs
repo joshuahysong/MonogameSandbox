@@ -5,7 +5,7 @@ namespace StellarOps
 {
     public abstract class Entity
     {
-        public Vector2 Position { get; protected set; }
+        public Vector2 Position { get; set; }
         public bool IsExpired { get; set; }
         public float Heading { get; set; }
 

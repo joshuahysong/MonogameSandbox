@@ -9,13 +9,13 @@ namespace StellarOps.Ships
         {
             Position = spawnPosition;
             Heading = spawnHeading;
-            Size = new Vector2(17 * MainGame.TileSize, 10 * MainGame.TileSize);
+            Size = new Vector2(17 * MainGame.TileSize, 12 * MainGame.TileSize);
             Thrust = 250f;
             MaxTurnRate = 0.65f;
             ManeuveringThrust = 0.01f;
             MaxVelocity = 500f;
-            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 1 * MainGame.TileSize) - Center));
-            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 8 * MainGame.TileSize) - Center));
+            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 2 * MainGame.TileSize) - Center));
+            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 9 * MainGame.TileSize) - Center));
             TileMapArtData = new int[,]
             {
                 {0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -35,14 +35,14 @@ namespace StellarOps.Ships
             {
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0},
-                {0,1,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0},
-                {1,1,0,0,0,0,1,0,0,0,0,1,1,1,1,1,1},
-                {1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,0,0,0,0,1,0,0,0,0,1,1,1,1,1,1},
-                {0,1,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0},
+                {0,1,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0},
+                {0,1,1,1,1,1,1,3,3,1,1,1,0,0,0,0,0},
+                {1,1,3,3,3,3,1,3,3,3,3,1,1,1,1,1,1},
+                {1,3,3,3,1,3,3,3,3,3,3,3,3,3,3,3,1},
+                {1,3,3,3,1,3,3,3,3,3,3,3,3,3,3,3,1},
+                {1,1,3,3,3,3,1,3,3,3,3,1,1,1,1,1,1},
+                {0,1,1,1,1,1,1,3,3,1,1,1,0,0,0,0,0},
+                {0,1,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0},
                 {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
             };
@@ -61,7 +61,7 @@ namespace StellarOps.Ships
                 {0,100,100,100,100,100,100,100,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
             };
-            TileMap = GetTileMap();
+            Tiles = GetTiles();
         }
 
         public override void UseTile(Vector2 position)
