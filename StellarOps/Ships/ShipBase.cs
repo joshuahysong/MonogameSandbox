@@ -13,11 +13,14 @@ namespace StellarOps.Ships
     public abstract class ShipBase : Entity, IContainer, IFocusable
     {
         public Vector2 WorldPosition { get; set; }
-        public List<Tile> TileMap { get; set; }
         public Vector2 Size { get; set; }
         public Vector2 Center => Size == null ? Vector2.Zero : new Vector2(Size.X / 2, Size.Y / 2);
+        public List<Tile> Tiles { get; set; }
         public List<IPawn> Pawns { get; set; }
         public bool IsManeuvering { get; set; }
+        public bool IsMainThrustFiring { get; set; }
+        public bool IsPortThrustFiring { get; set; }
+        public bool IsStarboardThrustFiring { get; set; }
 
         protected int[,] TileMapArtData;
         protected int[,] TileMapCollisionData;
@@ -30,9 +33,6 @@ namespace StellarOps.Ships
 
         private Vector2 _acceleration;
         private float _currentTurnRate;
-        private bool _isMainThrustFiring;
-        private bool _isPortThrustFiring;
-        private bool _isStarboardThrustFiring;
 
         public ShipBase()
         {
@@ -88,6 +88,7 @@ namespace StellarOps.Ships
                 MainGame.Instance.ShipDebugEntries["World Tile"] = $"{Math.Floor(Position.X / MainGame.WorldTileSize)}, {Math.Floor(Position.Y / MainGame.WorldTileSize)}";
                 MainGame.Instance.ShipDebugEntries["Current Turn Rate"] = $"{Math.Round(_currentTurnRate, 2)}";
             }
+            Console.WriteLine(Size);
         }
 
         public void HandleInput(float deltaTime)
@@ -159,42 +160,49 @@ namespace StellarOps.Ships
             DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
 
             // Tiles
-            Vector2 origin = Center;
-            TileMap.Where(t => t.TileType != TileType.Empty).ToList().ForEach(tile =>
-            {
-                Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
-                origin = Center - offset;
-                Tuple<Texture2D, Rectangle> tileArtData = GetTileImage(tile);
-                spriteBatch.Draw(tileArtData.Item1, Position, tileArtData.Item2, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                if (tile.CollisionType == CollisionType.All || tile.CollisionType == CollisionType.Projectile)
-                {
-                    if (tile.Health < 100 && tile.Health >= 75)
-                    {
-                        spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                    }
-                    if (tile.Health < 75 && tile.Health >= 50)
-                    {
-                        spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                    }
-                    if (tile.Health < 50)
-                    {
-                        spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-                    }
-                }
-            });
 
+            var test = Matrix.CreateTranslation(0, 0, 0f) *
+            Matrix.CreateScale(1f, 1f, 1f) *
+            Matrix.CreateRotationZ(Heading) *
+            Matrix.CreateTranslation(Position.X, Position.Y, 0f);
+
+            //Vector2 origin = Center;
+            //TileMap.Where(t => t.TileType != TileType.Empty).ToList().ForEach(tile =>
+            //{
+            //    //Vector2 offset = new Vector2(tile.Location.X * MainGame.TileSize, tile.Location.Y * MainGame.TileSize);
+            //    //origin = Center - offset;
+            //    //Tuple<Texture2D, Rectangle, float> tileArtData = GetTileImage(tile);
+            //    //spriteBatch.Draw(tileArtData.Item1, Position, tileArtData.Item2, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+            //    //if (tile.CollisionType == CollisionType.All || tile.CollisionType == CollisionType.Projectile)
+            //    //{
+            //    //    if (tile.Health < 100 && tile.Health >= 75)
+            //    //    {
+            //    //        spriteBatch.Draw(Art.Damage25, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+            //    //    }
+            //    //    if (tile.Health < 75 && tile.Health >= 50)
+            //    //    {
+            //    //        spriteBatch.Draw(Art.Damage50, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+            //    //    }
+            //    //    if (tile.Health < 50)
+            //    //    {
+            //    //        spriteBatch.Draw(Art.Damage75, Position, null, Color.White, Heading, origin / MainGame.TileScale, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+            //    //    }
+            //    //}
+            //});
+
+            Tiles.ForEach(t => t.Draw(spriteBatch, globalTransform));
             Pawns.ForEach(p => p.Draw(spriteBatch, globalTransform));
             IsManeuvering = false;
-            _isMainThrustFiring = false;
-            _isPortThrustFiring = false;
-            _isStarboardThrustFiring = false;
+            IsMainThrustFiring = false;
+            IsPortThrustFiring = false;
+            IsStarboardThrustFiring = false;
         }
 
         public void ApplyForwardThrust()
         {
             _acceleration.X += Thrust * (float)Math.Cos(Heading);
             _acceleration.Y += Thrust * (float)Math.Sin(Heading);
-            _isMainThrustFiring = true;
+            IsMainThrustFiring = true;
         }
 
         public void ApplyStarboardManeuveringThrusters()
@@ -202,7 +210,7 @@ namespace StellarOps.Ships
             _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
                 : _currentTurnRate + ManeuveringThrust;
             IsManeuvering = true;
-            _isStarboardThrustFiring = true;
+            IsStarboardThrustFiring = true;
         }
 
         public void ApplyPortManeuveringThrusters()
@@ -210,7 +218,7 @@ namespace StellarOps.Ships
             _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
                 : _currentTurnRate - ManeuveringThrust;
             IsManeuvering = true;
-            _isPortThrustFiring = true;
+            IsPortThrustFiring = true;
         }
 
         public void FireWeapons()
@@ -263,13 +271,13 @@ namespace StellarOps.Ships
                     {
                         _currentTurnRate = _currentTurnRate - ManeuveringThrust < -MaxTurnRate ? -MaxTurnRate
                             : _currentTurnRate - ManeuveringThrust;
-                        _isPortThrustFiring = true;
+                        IsPortThrustFiring = true;
                     }
                     else
                     {
                         _currentTurnRate = _currentTurnRate + ManeuveringThrust > MaxTurnRate ? MaxTurnRate
                             : _currentTurnRate + ManeuveringThrust;
-                        _isStarboardThrustFiring = true;
+                        IsStarboardThrustFiring = true;
                     }
                 }
                 else
@@ -314,15 +322,15 @@ namespace StellarOps.Ships
         public Maybe<Tile> GetTileByRelativePosition(Vector2 position)
         {
             Vector2 relativePosition = position + Center;
-            return TileMap.Any(t => t.Bounds.Contains(position))
-                ? Maybe<Tile>.Some(TileMap.First(t => t.Bounds.Contains(position)))
+            return Tiles.Any(t => t.Bounds.Contains(position))
+                ? Maybe<Tile>.Some(Tiles.First(t => t.Bounds.Contains(position)))
                 : Maybe<Tile>.None;
         }
 
         public Maybe<Tile> GetTileByPoint(Point location)
         {
-            return TileMap.Any(t => t.Location == location)
-                ? Maybe<Tile>.Some(TileMap.First(t => t.Location == location))
+            return Tiles.Any(t => t.Location == location)
+                ? Maybe<Tile>.Some(Tiles.First(t => t.Location == location))
                 : Maybe<Tile>.None;
         }
 
@@ -335,7 +343,7 @@ namespace StellarOps.Ships
             }
         }
 
-        protected List<Tile> GetTileMap()
+        protected List<Tile> GetTiles()
         {
             List<Tile> tileMap = new List<Tile>();
             int? rows = TileMapArtData.GetLength(0);
@@ -346,6 +354,7 @@ namespace StellarOps.Ships
                 {
                     Tile tile = new Tile
                     {
+                        Container = this,
                         Location = new Point(x, y),
                         CollisionType = (CollisionType)TileMapCollisionData[y, x],
                         TileType = (TileType)TileMapArtData[y, x],
@@ -359,6 +368,7 @@ namespace StellarOps.Ships
                         West = x == 0 ? null : (int?)tileMap.Count() - 1,
                         NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
                     };
+                    tile.Position = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize) - Center + tile.TileCenter;
                     Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
                     relativePosition -= Center;
                     tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
@@ -368,7 +378,6 @@ namespace StellarOps.Ships
 
             return tileMap;
         }
-
 
         private void SlowDownManueveringThrust()
         {
@@ -380,84 +389,6 @@ namespace StellarOps.Ships
             {
                 _currentTurnRate = _currentTurnRate - ManeuveringThrust < 0 ? 0 : _currentTurnRate - ManeuveringThrust;
             }
-        }
-
-        private Tuple<Texture2D, Rectangle> GetTileImage(Tile tile)
-        {
-            if (tile.TileType == TileType.Weapon)
-            {
-                return new Tuple<Texture2D, Rectangle>(Art.Weapon, Art.Weapon.Bounds);
-            }
-            if (tile.TileType == TileType.Engine)
-            {
-                return new Tuple<Texture2D, Rectangle>(Art.Engine, Art.Engine.Bounds);
-            }
-            if (tile.TileType == TileType.Floor)
-            {
-                return new Tuple<Texture2D, Rectangle>(Art.Floor, Art.Floor.Bounds);
-            }
-            if (tile.TileType == TileType.FlightConsole)
-            {
-                return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, Art.FlightConsole.Bounds);
-            }
-            if ((tile.TileType == TileType.MainThrust && _isMainThrustFiring)
-                || (tile.TileType == TileType.PortThrust && _isPortThrustFiring)
-                || (tile.TileType == TileType.StarboardThrust && _isStarboardThrustFiring))
-            {
-                return new Tuple<Texture2D, Rectangle>(Art.MainThruster, Art.FlightConsole.Bounds);
-            }
-            if (tile.TileType == TileType.Hull)
-            {
-                bool north = tile.North == null ? false : TileMap[(int)tile.North].TileType == TileType.Hull;
-                bool east = tile.East == null ? false : TileMap[(int)tile.East].TileType == TileType.Hull;
-                bool south = tile.South == null ? false : TileMap[(int)tile.South].TileType == TileType.Hull;
-                bool west = tile.West == null ? false : TileMap[(int)tile.West].TileType == TileType.Hull;
-                //if (north && east && south && west)
-                //{
-                //    return Art.HullFull;
-                //}
-                if (north && east && !south && !west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(3 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (!north && east && south && !west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(2 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (!north && !east && south && west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 2 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (north && !east && !south && west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 2 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (north && !east && south && !west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (!north && east && !south && west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (north && !east && !south && !west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(0 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (!north && east && !south && !west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(2 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (!north && !east && south && !west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(1 * Art.TileSize, 1 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-                if (!north && !east && !south && west)
-                {
-                    return new Tuple<Texture2D, Rectangle>(Art.Hull, new Rectangle(3 * Art.TileSize, 0 * Art.TileSize, Art.TileSize, Art.TileSize));
-                }
-            }
-            return new Tuple<Texture2D, Rectangle>(Art.FlightConsole, new Rectangle(0, 0, 0, 0));
         }
 
         private void DetectCollisions()

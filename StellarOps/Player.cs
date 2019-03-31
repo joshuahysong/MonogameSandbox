@@ -25,7 +25,7 @@ namespace StellarOps
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
             Health = 100;
-            Position = new Vector2(224, 16);
+            Position = new Vector2(224, -16);
             _currentSpeed = MaxSpeed;
         }
 
