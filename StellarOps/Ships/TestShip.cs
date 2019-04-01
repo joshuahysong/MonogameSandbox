@@ -61,7 +61,7 @@ namespace StellarOps.Ships
                 {0,100,100,100,100,100,100,100,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
             };
-            Tiles = GetTiles();
+            SetTiles();
         }
 
         public override void UseTile(Vector2 position)

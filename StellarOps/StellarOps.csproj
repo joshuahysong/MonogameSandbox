@@ -64,6 +64,7 @@
     <Compile Include="Ships\ShipBase.cs" />
     <Compile Include="Ships\TestShip.cs" />
     <Compile Include="Tile.cs" />
+    <Compile Include="TileHelper.cs" />
     <Compile Include="Weapons\TestWeapon.cs" />
     <Compile Include="Weapons\WeaponBase.cs" />
   </ItemGroup>

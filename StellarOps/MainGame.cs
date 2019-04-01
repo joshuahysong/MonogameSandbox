@@ -66,7 +66,7 @@ namespace StellarOps
             EntityManager.Add(Ship);
 
             Enemy = new Enemy(new TestShip(new Vector2(2000, 0), -(float)Math.PI / 2));
-            EntityManager.Add(Enemy);
+            //EntityManager.Add(Enemy);
         }
 
         protected override void LoadContent()

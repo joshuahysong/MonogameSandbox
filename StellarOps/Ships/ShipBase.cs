@@ -143,7 +143,6 @@ namespace StellarOps.Ships
                             if (targetTile.Value.Health <= 0)
                             {
                                 targetTile.Value.Health = 0;
-                                targetTile.Value.TileType = TileType.Empty;
                                 targetTile.Value.CollisionType = CollisionType.None;
                             }
                         }
@@ -310,9 +309,9 @@ namespace StellarOps.Ships
             }
         }
 
-        protected List<Tile> GetTiles()
+        protected void SetTiles()
         {
-            List<Tile> tileMap = new List<Tile>();
+            Tiles = new List<Tile>();
             int? rows = TileMapArtData.GetLength(0);
             int? columns = TileMapArtData.GetLength(1);
             for (int y = 0; y < rows; y++)
@@ -328,22 +327,31 @@ namespace StellarOps.Ships
                         Health = TileMapHealthData[y, x],
                         North = y == 0 ? null : columns * y - columns + x,
                         NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
-                        East = x == columns - 1 ? null : (int?)tileMap.Count() + 1,
+                        East = x == columns - 1 ? null : (int?)Tiles.Count() + 1,
                         SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
                         South = y == rows - 1 ? null : columns * y + columns + x,
                         SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
-                        West = x == 0 ? null : (int?)tileMap.Count() - 1,
+                        West = x == 0 ? null : (int?)Tiles.Count() - 1,
                         NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
                     };
                     tile.Position = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize) - Center + tile.TileCenter;
                     Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
                     relativePosition -= Center;
                     tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
-                    tileMap.Add(tile);
+                    Tiles.Add(tile);
                 }
             }
 
-            return tileMap;
+            Tiles.ForEach(tile =>
+            {
+                Tuple<Texture2D, Rectangle, float> tileData = TileHelper.GetTileData(tile, this);
+                if (tileData != null)
+                {
+                    tile.Image = tileData.Item1;
+                    tile.ImageSource = tileData.Item2;
+                    tile.Heading = tileData.Item3;
+                }
+            });
         }
 
         private void SlowDownManueveringThrust()
