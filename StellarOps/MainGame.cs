@@ -58,15 +58,14 @@ namespace StellarOps
             SystemDebugEntries = new Dictionary<string, string>();
 
             base.Initialize();
-            Player = new Player();
             Ship = new TestShip(Vector2.Zero, 0);
+            Player = new Player(Ship);
             Ship.Pawns.Add(Player);
-            Player.Container = Ship;
             Camera.Focus = Ship;
             EntityManager.Add(Ship);
 
             Enemy = new Enemy(new TestShip(new Vector2(2000, 0), -(float)Math.PI / 2));
-            //EntityManager.Add(Enemy);
+            EntityManager.Add(Enemy);
         }
 
         protected override void LoadContent()

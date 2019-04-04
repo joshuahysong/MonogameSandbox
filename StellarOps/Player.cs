@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StellarOps.Contracts;
 using System;
+using System.Linq;
 
 namespace StellarOps
 {
@@ -20,12 +21,13 @@ namespace StellarOps
 
         private float _currentSpeed;
 
-        public Player()
+        public Player(IContainer container)
         {
+            Container = container;
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
             Health = 100;
-            Position = new Vector2(224, -16);
+            Position = Container.Tiles.FirstOrDefault(t => t.TileType == TileType.FlightControl).Position;//new Vector2(224, -16);
             _currentSpeed = MaxSpeed;
         }
 

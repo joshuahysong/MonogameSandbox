@@ -139,6 +139,8 @@ namespace StellarOps.Ships
                             targetTile.Value.Health = targetTile.Value.Health - 25 < 0 ? 0 : targetTile.Value.Health - 25;
                             if (targetTile.Value.Health <= 0)
                             {
+                                targetTile.Value.Image = null;
+                                targetTile.Value.TileType = TileType.Empty;
                                 targetTile.Value.Health = 0;
                                 targetTile.Value.CollisionType = CollisionType.None;
                             }
@@ -258,6 +260,7 @@ namespace StellarOps.Ships
                 {
                     _acceleration.X += Thrust * (float)Math.Cos(Heading);
                     _acceleration.Y += Thrust * (float)Math.Sin(Heading);
+                    IsMainThrustFiring = true;
                 }
             }
         }
@@ -333,6 +336,7 @@ namespace StellarOps.Ships
                         tile.Value.Health -= 25;
                         if (tile.Value.Health <= 0)
                         {
+                            tile.Value.Image = null;
                             tile.Value.Health = 0;
                             tile.Value.TileType = TileType.Empty;
                             tile.Value.CollisionType = CollisionType.None;
