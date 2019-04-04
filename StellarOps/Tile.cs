@@ -28,15 +28,6 @@ namespace StellarOps
         public Vector2 DrawCenter = new Vector2(Art.TileSize / 2, Art.TileSize / 2);
         public Vector2 TileCenter = new Vector2(MainGame.TileSize / 2, MainGame.TileSize / 2);
 
-        private readonly List<TileType> EmptyTileTypes = new List<TileType>
-        {
-            TileType.Empty,
-            TileType.MainThrust,
-            TileType.PortThrust,
-            TileType.StarboardThrust,
-            TileType.Weapon
-        };
-
         public override void Update(GameTime gameTime, Matrix parentTransform) { }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)

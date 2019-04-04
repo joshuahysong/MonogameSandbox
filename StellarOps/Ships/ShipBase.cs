@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Tiled;
 using StellarOps.Contracts;
 using StellarOps.Projectiles;
 using StellarOps.Weapons;
@@ -22,9 +23,6 @@ namespace StellarOps.Ships
         public bool IsPortThrustFiring { get; set; }
         public bool IsStarboardThrustFiring { get; set; }
 
-        protected int[,] TileMapArtData;
-        protected int[,] TileMapCollisionData;
-        protected int[,] TileMapHealthData;
         protected float Thrust;
         protected float ManeuveringThrust;
         protected float MaxTurnRate;
@@ -88,7 +86,6 @@ namespace StellarOps.Ships
                 MainGame.Instance.ShipDebugEntries["World Tile"] = $"{Math.Floor(Position.X / MainGame.WorldTileSize)}, {Math.Floor(Position.Y / MainGame.WorldTileSize)}";
                 MainGame.Instance.ShipDebugEntries["Current Turn Rate"] = $"{Math.Round(_currentTurnRate, 2)}";
             }
-            Console.WriteLine(Size);
         }
 
         public void HandleInput(float deltaTime)
@@ -309,51 +306,6 @@ namespace StellarOps.Ships
             }
         }
 
-        protected void SetTiles()
-        {
-            Tiles = new List<Tile>();
-            int? rows = TileMapArtData.GetLength(0);
-            int? columns = TileMapArtData.GetLength(1);
-            for (int y = 0; y < rows; y++)
-            {
-                for (int x = 0; x < columns; x++)
-                {
-                    Tile tile = new Tile
-                    {
-                        Container = this,
-                        Location = new Point(x, y),
-                        CollisionType = (CollisionType)TileMapCollisionData[y, x],
-                        TileType = (TileType)TileMapArtData[y, x],
-                        Health = TileMapHealthData[y, x],
-                        North = y == 0 ? null : columns * y - columns + x,
-                        NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
-                        East = x == columns - 1 ? null : (int?)Tiles.Count() + 1,
-                        SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
-                        South = y == rows - 1 ? null : columns * y + columns + x,
-                        SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
-                        West = x == 0 ? null : (int?)Tiles.Count() - 1,
-                        NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
-                    };
-                    tile.Position = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize) - Center + tile.TileCenter;
-                    Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
-                    relativePosition -= Center;
-                    tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
-                    Tiles.Add(tile);
-                }
-            }
-
-            Tiles.ForEach(tile =>
-            {
-                Tuple<Texture2D, Rectangle, float> tileData = TileHelper.GetTileData(tile, this);
-                if (tileData != null)
-                {
-                    tile.Image = tileData.Item1;
-                    tile.ImageSource = tileData.Item2;
-                    tile.Heading = tileData.Item3;
-                }
-            });
-        }
-
         private void SlowDownManueveringThrust()
         {
             if (_currentTurnRate < 0)
@@ -387,6 +339,72 @@ namespace StellarOps.Ships
                         }
                         projectiles[i].IsExpired = true;
                     }
+                }
+            }
+        }
+
+        protected void SetTilesFromTiledMap(TiledMap tiledMap)
+        {
+            Tiles = new List<Tile>();
+            List<TiledMapTile> tiledMapTiles = tiledMap.TileLayers.FirstOrDefault().Tiles.ToList();
+            TiledMapTileset tiledMapTileset = tiledMap.Tilesets.FirstOrDefault();
+            List<TiledMapTilesetTile> tiledMapTilesetTiles = tiledMapTileset.Tiles.ToList();
+            var test = tiledMapTiles.Where(t => t.GlobalIdentifier != 0).ToList();
+            int textureColumns = tiledMapTileset.Columns;
+            Texture2D tilesetTexture = tiledMap.Tilesets.FirstOrDefault().Texture;
+            int? rows = tiledMap.TileLayers.FirstOrDefault().Height;
+            int? columns = tiledMap.TileLayers.FirstOrDefault().Width;
+            int i = 0;
+            for (int y = 0; y < rows; y++)
+            {
+                for (int x = 0; x < columns; x++)
+                {
+                    TiledMapTile tiledMapTile = tiledMapTiles[i];
+                    Tile tile = new Tile
+                    {
+                        Container = this,
+                        Location = new Point(x, y),
+                        CollisionType = CollisionType.None,
+                        TileType = (TileType)tiledMapTile.GlobalIdentifier,
+                        Health = 0,
+                        North = y == 0 ? null : columns * y - columns + x,
+                        NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
+                        East = x == columns - 1 ? null : (int?)Tiles.Count() + 1,
+                        SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
+                        South = y == rows - 1 ? null : columns * y + columns + x,
+                        SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
+                        West = x == 0 ? null : (int?)Tiles.Count() - 1,
+                        NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
+                    };
+                    tile.Position = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize) - Center + tile.TileCenter;
+                    Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
+                    relativePosition -= Center;
+                    tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
+
+                    // Set Image Data
+                    if (tiledMapTile.GlobalIdentifier > 0)
+                    {
+                        tile.Image = tilesetTexture;
+                        tile.ImageSource = new Rectangle(
+                            ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
+                            ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
+                            Art.TileSize, Art.TileSize);
+                        tile.Heading = tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedHorizontally ? (float)Math.PI / 2
+                           : tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedVertically ? -(float)Math.PI / 2
+                           : tiledMapTile.IsFlippedVertically ? (float)Math.PI : 0;
+                    }
+
+                    // Set Tileset Data
+                    TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.LocalTileIdentifier + 1 == tiledMapTile.GlobalIdentifier);
+                    if (tiledMapTilesetTile != null)
+                    {
+                        tile.CollisionType = tiledMapTilesetTile.Properties.ContainsKey("Collision") ?
+                            (CollisionType)int.Parse(tiledMapTilesetTile.Properties["Collision"]) : CollisionType.None;
+                        tile.Health = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
+                    }
+
+                    Tiles.Add(tile);
+                    i++;
                 }
             }
         }
