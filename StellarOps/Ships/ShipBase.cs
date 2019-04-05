@@ -75,6 +75,7 @@ namespace StellarOps.Ships
                 }
             }
 
+            Tiles.ForEach(t => t.Update(gameTime, LocalTransform));
             Pawns.ForEach(p => p.Update(gameTime, LocalTransform));
 
             if (MainGame.IsDebugging && MainGame.Ship == this)
@@ -137,13 +138,7 @@ namespace StellarOps.Ships
                         if (targetTile.Value.Health > 0)
                         {
                             targetTile.Value.Health = targetTile.Value.Health - 25 < 0 ? 0 : targetTile.Value.Health - 25;
-                            if (targetTile.Value.Health <= 0)
-                            {
-                                targetTile.Value.Image = null;
-                                targetTile.Value.TileType = TileType.Empty;
-                                targetTile.Value.Health = 0;
-                                targetTile.Value.CollisionType = CollisionType.None;
-                            }
+                            CheckTileDesruction(targetTile.Value);
                         }
                     }
                 }
@@ -334,13 +329,7 @@ namespace StellarOps.Ships
                         && (tile.Value.CollisionType == CollisionType.All || tile.Value.CollisionType == CollisionType.Projectile))
                     {
                         tile.Value.Health -= 25;
-                        if (tile.Value.Health <= 0)
-                        {
-                            tile.Value.Image = null;
-                            tile.Value.Health = 0;
-                            tile.Value.TileType = TileType.Empty;
-                            tile.Value.CollisionType = CollisionType.None;
-                        }
+                        CheckTileDesruction(tile.Value);
                         projectiles[i].IsExpired = true;
                     }
                 }
@@ -410,6 +399,15 @@ namespace StellarOps.Ships
                     Tiles.Add(tile);
                     i++;
                 }
+            }
+        }
+
+        private void CheckTileDesruction(Tile tile)
+        {
+            if (tile.Health <= 0)
+            {
+                tile.Health = 0;
+                tile.CollisionType = CollisionType.None;
             }
         }
     }

@@ -28,7 +28,18 @@ namespace StellarOps
         public Vector2 DrawCenter = new Vector2(Art.TileSize / 2, Art.TileSize / 2);
         public Vector2 TileCenter = new Vector2(MainGame.TileSize / 2, MainGame.TileSize / 2);
 
-        public override void Update(GameTime gameTime, Matrix parentTransform) { }
+        public override void Update(GameTime gameTime, Matrix parentTransform)
+        {
+            // Check if neighbors destroyed
+            if ((North == null || Container.Tiles[North.Value].Health <= 0)
+                && (East == null || Container.Tiles[East.Value].Health <= 0)
+                && (South == null || Container.Tiles[South.Value].Health <= 0)
+                && (West == null || Container.Tiles[West.Value].Health <= 0))
+            {
+                Image = null;
+                TileType = TileType.Empty;
+            }
+        }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
@@ -42,7 +53,7 @@ namespace StellarOps
 
                 spriteBatch.Draw(Image, position, ImageSource, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
 
-                if (CollisionType != CollisionType.None)
+                if (TileType != TileType.Empty)
                 {
                     if (Health < 100 && Health >= 75)
                     {
@@ -56,7 +67,7 @@ namespace StellarOps
                     {
                         spriteBatch.Draw(Art.Damage75, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }
-                }
+               }
             }
         }
     }
