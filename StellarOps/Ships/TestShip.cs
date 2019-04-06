@@ -14,60 +14,15 @@ namespace StellarOps.Ships
             MaxTurnRate = 0.65f;
             ManeuveringThrust = 0.01f;
             MaxVelocity = 500f;
-            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 2 * MainGame.TileSize) - Center));
-            Weapons.Add(new TestWeapon(new Vector2(13 * MainGame.TileSize, 9 * MainGame.TileSize) - Center));
-            TileMapArtData = new int[,]
-            {
-                {0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
-                {7,5,5,5,5,5,5,1,1,1,0,6,0,0,0,0,0},
-                {0,1,1,1,1,1,1,2,2,1,1,1,0,0,9,0,0},
-                {1,1,2,2,2,2,1,2,2,2,2,1,1,1,1,1,1},
-                {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,4,1},
-                {1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,1},
-                {1,1,2,2,2,2,1,2,2,2,2,1,1,1,1,1,1},
-                {0,1,1,1,1,1,1,2,2,1,1,1,0,0,8,0,0},
-                {7,5,5,5,5,5,5,1,1,1,0,6,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
-                {0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-            };
-            TileMapCollisionData = new int[,]
-            {
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0},
-                {0,1,1,1,1,1,1,3,3,1,1,1,0,0,0,0,0},
-                {1,1,3,3,3,3,1,3,3,3,3,1,1,1,1,1,1},
-                {1,3,3,3,1,3,3,3,3,3,3,3,3,3,3,3,1},
-                {1,3,3,3,1,3,3,3,3,3,3,3,3,3,3,3,1},
-                {1,1,3,3,3,3,1,3,3,3,3,1,1,1,1,1,1},
-                {0,1,1,1,1,1,1,3,3,1,1,1,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0},
-                {0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-            };
-            TileMapHealthData = new int[,]
-            {
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {0,100,100,100,100,100,100,100,0,0,0,0,0,0,0,0,0},
-                {0,100,100,100,100,100,100,100,100,100,0,100,100,0,0,0,0},
-                {0,100,100,100,100,100,100,100,100,100,100,100,0,0,0,0,0},
-                {100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
-                {100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
-                {100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
-                {100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
-                {0,100,100,100,100,100,100,100,100,100,100,100,0,0,0,0,0},
-                {0,100,100,100,100,100,100,100,100,100,0,100,100,0,0,0,0},
-                {0,100,100,100,100,100,100,100,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-            };
-            Tiles = GetTiles();
+            Weapons.Add(new TestWeapon(new Vector2(12 * MainGame.TileSize, 2 * MainGame.TileSize) - Center));
+            Weapons.Add(new TestWeapon(new Vector2(12 * MainGame.TileSize, 9 * MainGame.TileSize) - Center));
+            SetTilesFromTiledMap(Art.TestShip);
         }
 
         public override void UseTile(Vector2 position)
         {
             Maybe<Tile> tile = GetTileByRelativePosition(position);
-            if (tile.HasValue && tile.Value.TileType == TileType.FlightConsole)
+            if (tile.HasValue && tile.Value.TileType == TileType.FlightControl)
             {
                 SwitchControlToShip();
             }
@@ -76,7 +31,7 @@ namespace StellarOps.Ships
         public override string GetUsePrompt(Vector2 position)
         {
             Maybe<Tile> tile = GetTileByRelativePosition(position);
-            if (tile.HasValue && tile.Value.TileType == TileType.FlightConsole)
+            if (tile.HasValue && tile.Value.TileType == TileType.FlightControl)
             {
                 return "Use Flight Control";
             }

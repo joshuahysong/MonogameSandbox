@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Tiled;
 using System;
 
 namespace StellarOps
@@ -9,14 +10,11 @@ namespace StellarOps
     {
         public static int TileSize => 64;
 
+        public static TiledMap TestShip { get; set; }
+
         public static Texture2D Pixel { get; set; }
-        public static Texture2D TestShip { get; set; }
-        public static Texture2D TestShipInterior { get; set; }
         public static Texture2D Player { get; set; }
-        public static Texture2D Seeker { get; set; }
-        public static Texture2D Wanderer { get; set; }
         public static Texture2D Bullet { get; set; }
-        public static Texture2D Pointer { get; set; }
         public static Texture2D Background { get; set; }
 
         #region ShipTiles
@@ -24,7 +22,6 @@ namespace StellarOps
         public static Texture2D Damage50 { get; set; }
         public static Texture2D Damage75 { get; set; }
         public static Texture2D Hull { get; set; }
-        public static Texture2D HullTest { get; set; }
         public static Texture2D Floor { get; set; }
         public static Texture2D FlightConsole { get; set; }
         public static Texture2D Engine { get; set; }
@@ -47,13 +44,14 @@ namespace StellarOps
             Damage25 = content.Load<Texture2D>("Tiles/DamageOverlay25");
             Damage50 = content.Load<Texture2D>("Tiles/DamageOverlay50");
             Damage75 = content.Load<Texture2D>("Tiles/DamageOverlay75");
-            Hull = content.Load<Texture2D>("Tiles/Hull");
-            HullTest = content.Load<Texture2D>("Tiles/HullTest");
+            Hull = content.Load<Texture2D>("Tiles/Tiles");
             Floor = content.Load<Texture2D>("Tiles/Floor");
             FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
             Engine = CreateRectangle(TileSize, TileSize, Color.SaddleBrown, Color.Brown);
             Weapon = content.Load<Texture2D>("Tiles/Weapon");
             MainThruster = CreateRectangle(TileSize, TileSize, Color.LightCyan, Color.LightCyan);
+
+            TestShip = content.Load<TiledMap>("Tiles/TestShip");
 
             DebugFont = content.Load<SpriteFont>("Fonts/Debug");
             UIFont = content.Load<SpriteFont>("Fonts/UI");
