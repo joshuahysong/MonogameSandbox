@@ -135,9 +135,9 @@ namespace StellarOps.Ships
                     Maybe<Tile> targetTile = GetTileByWorldPosition(Input.WorldMousePosition);
                     if (targetTile.HasValue)
                     {
-                        if (targetTile.Value.Health > 0)
+                        if (targetTile.Value.CurrentHealth > 0)
                         {
-                            targetTile.Value.Health = targetTile.Value.Health - 25 < 0 ? 0 : targetTile.Value.Health - 25;
+                            targetTile.Value.CurrentHealth = targetTile.Value.CurrentHealth - 25;
                             CheckTileDesruction(targetTile.Value);
                         }
                     }
@@ -328,7 +328,7 @@ namespace StellarOps.Ships
                     if (tile.HasValue
                         && (tile.Value.CollisionType == CollisionType.All || tile.Value.CollisionType == CollisionType.Projectile))
                     {
-                        tile.Value.Health -= 25;
+                        tile.Value.CurrentHealth -= 25;
                         CheckTileDesruction(tile.Value);
                         projectiles[i].IsExpired = true;
                     }
@@ -359,7 +359,8 @@ namespace StellarOps.Ships
                         Location = new Point(x, y),
                         CollisionType = CollisionType.None,
                         TileType = (TileType)tiledMapTile.GlobalIdentifier,
-                        Health = 0,
+                        MaxHealth = 0,
+                        CurrentHealth = 0,
                         North = y == 0 ? null : columns * y - columns + x,
                         NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
                         East = x == columns - 1 ? null : (int?)Tiles.Count() + 1,
@@ -393,7 +394,8 @@ namespace StellarOps.Ships
                     {
                         tile.CollisionType = tiledMapTilesetTile.Properties.ContainsKey("Collision") ?
                             (CollisionType)int.Parse(tiledMapTilesetTile.Properties["Collision"]) : CollisionType.None;
-                        tile.Health = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
+                        tile.MaxHealth = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
+                        tile.CurrentHealth = tile.MaxHealth;
                     }
 
                     Tiles.Add(tile);
@@ -404,10 +406,10 @@ namespace StellarOps.Ships
 
         private void CheckTileDesruction(Tile tile)
         {
-            if (tile.Health <= 0)
+            if (tile.CurrentHealth <= 0)
             {
-                tile.Health = 0;
-                tile.CollisionType = CollisionType.None;
+                tile.CurrentHealth = 0;
+                tile.CollisionType = CollisionType.Pawn;
             }
         }
     }

@@ -15,7 +15,8 @@ namespace StellarOps
         public Rectangle Bounds { get; set; }
         public CollisionType CollisionType { get; set; }
         public TileType TileType { get; set; }
-        public int Health { get; set; }
+        public int MaxHealth { get; set; }
+        public int CurrentHealth { get; set; }
         public int? North { get; set; }
         public int? NorthEast { get; set; }
         public int? East { get; set; }
@@ -31,13 +32,15 @@ namespace StellarOps
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             // Check if neighbors destroyed
-            if ((North == null || Container.Tiles[North.Value].Health <= 0)
-                && (East == null || Container.Tiles[East.Value].Health <= 0)
-                && (South == null || Container.Tiles[South.Value].Health <= 0)
-                && (West == null || Container.Tiles[West.Value].Health <= 0))
+            if (TileType != TileType.Empty && CurrentHealth <= 0
+                && (North == null || Container.Tiles[North.Value].CurrentHealth <= 0)
+                && (East == null || Container.Tiles[East.Value].CurrentHealth <= 0)
+                && (South == null || Container.Tiles[South.Value].CurrentHealth <= 0)
+                && (West == null || Container.Tiles[West.Value].CurrentHealth <= 0))
             {
                 Image = null;
                 TileType = TileType.Empty;
+                CollisionType = CollisionType.None;
             }
         }
 
@@ -53,17 +56,18 @@ namespace StellarOps
 
                 spriteBatch.Draw(Image, position, ImageSource, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
 
-                if (TileType != TileType.Empty)
+                if (TileType != TileType.Empty && MaxHealth > 0)
                 {
-                    if (Health < 100 && Health >= 75)
+                    var healthPercentage = (double)CurrentHealth / MaxHealth * 100;
+                    if (healthPercentage < 100 && healthPercentage >= 75)
                     {
                         spriteBatch.Draw(Art.Damage25, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }
-                    if (Health < 75 && Health >= 50)
+                    if (healthPercentage < 75 && healthPercentage >= 50)
                     {
                         spriteBatch.Draw(Art.Damage50, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }
-                    if (Health < 50)
+                    if (healthPercentage < 50)
                     {
                         spriteBatch.Draw(Art.Damage75, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }

@@ -64,8 +64,11 @@ namespace StellarOps
             Camera.Focus = Ship;
             EntityManager.Add(Ship);
 
-            //Enemy = new Enemy(new TestShip(new Vector2(2000, 0), -(float)Math.PI / 2));
-            //EntityManager.Add(Enemy);
+            //for (var i = 2; i < 30; i++)
+            //{
+            //    Enemy = new Enemy(new TestShip(new Vector2(i * 500, 0), -(float)Math.PI / 2));
+            //    EntityManager.Add(Enemy);
+            //}
         }
 
         protected override void LoadContent()
@@ -133,9 +136,9 @@ namespace StellarOps
                 Maybe<Tile> hoveredTile = Ship.GetTileByWorldPosition(Input.WorldMousePosition);
                 if (hoveredTile.HasValue)
                 {
-                    if (hoveredTile.Value.Health > 0)
+                    if (hoveredTile.Value.MaxHealth > 0)
                     {
-                        text = $"Damage: {(hoveredTile.Value.Health - 100) * -1}";
+                        text = $"Health: {Math.Round((double)hoveredTile.Value.CurrentHealth / hoveredTile.Value.MaxHealth * 100)}%";
                         textSize = Art.UIFont.MeasureString(text);
                         textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
                         spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
