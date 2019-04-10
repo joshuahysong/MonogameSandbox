@@ -342,7 +342,6 @@ namespace StellarOps.Ships
             List<TiledMapTile> tiledMapTiles = tiledMap.TileLayers.FirstOrDefault().Tiles.ToList();
             TiledMapTileset tiledMapTileset = tiledMap.Tilesets.FirstOrDefault();
             List<TiledMapTilesetTile> tiledMapTilesetTiles = tiledMapTileset.Tiles.ToList();
-            var test = tiledMapTiles.Where(t => t.GlobalIdentifier != 0).ToList();
             int textureColumns = tiledMapTileset.Columns;
             Texture2D tilesetTexture = tiledMap.Tilesets.FirstOrDefault().Texture;
             int? rows = tiledMap.TileLayers.FirstOrDefault().Height;
@@ -378,7 +377,6 @@ namespace StellarOps.Ships
                     // Set Image Data
                     if (tiledMapTile.GlobalIdentifier > 0)
                     {
-                        tile.Image = tilesetTexture;
                         tile.ImageSource = new Rectangle(
                             ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
                             ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,

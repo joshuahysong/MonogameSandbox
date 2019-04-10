@@ -9,7 +9,6 @@ namespace StellarOps
     public class Tile : Entity
     {
         public IContainer Container { get; set; }
-        public Texture2D Image { get; set; }
         public Rectangle ImageSource { get; set; }
         public Point Location { get; set; }
         public Rectangle Bounds { get; set; }
@@ -38,40 +37,44 @@ namespace StellarOps
                 && (South == null || Container.Tiles[South.Value].CurrentHealth <= 0)
                 && (West == null || Container.Tiles[West.Value].CurrentHealth <= 0))
             {
-                Image = null;
-                TileType = TileType.Empty;
+                //Image = null;
+                //TileType = TileType.Empty;
                 CollisionType = CollisionType.None;
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
         {
-            if (Image != null 
-                && !((TileType == TileType.MainThrust && !Container.IsMainThrustFiring)
+            if (!((TileType == TileType.MainThrust && !Container.IsMainThrustFiring)
                 || (TileType == TileType.PortThrust && !Container.IsPortThrustFiring)
                 || (TileType == TileType.StarboardThrust && !Container.IsStarboardThrustFiring)))
             {
-                Matrix globalTransform = LocalTransform * parentTransform;
-                DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
-
-                spriteBatch.Draw(Image, position, ImageSource, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
-
                 if (TileType != TileType.Empty && MaxHealth > 0)
                 {
+                    Matrix globalTransform = LocalTransform * parentTransform;
+                    DecomposeMatrix(ref globalTransform, out Vector2 position, out float rotation, out Vector2 scale);
                     var healthPercentage = (double)CurrentHealth / MaxHealth * 100;
+                    if (healthPercentage <= 0)
+                    {
+                        spriteBatch.Draw(Art.ShipTiles, position, Art.Health0, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(Art.ShipTiles, position, ImageSource, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                    }
                     if (healthPercentage < 100 && healthPercentage >= 75)
                     {
-                        spriteBatch.Draw(Art.Damage25, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                        spriteBatch.Draw(Art.ShipTiles, position, Art.Health75, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }
                     if (healthPercentage < 75 && healthPercentage >= 50)
                     {
-                        spriteBatch.Draw(Art.Damage50, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                        spriteBatch.Draw(Art.ShipTiles, position, Art.Health50, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }
-                    if (healthPercentage < 50)
+                    if (healthPercentage < 50 && healthPercentage >= 25)
                     {
-                        spriteBatch.Draw(Art.Damage75, position, null, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
+                        spriteBatch.Draw(Art.ShipTiles, position, Art.Health25, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                     }
-               }
+                }
             }
         }
     }

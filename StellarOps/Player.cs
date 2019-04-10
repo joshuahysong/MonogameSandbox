@@ -27,7 +27,7 @@ namespace StellarOps
             Image = Art.Player;
             Radius = (float)Math.Ceiling((double)(Image.Width / 2) * MainGame.PawnScale);
             Health = 100;
-            Position = Container.Tiles.FirstOrDefault(t => t.TileType == TileType.FlightControl).Position;//new Vector2(224, -16);
+            Position = /*Container.Tiles.FirstOrDefault(t => t.TileType == TileType.FlightControl).Position;*/new Vector2(224, -16);
             _currentSpeed = MaxSpeed;
         }
 

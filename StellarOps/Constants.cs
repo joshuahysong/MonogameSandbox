@@ -4,8 +4,8 @@
     {
         None,
         All,
-        Pawn,
-        Projectile
+        Projectile,
+        Pawn
     }
 
     public enum TileType

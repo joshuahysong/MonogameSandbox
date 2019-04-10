@@ -18,15 +18,11 @@ namespace StellarOps
         public static Texture2D Background { get; set; }
 
         #region ShipTiles
-        public static Texture2D Damage25 { get; set; }
-        public static Texture2D Damage50 { get; set; }
-        public static Texture2D Damage75 { get; set; }
-        public static Texture2D Hull { get; set; }
-        public static Texture2D Floor { get; set; }
-        public static Texture2D FlightConsole { get; set; }
-        public static Texture2D Engine { get; set; }
-        public static Texture2D Weapon { get; set; }
-        public static Texture2D MainThruster { get; set; }
+        public static Texture2D ShipTiles { get; set; }
+        public static Rectangle Health0 { get; set; }
+        public static Rectangle Health25 { get; set; }
+        public static Rectangle Health50 { get; set; }
+        public static Rectangle Health75 { get; set; }
         #endregion
 
         #region Fonts
@@ -41,17 +37,13 @@ namespace StellarOps
             Background = content.Load<Texture2D>("starfield2");
             Bullet = CreateRectangle(10, 10, Color.White, Color.White);
 
-            Damage25 = content.Load<Texture2D>("Tiles/DamageOverlay25");
-            Damage50 = content.Load<Texture2D>("Tiles/DamageOverlay50");
-            Damage75 = content.Load<Texture2D>("Tiles/DamageOverlay75");
-            Hull = content.Load<Texture2D>("Tiles/Tiles");
-            Floor = content.Load<Texture2D>("Tiles/Floor");
-            FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
-            Engine = CreateRectangle(TileSize, TileSize, Color.SaddleBrown, Color.Brown);
-            Weapon = content.Load<Texture2D>("Tiles/Weapon");
-            MainThruster = CreateRectangle(TileSize, TileSize, Color.LightCyan, Color.LightCyan);
-
             TestShip = content.Load<TiledMap>("Tiles/TestShip");
+
+            ShipTiles = content.Load<Texture2D>("Tiles/Tiles");
+            Health0 = new Rectangle(0, TileSize * 2, TileSize, TileSize);
+            Health25 = new Rectangle(TileSize * 1, TileSize * 2, TileSize, TileSize);
+            Health50 = new Rectangle(TileSize * 2, TileSize * 2, TileSize, TileSize);
+            Health75 = new Rectangle(TileSize * 3, TileSize * 2, TileSize, TileSize);
 
             DebugFont = content.Load<SpriteFont>("Fonts/Debug");
             UIFont = content.Load<SpriteFont>("Fonts/UI");
