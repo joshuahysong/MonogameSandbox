@@ -20,42 +20,26 @@
  <objectgroup id="2" name="ShipObjects">
   <object id="1" name="Engine Small" x="64" y="576" width="128" height="64">
    <properties>
-    <property name="Type" value="Thruster"/>
+    <property name="Collision" value="1"/>
+    <property name="Health" value="300"/>
    </properties>
   </object>
   <object id="4" name="Engine Small" x="64" y="128" width="128" height="64">
    <properties>
-    <property name="Type" value="Thruster"/>
+    <property name="Collision" value="1"/>
+    <property name="Health" value="300"/>
    </properties>
   </object>
-  <object id="5" name="Manuevering Thruster" x="256" y="64" width="64" height="64">
+  <object id="13" name="Blaster" type="Weapon" x="640" y="128" width="128" height="64">
    <properties>
-    <property name="Type" value="Thruster"/>
+    <property name="Collision" value="1"/>
+    <property name="Health" value="300"/>
    </properties>
   </object>
-  <object id="10" name="Manuevering Thruster" x="256" y="640" width="64" height="64">
+  <object id="14" name="Blaster" type="Weapon" x="640" y="576" width="128" height="64">
    <properties>
-    <property name="Type" value="Thruster"/>
-   </properties>
-  </object>
-  <object id="11" name="Manuevering Thruster" x="768" y="192" width="64" height="64">
-   <properties>
-    <property name="Type" value="Thruster"/>
-   </properties>
-  </object>
-  <object id="12" name="Manuevering Thruster" x="768" y="512" width="64" height="64">
-   <properties>
-    <property name="Type" value="Thruster"/>
-   </properties>
-  </object>
-  <object id="13" name="Blaster" x="640" y="128" width="128" height="64">
-   <properties>
-    <property name="Type" value="Weapon"/>
-   </properties>
-  </object>
-  <object id="14" name="Blaster" x="640" y="576" width="128" height="64">
-   <properties>
-    <property name="Type" value="Weapon"/>
+    <property name="Collision" value="1"/>
+    <property name="Health" value="300"/>
    </properties>
   </object>
  </objectgroup>

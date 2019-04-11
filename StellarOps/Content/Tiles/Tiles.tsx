@@ -6,6 +6,7 @@
    <property name="Collision" type="int" value="1"/>
    <property name="Health" type="int" value="100"/>
    <property name="Name" value="Hull"/>
+   <property name="Type" value="Hull"/>
   </properties>
  </tile>
  <tile id="1" type="Floor">
@@ -13,18 +14,68 @@
    <property name="Collision" type="int" value="2"/>
    <property name="Health" type="int" value="100"/>
    <property name="Name" value="Floor"/>
+   <property name="Type" value="Floor"/>
   </properties>
  </tile>
  <tile id="2" type="Floor">
   <properties>
    <property name="Collision" type="int" value="2"/>
    <property name="Health" type="int" value="100"/>
-   <property name="Name" value="Flight Console"/>
+   <property name="Name" value="Flight Control"/>
+   <property name="Type" value="FlightControl"/>
   </properties>
  </tile>
- <tile id="5" type="Subcomponent"/>
- <tile id="6" type="Subcomponent"/>
- <tile id="7" type="Subcomponent"/>
- <tile id="8" type="Subcomponent"/>
- <tile id="9" type="Subcomponent"/>
+ <tile id="5">
+  <properties>
+   <property name="Collision" value="1"/>
+   <property name="Health" value="200"/>
+   <property name="Name" value="Maneuvering Thruster"/>
+   <property name="Type" value="Thruster"/>
+  </properties>
+ </tile>
+ <tile id="6">
+  <properties>
+   <property name="Type" value="Subcomponent"/>
+  </properties>
+ </tile>
+ <tile id="7" type="Subcomponent">
+  <properties>
+   <property name="Type" value="Subcomponent"/>
+  </properties>
+ </tile>
+ <tile id="8" type="Subcomponent">
+  <properties>
+   <property name="Type" value="Subcomponent"/>
+  </properties>
+ </tile>
+ <tile id="9" type="Subcomponent">
+  <properties>
+   <property name="Type" value="Subcomponent"/>
+  </properties>
+ </tile>
+ <tile id="10">
+  <properties>
+   <property name="Type" value="Effect"/>
+  </properties>
+ </tile>
+ <tile id="11">
+  <properties>
+   <property name="Type" value="Effect"/>
+  </properties>
+ </tile>
+ <tile id="12">
+  <properties>
+   <property name="Type" value="Effect"/>
+  </properties>
+ </tile>
+ <tile id="13">
+  <properties>
+   <property name="Type" value="Effect"/>
+  </properties>
+ </tile>
+ <tile id="14">
+  <properties>
+   <property name="Type" value="Effect"/>
+  </properties>
+ </tile>
 </tileset>

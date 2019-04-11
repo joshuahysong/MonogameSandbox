@@ -14,13 +14,8 @@
         Hull,
         Floor,
         FlightControl,
-        EngineThruster,
-        EngineBody,
-        WeaponBody,
-        WeaponBarrel,
-        MainThrust,
-        PortThrust,
-        StarboardThrust
+        Thruster,
+        Subcomponent
     }
 
     //public enum TileType

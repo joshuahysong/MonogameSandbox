@@ -340,24 +340,24 @@ namespace StellarOps.Ships
         {
             Tiles = new List<Tile>();
             List<TiledMapTile> tiledMapTiles = tiledMap.TileLayers.FirstOrDefault().Tiles.ToList();
+            List<TiledMapObject> tiledMapObjects = tiledMap.ObjectLayers.FirstOrDefault().Objects.ToList();
             TiledMapTileset tiledMapTileset = tiledMap.Tilesets.FirstOrDefault();
             List<TiledMapTilesetTile> tiledMapTilesetTiles = tiledMapTileset.Tiles.ToList();
             int textureColumns = tiledMapTileset.Columns;
-            Texture2D tilesetTexture = tiledMap.Tilesets.FirstOrDefault().Texture;
             int? rows = tiledMap.TileLayers.FirstOrDefault().Height;
             int? columns = tiledMap.TileLayers.FirstOrDefault().Width;
-            int i = 0;
+            int currentTileIndex = 0;
             for (int y = 0; y < rows; y++)
             {
                 for (int x = 0; x < columns; x++)
                 {
-                    TiledMapTile tiledMapTile = tiledMapTiles[i];
+                    TiledMapTile tiledMapTile = tiledMapTiles[currentTileIndex];
                     Tile tile = new Tile
                     {
                         Container = this,
                         Location = new Point(x, y),
                         CollisionType = CollisionType.None,
-                        TileType = (TileType)tiledMapTile.GlobalIdentifier,
+                        TileType = TileType.Empty,
                         MaxHealth = 0,
                         CurrentHealth = 0,
                         North = y == 0 ? null : columns * y - columns + x,
@@ -374,30 +374,49 @@ namespace StellarOps.Ships
                     relativePosition -= Center;
                     tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
 
-                    // Set Image Data
-                    if (tiledMapTile.GlobalIdentifier > 0)
-                    {
-                        tile.ImageSource = new Rectangle(
-                            ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
-                            ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
-                            Art.TileSize, Art.TileSize);
-                        tile.Heading = tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedHorizontally ? (float)Math.PI / 2
-                           : tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedVertically ? -(float)Math.PI / 2
-                           : tiledMapTile.IsFlippedVertically ? (float)Math.PI : 0;
-                    }
-
                     // Set Tileset Data
                     TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.LocalTileIdentifier + 1 == tiledMapTile.GlobalIdentifier);
                     if (tiledMapTilesetTile != null)
                     {
+                        tile.TileType = tiledMapTilesetTile.Properties.ContainsKey("Type") ? (TileType)Enum.Parse(typeof(TileType), tiledMapTilesetTile.Properties["Type"]) : TileType.Empty;
                         tile.CollisionType = tiledMapTilesetTile.Properties.ContainsKey("Collision") ?
                             (CollisionType)int.Parse(tiledMapTilesetTile.Properties["Collision"]) : CollisionType.None;
                         tile.MaxHealth = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
                         tile.CurrentHealth = tile.MaxHealth;
                     }
 
+                    // Set Image Data
+                    if (tiledMapTile.GlobalIdentifier > 0)
+                    {
+                        if (tile.TileType == TileType.Subcomponent)
+                        {
+                            TiledMapObject tiledMapObject = tiledMapObjects.FirstOrDefault(t => t.Position == new Vector2(x * Art.TileSize, y * Art.TileSize));
+                            if (tiledMapObject != null)
+                            {
+                                //tile.ImageSource = new Rectangle(
+                                //    tiledMapObject.Size.Width, tiledMapObject.Size.Height);
+                            }
+                            else
+                            {
+                                // This subcomponent is already part of a found object.
+                                // Move on to the next tile.
+                                //continue;
+                            }
+                        }
+                        else
+                        {
+                            tile.ImageSource = new Rectangle(
+                                ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
+                                ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
+                                Art.TileSize, Art.TileSize);
+                            tile.Heading = tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedHorizontally ? (float)Math.PI / 2
+                               : tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedVertically ? -(float)Math.PI / 2
+                               : tiledMapTile.IsFlippedVertically ? (float)Math.PI : 0;
+                        }
+                    }
+
                     Tiles.Add(tile);
-                    i++;
+                    currentTileIndex++;
                 }
             }
         }
