@@ -31,16 +31,16 @@ namespace StellarOps
         public override void Update(GameTime gameTime, Matrix parentTransform)
         {
             // Check if neighbors destroyed
-            //if (TileType != TileType.Empty && CurrentHealth <= 0
-            //    && (North == null || Container.Tiles[North.Value].CurrentHealth <= 0)
-            //    && (East == null || Container.Tiles[East.Value].CurrentHealth <= 0)
-            //    && (South == null || Container.Tiles[South.Value].CurrentHealth <= 0)
-            //    && (West == null || Container.Tiles[West.Value].CurrentHealth <= 0))
-            //{
-            //    //Image = null;
-            //    //TileType = TileType.Empty;
-            //    CollisionType = CollisionType.None;
-            //}
+            if (TileType != TileType.Empty && CurrentHealth <= 0
+                && (North == null || Container.Tiles[North.Value].CurrentHealth <= 0)
+                && (East == null || Container.Tiles[East.Value].CurrentHealth <= 0)
+                && (South == null || Container.Tiles[South.Value].CurrentHealth <= 0)
+                && (West == null || Container.Tiles[West.Value].CurrentHealth <= 0))
+            {
+                //Image = null;
+                //TileType = TileType.Empty;
+                CollisionType = CollisionType.None;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, Matrix parentTransform)
@@ -70,7 +70,7 @@ namespace StellarOps
                 {
                     spriteBatch.Draw(Art.ShipTiles, position, Art.Health50, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                 }
-                if (healthPercentage < 50 && healthPercentage >= 25)
+                if (healthPercentage < 50 && healthPercentage > 0)
                 {
                     spriteBatch.Draw(Art.ShipTiles, position, Art.Health25, Color.White, rotation, DrawCenter, scale * MainGame.TileScale, SpriteEffects.None, 0.0f);
                 }

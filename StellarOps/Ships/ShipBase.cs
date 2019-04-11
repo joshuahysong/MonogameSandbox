@@ -138,7 +138,7 @@ namespace StellarOps.Ships
                         if (targetTile.Value.CurrentHealth > 0)
                         {
                             targetTile.Value.CurrentHealth = targetTile.Value.CurrentHealth - 25;
-                            CheckTileDesruction(targetTile.Value);
+                            CheckTileDestruction(targetTile.Value);
                         }
                     }
                 }
@@ -329,7 +329,7 @@ namespace StellarOps.Ships
                         && (tile.Value.CollisionType == CollisionType.All || tile.Value.CollisionType == CollisionType.Projectile))
                     {
                         tile.Value.CurrentHealth -= 25;
-                        CheckTileDesruction(tile.Value);
+                        CheckTileDestruction(tile.Value);
                         projectiles[i].IsExpired = true;
                     }
                 }
@@ -346,82 +346,87 @@ namespace StellarOps.Ships
             int textureColumns = tiledMapTileset.Columns;
             int? rows = tiledMap.TileLayers.FirstOrDefault().Height;
             int? columns = tiledMap.TileLayers.FirstOrDefault().Width;
-            int currentTileIndex = 0;
-            for (int y = 0; y < rows; y++)
+
+            for (int i = 0; i < tiledMapTiles.Count(); i++)
             {
-                for (int x = 0; x < columns; x++)
+                TiledMapTile tiledMapTile = tiledMapTiles[i];
+                int x = i % columns ?? 1;
+                int y = i / columns ?? 1;
+                Tile tile = new Tile
                 {
-                    TiledMapTile tiledMapTile = tiledMapTiles[currentTileIndex];
-                    Tile tile = new Tile
-                    {
-                        Container = this,
-                        Location = new Point(x, y),
-                        CollisionType = CollisionType.None,
-                        TileType = TileType.Empty,
-                        MaxHealth = 0,
-                        CurrentHealth = 0,
-                        North = y == 0 ? null : columns * y - columns + x,
-                        NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
-                        East = x == columns - 1 ? null : (int?)Tiles.Count() + 1,
-                        SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
-                        South = y == rows - 1 ? null : columns * y + columns + x,
-                        SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
-                        West = x == 0 ? null : (int?)Tiles.Count() - 1,
-                        NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
-                    };
-                    tile.Position = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize) - Center + tile.TileCenter;
-                    Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
-                    relativePosition -= Center;
-                    tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
+                    Container = this,
+                    Location = new Point(x, y),
+                    CollisionType = CollisionType.None,
+                    TileType = TileType.Empty,
+                    MaxHealth = 0,
+                    CurrentHealth = 0,
+                    North = y == 0 ? null : columns * y - columns + x,
+                    NorthEast = y == 0 || x == columns - 1 ? null : columns * y - columns + x + 1,
+                    East = x == columns - 1 ? null : (int?)Tiles.Count() + 1,
+                    SouthEast = y == rows - 1 || x == columns - 1 ? null : columns * y + columns + x + 1,
+                    South = y == rows - 1 ? null : columns * y + columns + x,
+                    SouthWest = y == rows - 1 || x == 0 ? null : columns * y + columns + x - 1,
+                    West = x == 0 ? null : (int?)Tiles.Count() - 1,
+                    NorthWest = y == 0 || x == 0 ? null : columns * y - columns + x - 1,
+                };
 
-                    // Set Tileset Data
-                    TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.LocalTileIdentifier + 1 == tiledMapTile.GlobalIdentifier);
-                    if (tiledMapTilesetTile != null)
-                    {
-                        tile.TileType = tiledMapTilesetTile.Properties.ContainsKey("Type") ? (TileType)Enum.Parse(typeof(TileType), tiledMapTilesetTile.Properties["Type"]) : TileType.Empty;
-                        tile.CollisionType = tiledMapTilesetTile.Properties.ContainsKey("Collision") ?
-                            (CollisionType)int.Parse(tiledMapTilesetTile.Properties["Collision"]) : CollisionType.None;
-                        tile.MaxHealth = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
-                        tile.CurrentHealth = tile.MaxHealth;
-                    }
+                TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.LocalTileIdentifier + 1 == tiledMapTile.GlobalIdentifier);
+                if (tiledMapTilesetTile != null)
+                {
+                    tile.TileType = tiledMapTilesetTile.Properties.ContainsKey("Type") ? (TileType)Enum.Parse(typeof(TileType), tiledMapTilesetTile.Properties["Type"]) : TileType.Empty;
+                    tile.CollisionType = tiledMapTilesetTile.Properties.ContainsKey("Collision") ?
+                        (CollisionType)int.Parse(tiledMapTilesetTile.Properties["Collision"]) : CollisionType.None;
+                    tile.MaxHealth = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
+                    tile.CurrentHealth = tile.MaxHealth;
+                }
 
-                    // Set Image Data
-                    if (tiledMapTile.GlobalIdentifier > 0)
+                tile.Position = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize) - Center + tile.TileCenter;
+                Vector2 relativePosition = new Vector2(x * MainGame.TileSize, y * MainGame.TileSize);
+                relativePosition -= Center;
+                tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, MainGame.TileSize, MainGame.TileSize);
+
+                if (tiledMapTile.GlobalIdentifier > 0)
+                {
+                    if (tile.TileType == TileType.Subcomponent)
                     {
-                        if (tile.TileType == TileType.Subcomponent)
+                        TiledMapObject tiledMapObject = tiledMapObjects.FirstOrDefault(t => t.Position == new Vector2(x * Art.TileSize, y * Art.TileSize));
+                        if (tiledMapObject != null)
                         {
-                            TiledMapObject tiledMapObject = tiledMapObjects.FirstOrDefault(t => t.Position == new Vector2(x * Art.TileSize, y * Art.TileSize));
-                            if (tiledMapObject != null)
-                            {
-                                //tile.ImageSource = new Rectangle(
-                                //    tiledMapObject.Size.Width, tiledMapObject.Size.Height);
-                            }
-                            else
-                            {
-                                // This subcomponent is already part of a found object.
-                                // Move on to the next tile.
-                                //continue;
-                            }
+                            tile.ImageSource = new Rectangle(
+                            ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
+                            ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
+                                (int)tiledMapObject.Size.Width, (int)tiledMapObject.Size.Height);
+                            tile.Bounds = new Rectangle((int)relativePosition.X, (int)relativePosition.Y, 
+                                MainGame.TileSize * (int)tiledMapObject.Size.Width / Art.TileSize, MainGame.TileSize * (int)tiledMapObject.Size.Height / Art.TileSize);
+                            tile.CollisionType = tiledMapObject.Properties.ContainsKey("Collision") ?
+                                (CollisionType)int.Parse(tiledMapObject.Properties["Collision"]) : CollisionType.None;
+                            tile.MaxHealth = tiledMapObject.Properties.ContainsKey("Health") ? int.Parse(tiledMapObject.Properties["Health"]) : 0;
+                            tile.CurrentHealth = tile.MaxHealth;
                         }
                         else
                         {
-                            tile.ImageSource = new Rectangle(
-                                ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
-                                ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
-                                Art.TileSize, Art.TileSize);
-                            tile.Heading = tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedHorizontally ? (float)Math.PI / 2
-                               : tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedVertically ? -(float)Math.PI / 2
-                               : tiledMapTile.IsFlippedVertically ? (float)Math.PI : 0;
+                            // This subcomponent is already part of a found object.
+                            // Move on to the next tile.
+                            continue;
                         }
                     }
-
-                    Tiles.Add(tile);
-                    currentTileIndex++;
+                    else
+                    {
+                        tile.ImageSource = new Rectangle(
+                            ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
+                            ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
+                            Art.TileSize, Art.TileSize);
+                        tile.Heading = tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedHorizontally ? (float)Math.PI / 2
+                           : tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedVertically ? -(float)Math.PI / 2
+                           : tiledMapTile.IsFlippedVertically ? (float)Math.PI : 0;
+                    }
                 }
+
+                Tiles.Add(tile);
             }
         }
 
-        private void CheckTileDesruction(Tile tile)
+        private void CheckTileDestruction(Tile tile)
         {
             if (tile.CurrentHealth <= 0)
             {
