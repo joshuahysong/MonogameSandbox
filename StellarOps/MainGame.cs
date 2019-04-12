@@ -136,7 +136,7 @@ namespace StellarOps
                 Maybe<Tile> hoveredTile = Ship.GetTileByWorldPosition(Input.WorldMousePosition);
                 if (hoveredTile.HasValue)
                 {
-                    if (hoveredTile.Value.MaxHealth > 0)
+                    if (hoveredTile.Value.TileType != TileType.Empty)
                     {
                         text = $"Health: {Math.Round((double)hoveredTile.Value.CurrentHealth / hoveredTile.Value.MaxHealth * 100)}%";
                         textSize = Art.UIFont.MeasureString(text);
@@ -144,7 +144,7 @@ namespace StellarOps
                         spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                         yTextOffset += 15;
                     }
-                    text = $"{hoveredTile.Value.TileType.ToString().SplitCamelCase()}";
+                    text = $"{hoveredTile.Value.Name}";
                     textSize = Art.UIFont.MeasureString(text);
                     textLocation = new Vector2(5, Viewport.Height - yTextOffset - textSize.Y);
                     spriteBatch.DrawString(Art.UIFont, text, textLocation, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
