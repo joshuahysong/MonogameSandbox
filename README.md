@@ -1,4 +1,4 @@
-# Stellar Ops
+# Stellar Ops [![Build status](https://ci.appveyor.com/api/projects/status/ef6m9e4w4mkr4f08?svg=true)](https://ci.appveyor.com/project/joshuahysong/stellarops)
 
 Stellar Ops is planned to be a single-player top-down sandbox sci-fi role playing game where you take on the role of a character attempting to survive their way through life in a turbulent galaxy. Players will start with next to nothing and have the opportunity to work their way up to bigger ships, larger crews, and control over planets and space stations. The galaxy will feature an ai driven economy, warring factions, and dynamic storylines.
 
