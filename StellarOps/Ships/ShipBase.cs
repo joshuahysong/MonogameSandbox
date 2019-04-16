@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.Tiled;
 using StellarOps.Contracts;
 using StellarOps.Projectiles;
+using StellarOps.Tiled;
 using StellarOps.Weapons;
 using System;
 using System.Collections.Generic;
@@ -340,8 +340,8 @@ namespace StellarOps.Ships
         {
             Tiles = new List<Tile>();
             List<TiledMapTile> tiledMapTiles = tiledMap.TileLayers.FirstOrDefault().Tiles.ToList();
-            List<TiledMapObject> tiledMapObjects = tiledMap.ObjectLayers.FirstOrDefault().Objects.ToList();
-            TiledMapTileset tiledMapTileset = tiledMap.Tilesets.FirstOrDefault();
+            List<TiledMapObject> tiledMapObjects = tiledMap.ObjectLayers.FirstOrDefault()?.Objects.ToList() ?? new List<TiledMapObject>();
+            TiledMapTileset tiledMapTileset = tiledMap.TileSets.FirstOrDefault();
             List<TiledMapTilesetTile> tiledMapTilesetTiles = tiledMapTileset.Tiles.ToList();
             int textureColumns = tiledMapTileset.Columns;
             int rows = tiledMap.TileLayers.FirstOrDefault().Height;
@@ -354,7 +354,9 @@ namespace StellarOps.Ships
                 int y = (int)tiledMapObject.Position.Y / Art.TileSize;
                 Tile tile = CreateBaseTile(rows, columns, x, y);
                 // TODO Fix Image Source
-                // TODO Fix Hover Not Working for some reason
+                tile.ImageSource = new Rectangle(64, 64, 128, 64);
+                tile.Name = tiledMapObject.Name;
+                tile.TileType = !string.IsNullOrWhiteSpace(tiledMapObject.Type) ? (TileType)Enum.Parse(typeof(TileType), tiledMapObject.Type) : TileType.Empty;
                 tile.Bounds = new Rectangle(tile.Bounds.X, tile.Bounds.Y,
                     MainGame.TileSize * (int)tiledMapObject.Size.Width / Art.TileSize, MainGame.TileSize * (int)tiledMapObject.Size.Height / Art.TileSize);
                 tile.CollisionType = tiledMapObject.Properties.ContainsKey("Collision") ?
@@ -362,6 +364,25 @@ namespace StellarOps.Ships
                 tile.MaxHealth = tiledMapObject.Properties.ContainsKey("Health") ? int.Parse(tiledMapObject.Properties["Health"]) : 0;
                 tile.CurrentHealth = tile.MaxHealth;
                 tile.IsDrawable = true;
+
+                switch (tiledMapObject.Rotation)
+                {
+                    case 90:
+                        tile.Location = new Point(tile.Location.X - 1, tile.Location.Y);
+                        tile.Position = tile.Position - new Vector2(MainGame.TileSize, 0);
+                        tile.Bounds = new Rectangle(tile.Bounds.X - MainGame.TileSize, tile.Bounds.Y, tile.Bounds.Height, tile.Bounds.Width);
+                        tile.Heading = (float)Math.PI / 2;
+                        return;
+                    case 180:
+                        tile.Location = new Point(tile.Location.X - 1, tile.Location.Y);
+                        tile.Position = tile.Position - new Vector2(MainGame.TileSize, 0);
+                        tile.Bounds = new Rectangle(tile.Bounds.X - MainGame.TileSize, tile.Bounds.Y, tile.Bounds.Height, tile.Bounds.Width);
+                        tile.Heading = (float)Math.PI / 2;
+                        return;
+
+                }
+                
+
                 Tiles.Add(tile);
             }
 
@@ -372,7 +393,7 @@ namespace StellarOps.Ships
                 int y = i / columns;
                 Tile tile = CreateBaseTile(rows, columns, x, y);
 
-                TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.LocalTileIdentifier + 1 == tiledMapTile.GlobalIdentifier);
+                TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.Id + 1 == tiledMapTile.GlobalIdentifier);
                 if (tiledMapTilesetTile != null)
                 {
                     tile.Name = tiledMapTilesetTile.Properties.ContainsKey("Name") ? tiledMapTilesetTile.Properties["Name"] : string.Empty;

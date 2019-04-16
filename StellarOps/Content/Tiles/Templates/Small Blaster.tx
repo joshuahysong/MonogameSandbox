@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+ <tileset firstgid="1" source="..\Objects.tsx"/>
+ <object name="Small Blaster" type="Weapon" gid="7" width="128" height="64">
+  <properties>
+   <property name="Collision" type="int" value="1"/>
+   <property name="Health" type="int" value="300"/>
+  </properties>
+ </object>
+</template>

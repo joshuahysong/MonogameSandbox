@@ -15,7 +15,9 @@
         Floor,
         FlightControl,
         Thruster,
-        Subcomponent
+        Subcomponent,
+        Engine,
+        Weapon
     }
 
     //public enum TileType
