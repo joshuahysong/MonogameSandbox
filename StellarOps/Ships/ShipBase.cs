@@ -350,15 +350,15 @@ namespace StellarOps.Ships
             for (int o = 0; o < tiledMapObjects.Count(); o++)
             {
                 TiledMapObject tiledMapObject = tiledMapObjects[o];
-                int x = (int)tiledMapObject.Position.X / Art.TileSize;
-                int y = (int)tiledMapObject.Position.Y / Art.TileSize;
+                int x = (int)tiledMapObject.X / Art.TileSize;
+                int y = (int)tiledMapObject.Y / Art.TileSize;
                 Tile tile = CreateBaseTile(rows, columns, x, y);
                 // TODO Fix Image Source
                 tile.ImageSource = new Rectangle(64, 64, 128, 64);
                 tile.Name = tiledMapObject.Name;
                 tile.TileType = !string.IsNullOrWhiteSpace(tiledMapObject.Type) ? (TileType)Enum.Parse(typeof(TileType), tiledMapObject.Type) : TileType.Empty;
                 tile.Bounds = new Rectangle(tile.Bounds.X, tile.Bounds.Y,
-                    MainGame.TileSize * (int)tiledMapObject.Size.Width / Art.TileSize, MainGame.TileSize * (int)tiledMapObject.Size.Height / Art.TileSize);
+                    MainGame.TileSize * (int)tiledMapObject.Width / Art.TileSize, MainGame.TileSize * (int)tiledMapObject.Height / Art.TileSize);
                 tile.CollisionType = tiledMapObject.Properties.ContainsKey("Collision") ?
                     (CollisionType)int.Parse(tiledMapObject.Properties["Collision"]) : CollisionType.None;
                 tile.MaxHealth = tiledMapObject.Properties.ContainsKey("Health") ? int.Parse(tiledMapObject.Properties["Health"]) : 0;
@@ -379,9 +379,7 @@ namespace StellarOps.Ships
                         tile.Bounds = new Rectangle(tile.Bounds.X - MainGame.TileSize, tile.Bounds.Y, tile.Bounds.Height, tile.Bounds.Width);
                         tile.Heading = (float)Math.PI / 2;
                         return;
-
                 }
-                
 
                 Tiles.Add(tile);
             }
@@ -393,7 +391,7 @@ namespace StellarOps.Ships
                 int y = i / columns;
                 Tile tile = CreateBaseTile(rows, columns, x, y);
 
-                TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.Id + 1 == tiledMapTile.GlobalIdentifier);
+                TiledMapTilesetTile tiledMapTilesetTile = tiledMapTilesetTiles.FirstOrDefault(t => t.Id + 1 == tiledMapTile.Id);
                 if (tiledMapTilesetTile != null)
                 {
                     tile.Name = tiledMapTilesetTile.Properties.ContainsKey("Name") ? tiledMapTilesetTile.Properties["Name"] : string.Empty;
@@ -403,8 +401,8 @@ namespace StellarOps.Ships
                     tile.MaxHealth = tiledMapTilesetTile.Properties.ContainsKey("Health") ? int.Parse(tiledMapTilesetTile.Properties["Health"]) : 0;
                     tile.CurrentHealth = tile.MaxHealth;
                     tile.ImageSource = new Rectangle(
-                        ((tiledMapTile.GlobalIdentifier - 1) % textureColumns) * Art.TileSize,
-                        ((tiledMapTile.GlobalIdentifier - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.GlobalIdentifier - 1) / textureColumns) * Art.TileSize,
+                        ((tiledMapTile.Id - 1) % textureColumns) * Art.TileSize,
+                        ((tiledMapTile.Id - 1) / textureColumns - 1 < 0 ? 0 : (tiledMapTile.Id - 1) / textureColumns) * Art.TileSize,
                         Art.TileSize, Art.TileSize);
                     tile.Heading = tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedHorizontally ? (float)Math.PI / 2
                        : tiledMapTile.IsFlippedDiagonally && tiledMapTile.IsFlippedVertically ? -(float)Math.PI / 2
