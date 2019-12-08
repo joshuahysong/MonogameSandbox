@@ -45,10 +45,7 @@ namespace StellarOps
             Damage50 = content.Load<Texture2D>("Tiles/DamageOverlay50");
             Damage75 = content.Load<Texture2D>("Tiles/DamageOverlay75");
             Hull = content.Load<Texture2D>("Tiles/Tiles");
-            Floor = content.Load<Texture2D>("Tiles/Floor");
-            FlightConsole = content.Load<Texture2D>("Tiles/FlightConsole");
             Engine = CreateRectangle(TileSize, TileSize, Color.SaddleBrown, Color.Brown);
-            Weapon = content.Load<Texture2D>("Tiles/Weapon");
             MainThruster = CreateRectangle(TileSize, TileSize, Color.LightCyan, Color.LightCyan);
 
             TestShip = content.Load<TiledMap>("Tiles/TestShip");
