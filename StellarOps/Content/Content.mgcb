@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\StellarOps.Content.Pipeline\bin\Debug\StellarOps.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -158,6 +159,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:starfield2.jpg
+
+#begin Tiles/TestShip.json
+/importer:
+/processor:
+/build:Tiles/TestShip.json
 
 #begin Tiles/Tiles.png
 /importer:TextureImporter
